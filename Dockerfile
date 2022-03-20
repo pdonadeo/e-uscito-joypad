@@ -36,6 +36,7 @@ RUN chown root:root /usr/local/bin/e_uscito_joypad
 ################
 FROM alpine:latest
 COPY --from=0 /usr/local/bin/e_uscito_joypad /usr/local/bin/
+ADD ./assets /assets
 RUN apk update
 RUN apk add gmp libev ca-certificates ca-certificates-bundle
 COPY Dockerfile /Dockerfile

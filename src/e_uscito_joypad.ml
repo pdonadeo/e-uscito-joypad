@@ -28,10 +28,7 @@ let server =
     ~stop:will_stop
   @@ logger
   @@ router [
-    get "/apple-touch-icon.png" (static "assets");
-    get "/favicon-32x32.png" (static "assets");
-    get "/favicon-16x16.png" (static "assets");
-    get "/site.webmanifest" (static "assets");
+    get "/static/**" @@ static "assets";
     get "/" (fun _req -> Dream.html (Views.index ()));
   ]
 
