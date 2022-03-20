@@ -1,0 +1,10 @@
+(executable
+ (name e_uscito_joypad)
+ (modules e_uscito_joypad utils views)
+ (preprocess (pps lwt lwt.unix lwt_ppx))
+ (libraries dream batteries malloc timedesc))
+
+(rule
+ (targets views.ml)
+ (deps views.eml.ml)
+ (action (run dream_eml %{deps} --workspace %{workspace_root})))
