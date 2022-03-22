@@ -91,5 +91,9 @@ let risposta () =
   let oggi = Timedesc.date adesso in
   let data_ultima_puntata = Unix.getenv "ULTIMA_PUNTATA" |> Timedesc.Date.of_iso8601_exn in
   let giorni_passati = Timedesc.Date.diff_days oggi data_ultima_puntata in
-  let uscito = if giorni_passati < 20 then true else false in
-  if uscito then spf "Sì è uscito %s, %s!" (distanza giorni_passati) (string_of_date ultima_puntata) else "No."
+  let uscito = if giorni_passati <= 20 then true else false in
+  let risposta =
+    if uscito then spf "Sì è uscito %s, %s!" (distanza giorni_passati) (string_of_date ultima_puntata) else "No."
+  in
+  let fretta = if giorni_passati >= 10 && giorni_passati <= 20 then true else false in
+  (risposta, uscito, fretta)

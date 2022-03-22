@@ -30,3 +30,4 @@ _opam/
 
 # Visual Studio Code
 *.code-workspace
+.envrc
