@@ -17,6 +17,7 @@ let index risposta uscito fretta =
 
   <head>
       <meta charset="UTF-8">
+      <meta name="google-site-verification" content="RVQl_YUzLnpzfD8LfW0RND3EgYD_grzfjKCwshqJ1Xg" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <title>È uscito Joypad?</title>
