@@ -13,5 +13,5 @@ $ docker push gitlab.4sigma.it:5050/pdonadeo/e-uscito-joypad
 
 Per eseguire l'immagine:
 ```bash
-$ docker run -e ULTIMA_PUNTATA=2022-03-19 --rm -it -p 8000:8000 gitlab.4sigma.it:5050/pdonadeo/e-uscito-joypad
+$ docker run --rm -it -p 3000:3000 gitlab.4sigma.it:5050/pdonadeo/e-uscito-joypad
 ```

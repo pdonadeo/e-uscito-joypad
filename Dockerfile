@@ -14,7 +14,7 @@ USER opam
 WORKDIR /home/opam
 RUN opam repo set-url default https://opam.ocaml.org
 RUN opam update -y && opam upgrade -y
-RUN opam install dream batteries timedesc
+RUN opam install dream batteries timedesc re2 lambdasoup cohttp-lwt-unix
 
 USER root
 ADD ./ /app
@@ -38,10 +38,9 @@ FROM alpine:latest
 COPY --from=0 /usr/local/bin/e_uscito_joypad /usr/local/bin/
 ADD ./assets /assets
 RUN apk update
-RUN apk add gmp libev ca-certificates ca-certificates-bundle
+RUN apk add gmp libev ca-certificates ca-certificates-bundle libstdc++
 COPY Dockerfile /Dockerfile
 
 WORKDIR /
-EXPOSE 8000
-ENV ULTIMA_PUNTATA "2022-03-19"
+EXPOSE 3000
 CMD [ "/usr/local/bin/e_uscito_joypad" ]
