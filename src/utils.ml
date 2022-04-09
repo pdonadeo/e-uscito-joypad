@@ -55,9 +55,9 @@ let distanza giorni =
   | 2 -> "l'altro ieri"
   | _ -> spf "%d giorni fa" giorni
 
-let string_of_date ts =
+let string_of_date date =
   let giorno =
-    match Timedesc.weekday ts with
+    match Timedesc.Date.weekday date with
     | `Sun -> "domenica"
     | `Mon -> "lunedì"
     | `Tue -> "martedì"
@@ -67,7 +67,7 @@ let string_of_date ts =
     | `Sat -> "sabato"
   in
   let mese =
-    match Timedesc.month ts with
+    match Timedesc.Date.month date with
     | 1 -> "Gennaio"
     | 2 -> "Febbraio"
     | 3 -> "Marzo"
@@ -82,18 +82,19 @@ let string_of_date ts =
     | 12 -> "Dicembre"
     | _ -> failwith "Mese impossibile"
   in
-  spf "%s %d %s %d" giorno (Timedesc.day ts) mese (Timedesc.year ts)
+  spf "%s %d %s %d" giorno (Timedesc.Date.day date) mese (Timedesc.Date.year date)
 
 let risposta () =
   let tz = Timedesc.Time_zone.make_exn "Europe/Rome" in
-  let ultima_puntata = Timedesc.make_exn ~tz ~year:2022 ~month:3 ~day:19 ~hour:12 ~minute:0 ~second:0 () in
   let adesso = Timedesc.now ~tz_of_date_time:tz () in
   let oggi = Timedesc.date adesso in
-  let data_ultima_puntata = Unix.getenv "ULTIMA_PUNTATA" |> Timedesc.Date.of_iso8601_exn in
+  let data_ultima_puntata_env = Unix.getenv "ULTIMA_PUNTATA" in
+  debug (fun l -> l "ULTIMA_PUNTATA = %s" data_ultima_puntata_env);
+  let data_ultima_puntata = Timedesc.Date.of_iso8601_exn data_ultima_puntata_env in
   let giorni_passati = Timedesc.Date.diff_days oggi data_ultima_puntata in
   let uscito = if giorni_passati <= 20 then true else false in
   let risposta =
-    if uscito then spf "Sì è uscito %s, %s!" (distanza giorni_passati) (string_of_date ultima_puntata) else "No."
+    if uscito then spf "Sì è uscito %s, %s!" (distanza giorni_passati) (string_of_date data_ultima_puntata) else "No."
   in
   let fretta = if giorni_passati >= 10 && giorni_passati <= 20 then true else false in
   (risposta, uscito, fretta)
