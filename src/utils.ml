@@ -119,12 +119,9 @@ let risposta last_episode_data =
     let adesso = Timedesc.now ~tz_of_date_time:tz () in
     let oggi = Timedesc.date adesso in
     let giorni_passati = Timedesc.Date.diff_days oggi last_episode_data.date in
-    let uscito = if giorni_passati <= 20 then true else false in
-    let risposta =
-      if uscito
-      then spf "Sì è uscito %s, %s!" (distanza giorni_passati) (string_of_date last_episode_data.date)
-      else "No."
-    in
-    let fretta = if giorni_passati >= 10 && giorni_passati <= 20 then true else false in
-    (risposta, uscito, fretta)
-  | None -> ("", false, false)
+    let uscito = if giorni_passati <= 14 then true else false in
+    let giorni_fa = distanza giorni_passati in
+    let data_italiano = string_of_date last_episode_data.date in
+    let fretta = if giorni_passati >= 10 && giorni_passati <= 14 then true else false in
+    (uscito, fretta, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title)
+  | None -> (false, false, "", "", 1999, "")

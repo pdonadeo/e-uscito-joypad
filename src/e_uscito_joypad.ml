@@ -27,8 +27,8 @@ let server =
        [
          get "/static/**" @@ static "assets";
          get "/" (fun _req ->
-             let risposta, uscito, fretta = Utils.risposta !last_episode_data in
-             Dream.html (Views.index risposta uscito fretta));
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo = Utils.risposta !last_episode_data in
+             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo));
        ]
 
 let () = Lwt_main.run server

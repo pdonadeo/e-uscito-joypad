@@ -11,7 +11,15 @@ let corri () =
     Corri! Se aspetti ancora un po' esce il prossimo episodio!
   </p>
 
-let index risposta uscito fretta =
+let risposta_si giorni_fa data_italiano ep_num titolo =
+  <h1>Sì! È uscito <span title="<%s data_italiano %>"><%s! giorni_fa %></span> <u>l'episodio</u> numero <%d ep_num %> di Joypad, dal titolo
+  <em> «<%s titolo %>» </em>
+  </h1>
+
+let risposta_no giorni_fa data_italiano _ep_num _titolo =
+  <h1>No. L'ultimo episodio è uscito <%s giorni_fa%>, <%s data_italiano %>.</h1>
+
+let index uscito fretta giorni_fa data_italiano ep_num titolo =
   <!DOCTYPE html>
   <html lang="en">
 
@@ -54,11 +62,11 @@ let index risposta uscito fretta =
   </head>
 
   <body>
-      <h1>
-          <%s risposta %>
-      </h1>
+      <%s! if uscito
+        then risposta_si giorni_fa data_italiano ep_num titolo
+        else risposta_no giorni_fa data_italiano ep_num titolo %>
 
-      <%s! if uscito then dove_ascoltare () else "" %>
+      <%s! dove_ascoltare () %>
 
       <%s! if fretta then corri () else "" %>
   </body>
