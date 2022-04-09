@@ -1,5 +1,11 @@
 open Cohttp_lwt_unix
 
+type data = {
+  ep_num : int;
+  title : string;
+  date : Timedesc.Date.t;
+}
+
 let log = Dream.sub_log "joypad.monitor"
 
 let body () =
@@ -40,6 +46,20 @@ let extract_data_from_page () =
     Lwt.return (data_title, data_desc)
   | None -> failwith "TODO: MANCANO I DATI"
 
+let elabora_risposta last_episode_data =
+  match last_episode_data with
+  | Some last_episode_data ->
+    let tz = Timedesc.Time_zone.make_exn "Europe/Rome" in
+    let adesso = Timedesc.now ~tz_of_date_time:tz () in
+    let oggi = Timedesc.date adesso in
+    let giorni_passati = Timedesc.Date.diff_days oggi last_episode_data.date in
+    let uscito = if giorni_passati <= 14 then true else false in
+    let giorni_fa = Utils.distanza giorni_passati in
+    let data_italiano = Utils.string_of_date last_episode_data.date in
+    let fretta = if giorni_passati >= 10 && giorni_passati <= 14 then true else false in
+    (uscito, fretta, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title)
+  | None -> (false, false, "", "", 1999, "")
+
 let rec monitor ~last_episode_data () =
   log.debug (fun l -> l "Scarico info ultima puntata...");
 
@@ -48,7 +68,7 @@ let rec monitor ~last_episode_data () =
       let%lwt data_title, data_desc = extract_data_from_page () in
       let ep_num, title = extract_ep_num_and_title data_title in
       let date = extract_date data_desc in
-      let data = { Utils.ep_num; title; date } in
+      let data = { ep_num; title; date } in
       last_episode_data := Some data;
       log.debug (fun l -> l "...fatto!");
       Lwt.return_unit

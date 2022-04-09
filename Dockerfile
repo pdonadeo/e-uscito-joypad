@@ -14,7 +14,8 @@ USER opam
 WORKDIR /home/opam
 RUN opam repo set-url default https://opam.ocaml.org
 RUN opam update -y && opam upgrade -y
-RUN opam install dream batteries timedesc re2 lambdasoup cohttp-lwt-unix
+ADD ./e-uscito-joypad.opam.locked /home/opam/
+RUN opam install ./e-uscito-joypad.opam.locked --deps-only
 
 USER root
 ADD ./ /app
@@ -24,11 +25,11 @@ RUN apk add upx
 USER opam
 WORKDIR /home/opam
 ENV PATH /home/opam/.opam/4.12/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-RUN cd /app && dune build src/e_uscito_joypad.exe
-RUN upx /app/_build/default/src/e_uscito_joypad.exe
+RUN cd /app && opam install .
+RUN upx /home/opam/.opam/4.12/bin/e_uscito_joypad
 
 USER root
-RUN mv /app/_build/default/src/e_uscito_joypad.exe /usr/local/bin/e_uscito_joypad
+RUN mv /home/opam/.opam/4.12/bin/e_uscito_joypad /usr/local/bin/e_uscito_joypad
 RUN chown root:root /usr/local/bin/e_uscito_joypad
 
 ################

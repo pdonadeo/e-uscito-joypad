@@ -1,2 +1,5 @@
-_build
+*.code-workspace
 .git
+.vscode
+_build
+_opam/

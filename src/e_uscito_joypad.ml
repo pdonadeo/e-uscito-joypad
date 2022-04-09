@@ -9,7 +9,7 @@ let signal_handler s =
 let _ = Lwt_unix.on_signal 15 signal_handler
 let _ = Lwt_unix.on_signal 2 signal_handler
 let () = initialize_log ~level:`Debug ()
-let last_episode_data : Utils.data option ref = ref None
+let last_episode_data : Joypad_monitor.data option ref = ref None
 
 let () =
   List.iter (fun src ->
@@ -27,7 +27,9 @@ let server =
        [
          get "/static/**" @@ static "assets";
          get "/" (fun _req ->
-             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo = Utils.risposta !last_episode_data in
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo =
+               Joypad_monitor.elabora_risposta !last_episode_data
+             in
              Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo));
        ]
 
