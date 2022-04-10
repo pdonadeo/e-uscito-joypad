@@ -12,6 +12,10 @@
 
 (maintainers "paolo@donadeo.net")
 
+(homepage "https://github.com/pdonadeo/e-uscito-joypad")
+
+(bug_reports "https://github.com/pdonadeo/e-uscito-joypad/issues")
+
 (package
  (name e-uscito-joypad)
  (version 2)

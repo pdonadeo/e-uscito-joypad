@@ -9,6 +9,8 @@ Francesco Fossetti"""
 maintainer: ["paolo@donadeo.net"]
 authors: ["Paolo Donadeo"]
 license: "ISC"
+homepage: "https://github.com/pdonadeo/e-uscito-joypad"
+bug-reports: "https://github.com/pdonadeo/e-uscito-joypad/issues"
 depends: [
   "dune" {>= "2.9"}
   "dream" {>= "1.0.0~alpha4"}
