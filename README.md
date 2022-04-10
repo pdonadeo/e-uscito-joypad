@@ -1,18 +1,26 @@
 # È uscito Joypad?
 
-Sito simpatico scritto in OCaml and Dream: https://aantron.github.io/dream/
-Una semplice pagina web per sapere se è uscito e quando l'ultimo episodio di Joypad, il podcast di Matteo Bordone, Alessandro Zampini e Francesco Fossetti
+Una semplice pagina web per sapere se è uscito e quando l'ultimo episodio di Joypad, il podcast di Matteo Bordone, Alessandro Zampini e Francesco Fossetti.
 
-## Docker
+La pagina è pubblicata qui: https://www.euscitojoypad.it/
 
-Per buildare l'immagine Docker:
+## Dettagli tecnici
+
+### Linguaggio e framework
+
+L'applicazione è scritta in [OCaml](https://ocaml.org/) utilizzando lo splendido web framework [Dream](https://aantron.github.io/dream/) di [Anton Bachin](https://github.com/aantron).
+
+### Docker
+
+Se non sapete cosa siano OCaml o Dream potete fare una build di Docker *senza sapere né leggere né scrivere*:
 
 ```bash
-$ docker build -t gitlab.4sigma.it:5050/pdonadeo/e-uscito-joypad .
-$ docker push gitlab.4sigma.it:5050/pdonadeo/e-uscito-joypad
+$ docker build -t e-uscito-joypad .
 ```
 
 Per eseguire l'immagine:
 ```bash
-$ docker run --rm -it -p 3000:3000 gitlab.4sigma.it:5050/pdonadeo/e-uscito-joypad
+$ docker run --rm -it -p 3000:3000 e-uscito-joypad
 ```
+
+Poi apri il browser su http://localhost:3000/
