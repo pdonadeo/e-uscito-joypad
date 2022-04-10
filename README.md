@@ -1,6 +1,7 @@
 # È uscito Joypad?
 
 Sito simpatico scritto in OCaml and Dream: https://aantron.github.io/dream/
+Una semplice pagina web per sapere se è uscito e quando l'ultimo episodio di Joypad, il podcast di Matteo Bordone, Alessandro Zampini e Francesco Fossetti
 
 ## Docker
 
