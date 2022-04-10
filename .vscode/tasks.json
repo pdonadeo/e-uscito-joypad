@@ -4,7 +4,7 @@
 		{
 			"type": "shell",
 			"label": "Build",
-			"command": "dune build --watch --terminal-persistence=clear-on-rebuild",
+			"command": "./_opam/bin/dune build --watch --terminal-persistence=clear-on-rebuild",
 			"group": {
 				"kind": "build",
 				"isDefault": true

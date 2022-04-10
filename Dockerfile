@@ -1,7 +1,7 @@
 ###############
 # BUILD PHASE #
 ###############
-FROM ocaml/opam:alpine-ocaml-4.12
+FROM ocaml/opam:alpine-ocaml-4.14
 
 USER root
 RUN apk update && apk upgrade
@@ -24,12 +24,12 @@ RUN apk add upx
 
 USER opam
 WORKDIR /home/opam
-ENV PATH /home/opam/.opam/4.12/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH /home/opam/.opam/4.14/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 RUN cd /app && opam install .
-RUN upx /home/opam/.opam/4.12/bin/e_uscito_joypad
+RUN upx /home/opam/.opam/4.14/bin/e_uscito_joypad
 
 USER root
-RUN mv /home/opam/.opam/4.12/bin/e_uscito_joypad /usr/local/bin/e_uscito_joypad
+RUN mv /home/opam/.opam/4.14/bin/e_uscito_joypad /usr/local/bin/e_uscito_joypad
 RUN chown root:root /usr/local/bin/e_uscito_joypad
 
 ################

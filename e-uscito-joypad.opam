@@ -12,9 +12,12 @@ license: "ISC"
 homepage: "https://github.com/pdonadeo/e-uscito-joypad"
 bug-reports: "https://github.com/pdonadeo/e-uscito-joypad/issues"
 depends: [
-  "dune" {>= "2.9"}
-  "dream" {>= "1.0.0~alpha4"}
+  "ocaml" {= "4.14.0"}
+  "ocaml-lsp-server" {>= "1.10.6"}
   "batteries" {>= "3.5.1"}
+  "utop" {>= "2.9.1"}
+  "dune" {>= "3.0" & >= "3.0.3"}
+  "dream" {>= "1.0.0~alpha4"}
   "timedesc" {>= "0.6.0"}
   "cohttp-lwt-unix" {>= "5.0.0"}
   "lambdasoup" {>= "0.7.3"}
@@ -30,10 +33,8 @@ build: [
     name
     "-j"
     jobs
-    "--promote-install-files=false"
     "@install"
     "@runtest" {with-test}
     "@doc" {with-doc}
   ]
-  ["dune" "install" "-p" name "--create-install-files" name]
 ]
