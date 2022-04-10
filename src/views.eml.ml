@@ -42,21 +42,34 @@ let index uscito fretta giorni_fa data_italiano ep_num titolo =
               font-family: 'Montserrat', sans-serif;
               text-align: center;
               background-color: beige;
+              line-height: 1.4;
           }
 
           h1 {
               margin: auto;
-              margin-top: 3em;
+              margin-top: 1em;
               width: 75%;
           }
 
           p {
             margin: auto;
-            margin-top: 2em;
+            margin-top: 1em;
             text-align: left;
             width: 75%;
             font-style: italic;
             font-size: 20px;
+          }
+
+          p.nota {
+            margin-top: 4em;
+            font-style: italic;
+            font-size: 12px;
+          }
+
+          footer {
+            margin-top: 10em;
+            font-size: 10px;
+            line-height: 1.4;
           }
       </style>
   </head>
@@ -69,6 +82,18 @@ let index uscito fretta giorni_fa data_italiano ep_num titolo =
       <%s! dove_ascoltare () %>
 
       <%s! if fretta then corri () else "" %>
+
+      <p class="nota">Nota per gli autori del podcast: il sito è pubblicato gratuitamente e con licenza open su
+        <a href="https://github.com/pdonadeo/e-uscito-joypad">GitHub</a> e
+        potete fare tutte le richieste che volete
+        <a href="https://github.com/pdonadeo/e-uscito-joypad/issues">qui</a>.
+      </p>
   </body>
+
+  <footer>
+    Copyright © 2022 Paolo Donadeo.
+    <br>
+    Rilasciato sotto licenza MIT, vedi <a href="https://github.com/pdonadeo/e-uscito-joypad/blob/main/LICENSE">LICENSE.md</a>
+  </footer>
 
   </html>
