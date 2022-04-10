@@ -21,7 +21,8 @@
  (version 2)
  (synopsis "\195\136 uscito Joypad")
  (description
-  "Semplice pagina di informazione per sapere se \195\168 uscito Joypad,\nil podcast a tema videoludico di Matteo Bordone, Alessandro Zampini e\nFrancesco Fossetti")
+  "Semplice pagina di informazione per sapere se e quando \195\168 uscito\nJoypad, il podcast a tema videoludico di Matteo Bordone (Corri!),\nFrancesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)")
+
  (depends
   (ocaml (= 4.14.0))
   (ocaml-lsp-server (>= 1.10.6))

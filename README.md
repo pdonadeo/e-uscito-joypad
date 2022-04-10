@@ -1,6 +1,6 @@
 # È uscito Joypad?
 
-Una semplice pagina web per sapere se è uscito e quando l'ultimo episodio di Joypad, il podcast di Matteo Bordone, Alessandro Zampini e Francesco Fossetti.
+Semplice pagina di informazione per sapere se e quando è uscito Joypad, il podcast a tema videoludico di Matteo Bordone (Corri!), Francesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta).
 
 La pagina è pubblicata qui: https://www.euscitojoypad.it/
 

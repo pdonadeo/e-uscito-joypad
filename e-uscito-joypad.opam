@@ -3,9 +3,9 @@ opam-version: "2.0"
 version: "2"
 synopsis: "È uscito Joypad"
 description: """
-Semplice pagina di informazione per sapere se è uscito Joypad,
-il podcast a tema videoludico di Matteo Bordone, Alessandro Zampini e
-Francesco Fossetti"""
+Semplice pagina di informazione per sapere se e quando è uscito
+Joypad, il podcast a tema videoludico di Matteo Bordone (Corri!),
+Francesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)"""
 maintainer: ["paolo@donadeo.net"]
 authors: ["Paolo Donadeo"]
 license: "ISC"
