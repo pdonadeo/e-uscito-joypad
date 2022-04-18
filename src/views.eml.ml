@@ -40,84 +40,8 @@ let index uscito fretta giorni_fa data_italiano ep_num titolo =
     <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
     <link rel="manifest" href="/static/site.webmanifest">
-    <style>
-      body {
-        min-height: calc(100vh - 20px);
-        margin: 10px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        font-family: 'Montserrat', sans-serif;
-        text-align: left;
-        background-color: #f7f7f7;
-      }
-
-      header {
-        display: flex;
-        justify-content: center;
-        height: 30vh;
-      }
-
-      header img {
-        height: 100%;
-      }
-
-      h1 {
-        margin: auto;
-        width: 80%;
-        font-size: 20px;
-        line-height: 25px;
-        font-weight: 700;
-        margin-top: 10px;
-        margin-bottom: 10px;
-      }
-
-      h1 em {
-        font-weight: 900;
-      }
-
-      p {
-        margin: auto;
-        text-align: left;
-        width: 80%;
-        font-size: 15px;
-        line-height: 20px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-      }
-
-      .nota {
-        font-style: italic;
-        font-size: 12px;
-        line-height: 15px;
-      }
-
-      a {
-        color: #29ABE2;
-        font-weight: 700;
-        text-decoration: unset;
-        transition: color 0.2s;
-        -webkit-transition: color 0.2s;
-      }
-
-      a:hover {
-        color: #313131;
-        transition: color 0.2s;
-        -webkit-transition: color 0.2s;
-      }
-
-      footer {
-        height: 30px;
-        margin-top: 20px;
-        margin-bottom: 20px;
-      }
-
-      footer p {
-        font-size: 10px;
-        line-height: 12px;
-        text-align: center;
-      }
-    </style>
+    <link rel="preload" href="/static/e-uscito-joypad.css" as="style" onload="this.rel='stylesheet'">
+    <link rel="stylesheet" href="/static/e-uscito-joypad.css" media="print" onload="this.media='all'"
   </head>
 
   <body>

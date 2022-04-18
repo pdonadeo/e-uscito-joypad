@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png">
+  <meta name="google-site-verification" content="RVQl_YUzLnpzfD8LfW0RND3EgYD_grzfjKCwshqJ1Xg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <meta name="theme-color" content="#000000" />
-  <meta name="description" content="Web site created using create-react-app" />
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+  <meta name="description"
+    content="Semplice pagina di informazione per sapere se e quando è uscito Joypad, il podcast a tema videoludico di Matteo Bordone (Corri!), Francesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)." />
   <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
-  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+  <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest">
   <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -22,22 +26,47 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-  <title>React App</title>
+  <title>È uscito Joypad?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap"
+    rel="stylesheet">
+  <link rel="preload" href="%PUBLIC_URL%/e-uscito-joypad.css" as="style" onload="this.rel='stylesheet'">
+  <link rel="stylesheet" href="%PUBLIC_URL%/e-uscito-joypad.css" media="print" onload="this.media='all'">
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root"></div>
-  <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+  <header>
+    <img src="%PUBLIC_URL%/joypad-img.jpg" alt="È uscito Joypad?">
+  </header>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  <main id="root">
+    <h1>Sì! È uscito <span title="sabato 9 Aprile 2022">9 giorni fa</span> <u>l'episodio</u> numero 47 di Joypad,
+      dal titolo
+      <em> «Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo» </em>
+    </h1>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    <p>Ascolta la puntata <a href="https://www.ilpost.it/podcasts/joypad/">sulla pagina del Post</a>,
+      sull’<a href="https://app.ilpost.it/">app</a> o sulle principali piattaforme:
+      <a href="https://open.spotify.com/show/2JXX6er1IfNvbyPbYPI9tJ">Spotify</a>,
+      <a href="https://podcasts.apple.com/us/podcast/joypad/id1491137742?uo=4">Apple Podcast</a> e
+      <a
+        href="https://www.google.com/podcasts?feed=aHR0cHM6Ly93d3cuc3ByZWFrZXIuY29tL3Nob3cvNDE1MTQyOS9lcGlzb2Rlcy9mZWVk">Google
+        Podcast</a>.
+    </p>
+
+    <p class="nota">Nota per gli autori del podcast: il sito è pubblicato gratuitamente e con licenza open su
+      <a href="https://github.com/pdonadeo/e-uscito-joypad">GitHub</a> e
+      potete fare tutte le richieste che volete
+      <a href="https://github.com/pdonadeo/e-uscito-joypad/issues">qui</a>.
+    </p>
+  </main>
+
+  <footer>
+    <p>Copyright © 2022 Paolo Donadeo.<br>Rilasciato sotto licenza MIT, vedi <a
+        href="https://github.com/pdonadeo/e-uscito-joypad/blob/main/LICENSE">LICENSE.md</a></p>
+  </footer>
 </body>
 
 </html>
