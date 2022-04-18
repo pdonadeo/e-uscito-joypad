@@ -3,11 +3,5 @@
  (public_name e_uscito_joypad)
  (modules e_uscito_joypad utils views settings joypad_monitor)
  (preprocess
-  (pps lwt_ppx))
- (libraries dream batteries malloc timedesc cohttp-lwt-unix lambdasoup re2))
-
-(rule
- (targets views.ml)
- (deps views.eml.ml)
- (action
-  (run dream_eml %{deps} --workspace %{workspace_root})))
+  (pps lwt_ppx tyxml-ppx))
+ (libraries dream batteries malloc timedesc cohttp-lwt-unix lambdasoup re2 tyxml))

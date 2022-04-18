@@ -1,6 +1,7 @@
 open Dream
 
 let will_stop, stop_now = Lwt.wait ()
+let html_to_string html = Format.asprintf "%a" (Tyxml.Html.pp ()) html
 
 let signal_handler s =
   log "Exiting on signal %d" s;
@@ -30,7 +31,7 @@ let server =
              let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo =
                Joypad_monitor.elabora_risposta !last_episode_data
              in
-             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo));
+             Dream.html (html_to_string (Views.index uscito fretta giorni_fa data_italiano ep_num titolo)));
        ]
 
 let () = Lwt_main.run server

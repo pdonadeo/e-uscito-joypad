@@ -20,12 +20,15 @@ depends: [
   "lambdasoup" {= "0.7.3"}
   "re2" {= "v0.15.0"}
   "dream" {= "1.0.0~alpha4"}
+  "tyxml-ppx" {= "4.5.0"}
   "utop" {dev & = "2.9.1"}
   "merlin" {dev & = "4.5-414"}
   "ocp-indent" {dev & = "1.8.1"}
   "ocp-index" {dev & = "1.3.3"}
   "ocamlformat" {dev & = "0.21.0"}
   "ocaml-lsp-server" {dev & = "1.10.6"}
+  "odoc" {dev & = "2.1.0"}
+  "odig" {dev & = "0.0.8"}
   "odoc" {with-doc}
 ]
 build: [

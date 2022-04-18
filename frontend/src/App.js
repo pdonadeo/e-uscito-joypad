@@ -1,6 +1,6 @@
 function App() {
   return (
-    <main id="root">
+    <>
       <h1>Sì! È uscito <span title="sabato 9 Aprile 2022">9 giorni fa</span> <u>l'episodio</u> numero 47 di Joypad,
         dal titolo
         <em> «Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo» </em>
@@ -20,7 +20,7 @@ function App() {
         potete fare tutte le richieste che volete&nbsp;
         <a href="https://github.com/pdonadeo/e-uscito-joypad/issues">qui</a>.
       </p>
-    </main>
+    </>
   );
 }
 
