@@ -3,3 +3,4 @@
 .vscode
 _build
 _opam/
+frontend/node_modules
