@@ -1,7 +1,6 @@
 open Dream
 
 let will_stop, stop_now = Lwt.wait ()
-let html_to_string html = Format.asprintf "%a" (Tyxml.Html.pp ()) html
 
 let signal_handler s =
   log "Exiting on signal %d" s;
@@ -19,6 +18,16 @@ let () =
       | _ -> ())
   @@ Logs.Src.list ()
 
+type dati_ultima_puntata = {
+  uscito : bool;
+  fretta : bool;
+  giorni_fa : string;
+  data_italiano : string;
+  ep_num : int;
+  titolo : string;
+}
+[@@deriving yojson]
+
 let server =
   Lwt.async (Joypad_monitor.monitor ~last_episode_data);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec);
@@ -26,12 +35,19 @@ let server =
   @@ logger
   @@ router
        [
+         get "/static/static/js/**" @@ static "assets/js";
          get "/static/**" @@ static "assets";
+         get "/api/ultima-puntata" (fun _req ->
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo =
+               Joypad_monitor.elabora_risposta !last_episode_data
+             in
+             let dati = { uscito; fretta; giorni_fa; data_italiano; ep_num; titolo } in
+             dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
          get "/" (fun _req ->
              let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo =
                Joypad_monitor.elabora_risposta !last_episode_data
              in
-             Dream.html (html_to_string (Views.index uscito fretta giorni_fa data_italiano ep_num titolo)));
+             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo));
        ]
 
 let () = Lwt_main.run server

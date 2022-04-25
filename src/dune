@@ -1,7 +1,27 @@
 (executable
  (name e_uscito_joypad)
  (public_name e_uscito_joypad)
- (modules e_uscito_joypad utils views settings joypad_monitor)
+ (modules e_uscito_joypad utils views settings joypad_monitor react)
  (preprocess
-  (pps lwt_ppx tyxml-ppx))
- (libraries dream batteries malloc timedesc cohttp-lwt-unix lambdasoup re2 tyxml))
+  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
+ (libraries
+  dream
+  batteries
+  malloc
+  timedesc
+  cohttp-lwt-unix
+  lambdasoup
+  re2
+  tyxml
+  ppx_deriving_yojson.runtime))
+
+(rule
+ (targets index.html)
+ (action
+  (copy ../frontend/build/index.html index.html)))
+
+(rule
+ (targets react.ml)
+ (deps index.html)
+ (action
+  (run ./tyxml_of_react.sh react.ml --workspace %{workspace_root})))

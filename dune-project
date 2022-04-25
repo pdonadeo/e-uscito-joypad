@@ -33,6 +33,7 @@
   (re2 (= v0.15.0))
   (dream (= 1.0.0~alpha4))
   (tyxml-ppx (= 4.5.0))
+  (ppx_deriving_yojson (= 3.6.1))
   (utop (and :dev (= 2.9.1)))
   (merlin (and :dev (= 4.5-414)))
   (ocp-indent (and :dev (= 1.8.1)))

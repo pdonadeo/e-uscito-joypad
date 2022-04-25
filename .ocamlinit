@@ -1,4 +1,7 @@
 #require "tyxml";;
 #require "tyxml-ppx";;
+#require "lambdasoup";;
+
 open Tyxml;;
 open Html;;
+open Soup;;
