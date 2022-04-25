@@ -7,8 +7,6 @@ COPY ./frontend/package.json ./frontend/yarn.lock ./
 RUN yarn
 COPY ./frontend/ ./
 RUN yarn build
-# la build sta in /app/build
-# la public sta in /app/public
 
 #################
 # BUILD PHASE 2 #
@@ -39,8 +37,11 @@ WORKDIR /app
 ENV PATH /home/opam/.opam/4.14/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN rm -Rf assets && mkdir assets
-COPY --from=build-stage-1 /app/public/* ./assets/
-RUN mkdir ./assets/js
+COPY --from=build-stage-1 /app/build/* ./assets/
+COPY --from=build-stage-1 /app/build/* ./frontend/build/
+USER root
+RUN rm -Rf ./assets/js && mkdir ./assets/js
+USER opam
 COPY --from=build-stage-1 /app/build/static/js/* ./assets/js/
 RUN dune build @install
 RUN chmod +w /app/_build/default/src/e_uscito_joypad.exe && \
