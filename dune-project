@@ -2,7 +2,7 @@
 
 (name e-uscito-joypad)
 
-(version 5)
+(version 6)
 
 (generate_opam_files true)
 
@@ -18,7 +18,7 @@
 
 (package
  (name e-uscito-joypad)
- (version 5)
+ (version 6)
  (synopsis "\195\136 uscito Joypad")
  (description
   "Semplice pagina di informazione per sapere se e quando \195\168 uscito\nJoypad, il podcast a tema videoludico di Matteo Bordone (Corri!),\nFrancesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)")
