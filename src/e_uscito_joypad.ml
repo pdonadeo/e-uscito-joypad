@@ -25,6 +25,7 @@ type dati_ultima_puntata = {
   data_italiano : string;
   ep_num : int;
   titolo : string;
+  rompi_le_palle : bool;
 }
 [@@deriving yojson]
 
@@ -38,16 +39,16 @@ let server =
          get "/static/static/js/**" @@ static "assets/js";
          get "/static/**" @@ static "assets";
          get "/api/ultima-puntata" (fun _req ->
-             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo =
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
                Joypad_monitor.elabora_risposta !last_episode_data
              in
-             let dati = { uscito; fretta; giorni_fa; data_italiano; ep_num; titolo } in
+             let dati = { uscito; fretta; giorni_fa; data_italiano; ep_num; titolo; rompi_le_palle } in
              dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
          get "/" (fun _req ->
-             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo =
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
                Joypad_monitor.elabora_risposta !last_episode_data
              in
-             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo));
+             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle));
        ]
 
 let () = Lwt_main.run server

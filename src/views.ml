@@ -15,10 +15,24 @@ let%html risposta_si giorni_fa data_italiano ep_num titolo =
   </h1>
   |}
 
-let%html risposta_no giorni_fa data_italiano =
-  {|
-  <h1>No. L'ultimo episodio è uscito |} [txt giorni_fa] {|, |} [txt data_italiano] {|.</h1>
+let%html non_rompere_msg = {|
+    <h2><em>Però adesso non torturare Zampa, aspetta ancora qualche giorno…</em></h2>
   |}
+
+let%html rompi_pure_msg = {|
+    <h2><em>Mi duole ammetterlo ma è giunto il momento di protestare!</em></h2>
+  |}
+
+let%html risposta_no giorni_fa data_italiano rompi_le_palle =
+
+  {|
+  <div>
+  <h1>No. L'ultimo episodio è uscito |} [txt giorni_fa] {|, |} [txt data_italiano] {|.</h1>
+  |}[(
+    if rompi_le_palle
+    then rompi_pure_msg
+    else non_rompere_msg
+  )]{| </div> |}
 
 let%html dove_ascoltare () =
   {|<p>Ascolta la puntata <a href="https://www.ilpost.it/podcasts/joypad/">sulla pagina del Post</a>,
@@ -32,13 +46,13 @@ let%html corri () = {|<p>
     Corri! Se aspetti ancora un po' esce il prossimo episodio!
   </p>|}
 
-let%html main uscito fretta giorni_fa data_italiano ep_num titolo =
+let%html main uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle =
   {|
     <main id="root">
     |}[(
       if uscito
         then risposta_si giorni_fa data_italiano ep_num titolo
-        else risposta_no giorni_fa data_italiano
+        else risposta_no giorni_fa data_italiano rompi_le_palle
       )]
     {|
 
@@ -54,14 +68,14 @@ let%html main uscito fretta giorni_fa data_italiano ep_num titolo =
 </main>
   |}
 
-let index uscito fretta giorni_fa data_italiano ep_num titolo =
+let index uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle =
   let open Soup in
 
   let index = React.react_build_index () in
   let index_s = Format.asprintf "%a" (pp ()) index in
   let soup_i = parse index_s in
 
-  let main = main uscito fretta giorni_fa data_italiano ep_num titolo in
+  let main = main uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle in
   let main_s =  Format.asprintf "%a" (pp_elt ()) main in
   let soup_m = parse main_s in
 

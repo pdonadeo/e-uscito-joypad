@@ -8,7 +8,6 @@ function App() {
   const [datiUltimaPuntata, setDatiUltimaPuntata] = React.useState({});
 
   React.useEffect(() => {
-    console.log("App.js: useEffect");
     fetch("/api/ultima-puntata")
       .then(response => response.json())
       .then(data => {
@@ -32,7 +31,7 @@ function App() {
     </p> : ""
     }
 
-    <p class="nota">
+    <p className="nota">
       Nota per gli autori del podcast: il sito è pubblicato gratuitamente e con licenza open
       su <a href="https://github.com/pdonadeo/e-uscito-joypad">GitHub</a> e potete fare tutte
       le richieste che volete <a href="https://github.com/pdonadeo/e-uscito-joypad/issues">qui</a>.

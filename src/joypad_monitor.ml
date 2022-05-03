@@ -57,8 +57,9 @@ let elabora_risposta last_episode_data =
     let giorni_fa = Utils.distanza giorni_passati in
     let data_italiano = Utils.string_of_date last_episode_data.date in
     let fretta = if giorni_passati >= 10 && giorni_passati <= 14 then true else false in
-    (uscito, fretta, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title)
-  | None -> (false, false, "", "", 1999, "")
+    let rompi_le_palle = if giorni_passati > 20 then true else false in
+    (uscito, fretta, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, rompi_le_palle)
+  | None -> (false, false, "", "", 1999, "", false)
 
 let rec monitor ~last_episode_data () =
   log.debug (fun l -> l "Scarico info ultima puntata...");
