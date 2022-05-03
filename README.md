@@ -6,6 +6,10 @@ Semplice pagina di informazione per sapere se e quando è uscito Joypad, il podc
 
 La pagina è pubblicata qui: https://www.euscitojoypad.it/
 
+## Come partecipare al progetto
+
+Per ora siamo ancora in fase di discussione su cosa effettivamente vogliamo aggiungere al progetto. Le discussioni si tengono in pubblico, qui su GitHub nella [pagina Discussions](https://github.com/pdonadeo/e-uscito-joypad/discussions).
+
 ## Dettagli tecnici
 
 ### Linguaggio e framework
