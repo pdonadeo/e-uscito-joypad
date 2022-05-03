@@ -10,6 +10,10 @@ La pagina è pubblicata qui: https://www.euscitojoypad.it/
 
 Per ora siamo ancora in fase di discussione su cosa effettivamente vogliamo aggiungere al progetto. Le discussioni si tengono in pubblico, qui su GitHub nella [pagina Discussions](https://github.com/pdonadeo/e-uscito-joypad/discussions).
 
+Ho attivato la pagina delle donazioni per sostenere eventuali costi di trascrizione degli episodi o di infrastruttura.
+
+Per ora, tuttavia, **non servono fondi quindi aspettate a donare**.
+
 ## Dettagli tecnici
 
 ### Linguaggio e framework
