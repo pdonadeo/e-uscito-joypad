@@ -9,6 +9,6 @@ class EpisodioAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(Videogame)
-class VideogameAdmin(admin.ModelAdmin):
-    pass
+#@admin.register(Videogame)
+#class VideogameAdmin(admin.ModelAdmin):
+#    pass
