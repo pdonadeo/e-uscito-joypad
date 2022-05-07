@@ -25,7 +25,6 @@
 
  (depends
   (ocaml (= 4.14.0))
-  (dune (and :dev (= 3.0.3)))
   (batteries (= 3.5.1))
   (timedesc (= 0.6.0))
   (cohttp-lwt-unix (= 5.0.0))
@@ -34,12 +33,13 @@
   (dream (= 1.0.0~alpha4))
   (tyxml-ppx (= 4.5.0))
   (ppx_deriving_yojson (= 3.6.1))
+  (dune (and :dev (= 3.1.1)))
   (utop (and :dev (= 2.9.1)))
   (merlin (and :dev (= 4.5-414)))
   (ocp-indent (and :dev (= 1.8.1)))
   (ocp-index (and :dev (= 1.3.3)))
   (ocamlformat (and :dev (= 0.21.0)))
-  (ocaml-lsp-server (and :dev (= 1.10.6)))
+  (ocaml-lsp-server (and :dev (= 1.11.4)))
   (odoc (and :dev (= 2.1.0)))
   (odig (and :dev (= 0.0.8)))
  )

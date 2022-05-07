@@ -24,7 +24,7 @@ USER opam
 WORKDIR /home/opam
 RUN opam repo set-url default https://opam.ocaml.org
 RUN opam update -y && opam upgrade -y
-ADD ./e-uscito-joypad.opam.locked /home/opam/
+ADD ./e-uscito-joypad.opam.locked.docker /home/opam/e-uscito-joypad.opam.locked
 RUN opam install ./e-uscito-joypad.opam.locked --deps-only
 
 USER root

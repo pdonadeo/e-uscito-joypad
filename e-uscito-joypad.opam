@@ -13,7 +13,6 @@ homepage: "https://github.com/pdonadeo/e-uscito-joypad"
 bug-reports: "https://github.com/pdonadeo/e-uscito-joypad/issues"
 depends: [
   "ocaml" {= "4.14.0"}
-  "dune" {>= "3.0" & dev & = "3.0.3"}
   "batteries" {= "3.5.1"}
   "timedesc" {= "0.6.0"}
   "cohttp-lwt-unix" {= "5.0.0"}
@@ -22,12 +21,13 @@ depends: [
   "dream" {= "1.0.0~alpha4"}
   "tyxml-ppx" {= "4.5.0"}
   "ppx_deriving_yojson" {= "3.6.1"}
+  "dune" {>= "3.0" & dev & = "3.1.1"}
   "utop" {dev & = "2.9.1"}
   "merlin" {dev & = "4.5-414"}
   "ocp-indent" {dev & = "1.8.1"}
   "ocp-index" {dev & = "1.3.3"}
   "ocamlformat" {dev & = "0.21.0"}
-  "ocaml-lsp-server" {dev & = "1.10.6"}
+  "ocaml-lsp-server" {dev & = "1.11.4"}
   "odoc" {dev & = "2.1.0"}
   "odig" {dev & = "0.0.8"}
   "odoc" {with-doc}
