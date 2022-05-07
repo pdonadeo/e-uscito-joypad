@@ -1,0 +1,10 @@
+.direnv
+.envrc
+*.exp
+*.ipynb
+*.sql.bz2
+*.tsv
+.git
+**/*.pyc
+/STATIC
+**/node_modules
