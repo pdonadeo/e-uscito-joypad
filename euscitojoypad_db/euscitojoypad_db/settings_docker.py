@@ -17,6 +17,7 @@ def bool_of_string(b_s):
 DEBUG = bool_of_string(os.environ.get("DEBUG", "False"))
 
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", None).split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", None).split(",")
 SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
 ################################################################################
