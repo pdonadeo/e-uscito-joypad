@@ -34,6 +34,9 @@ echo "Dockerentrypoint | Django App --> START collectstatic"
 /venv/bin/python manage.py collectstatic
 echo "Dockerentrypoint | Django App -->   END collectstatic"
 
+echo "Dockerentrypoint | Django App --> chown -R joypad:joypad MEDIA/ STATIC/"
+sudo chown -R joypad:joypad MEDIA/ STATIC/
+
 echo "Dockerentrypoint | Django App --> Super User"
 
 cat <<EOF | /venv/bin/python manage.py shell
