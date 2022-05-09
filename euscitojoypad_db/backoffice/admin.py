@@ -17,9 +17,17 @@ class EpisodioAdminForm(forms.ModelForm):
 @admin.register(Episodio)
 class EpisodioAdmin(admin.ModelAdmin):
     form = EpisodioAdminForm
-    list_display = ("episodio_numero", "titolo", "data_uscita", "durata")
+    list_display = ("episodio_numero", "titolo", "data_uscita", "durata", "cover_presente")
     ordering = ("-data_uscita",)
     search_fields = ("episodio_numero", "titolo")
+    list_per_page = 20
+    list_display_links = ("episodio_numero", "titolo")
+
+    def cover_presente(self, instance):
+        return instance.cover != None and instance.cover != ""
+
+    cover_presente.boolean = True
+    cover_presente.short_description = "Cover presente"
 
 
 # @admin.register(Videogame)

@@ -33,6 +33,13 @@ class Episodio(models.Model):
         verbose_name="Durata", null=False, blank=False, default=datetime.timedelta(minutes=30)
     )
     url = models.URLField(verbose_name="URL", max_length=256, null=True, blank=True)
+    url_video = models.URLField(
+        verbose_name="URL video",
+        max_length=256,
+        null=True,
+        blank=True,
+        help_text="URL al contenuto video dell'episodio. Opzionale.",
+    )
     cover = models.ImageField(
         verbose_name="Cover",
         null=True,
