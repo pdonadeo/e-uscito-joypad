@@ -1,8 +1,8 @@
-name: Build Docker and push to registry
+name: Build Docker and push to registry (Django)
 on:
   push:
-    tags:
-      - '*'
+    branch:
+      - 'main'
   release:
     types: [published, created, edited]
 jobs:
@@ -19,7 +19,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/${{ github.repository_owner }}/e-uscito-joypad
+            ghcr.io/${{ github.repository_owner }}/e-uscito-joypad-db
           # generate Docker tags based on the following events/attributes
           tags: |
             type=semver,pattern={{row}}
@@ -41,7 +41,7 @@ jobs:
         name: Build and push Docker images
         uses: docker/build-push-action@v2.10.0
         with:
-          context: .
+          context: ./euscitojoypad_db/
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
