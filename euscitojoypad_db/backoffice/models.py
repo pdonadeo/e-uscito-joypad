@@ -32,7 +32,10 @@ class Episodio(models.Model):
     durata = models.DurationField(
         verbose_name="Durata", null=False, blank=False, default=datetime.timedelta(minutes=30)
     )
-    url = models.URLField(verbose_name="URL", max_length=256, null=True, blank=True)
+    url = models.URLField(verbose_name="URL dell'episodio in formato audio", max_length=256, null=True, blank=True)
+    url_post = models.URLField(
+        verbose_name="URL del post che annuncia l'episodio", max_length=256, null=True, blank=True
+    )
     url_video = models.URLField(
         verbose_name="URL video",
         max_length=256,
