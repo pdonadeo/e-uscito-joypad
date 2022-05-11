@@ -6,12 +6,21 @@ import RispostaNo from "./RispostaNo";
 
 function App() {
   const [datiUltimaPuntata, setDatiUltimaPuntata] = React.useState({});
+  const [dbData, setDbData] = React.useState({});
 
   React.useEffect(() => {
     fetch("/api/ultima-puntata")
       .then(response => response.json())
       .then(data => {
         setDatiUltimaPuntata(data);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    fetch("/api/db-data")
+      .then(response => response.json())
+      .then(data => {
+        setDbData(data);
       });
   }, []);
 

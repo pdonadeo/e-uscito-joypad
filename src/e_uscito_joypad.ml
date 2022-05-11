@@ -29,9 +29,23 @@ type dati_ultima_puntata = {
 }
 [@@deriving yojson]
 
+type episode = {
+  titolo: string;
+  episodio_numero: string option;
+  data_uscita: string;
+  durata: float;
+  url: string option;
+  url_post: string option;
+  url_video: string option;
+  cover: string option;
+} [@@deriving yojson]
+type db_data = { episodi : episode list } [@@deriving yojson]
+
 let server =
   Lwt.async (Joypad_monitor.monitor ~last_episode_data);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec);
+  let%lwt db_data_string = Utils.read_all "assets/db_data.json" in
+  let db_data = Yojson.Safe.from_string db_data_string |> db_data_of_yojson |> Utils.yojson_ok_exn in
   serve ~interface:"0.0.0.0" ~port:3000 ~error_handler:Dream.debug_error_handler ~stop:will_stop
   @@ logger
   @@ router
@@ -44,6 +58,7 @@ let server =
              in
              let dati = { uscito; fretta; giorni_fa; data_italiano; ep_num; titolo; rompi_le_palle } in
              dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
+         get "/api/db-data" (fun _req -> db_data |> db_data_to_yojson |> Yojson.Safe.to_string |> Dream.json);
          get "/" (fun _req ->
              let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
                Joypad_monitor.elabora_risposta !last_episode_data

@@ -105,3 +105,21 @@ let string_of_date date =
     | _ -> failwith "Mese impossibile"
   in
   spf "%s %d %s %d" giorno (Timedesc.Date.day date) mese (Timedesc.Date.year date)
+
+let read_all fname =
+  let open Lwt_io in
+  let%lwt ic = open_file ~mode:Input fname in
+  let b = Buffer.create 1024 in
+  let rec loop () =
+    let%lwt chunk = read ~count:1024 ic in
+    Buffer.add_string b chunk;
+    if String.length chunk = 0 then Lwt.return (Buffer.contents b) else loop ()
+  in
+  let%lwt res = loop () in
+  let%lwt () = close ic in
+  Lwt.return res
+
+let yojson_ok_exn (res : 'a Ppx_deriving_yojson_runtime.error_or) =
+  match res with
+  | Ok res -> res
+  | Error msg -> failwith (spf "Cannot read JSON: %s" msg)
