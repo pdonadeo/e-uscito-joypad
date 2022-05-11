@@ -14,6 +14,40 @@ Ho attivato la pagina delle donazioni per sostenere eventuali costi di trascrizi
 
 Per ora, tuttavia, **non servono fondi quindi aspettate a donare**.
 
+## Sviluppare in frontend in React
+
+Per sviluppare il frontend, realizzato con [React](https://reactjs.org/), occorre far partire **due shell**, la prima per eseguire il backend e la seconda per sviluppare il frontend.
+
+### Prima shell: backend (Docker)
+
+1. (su OSX è indispensabile installare l'ultima versione di Docker e abilitare le ottimizzazioni)
+2. fai fork del progetto da GitHub: https://github.com/pdonadeo/e-uscito-joypad
+3. entra nella directory del progetto:
+
+   `git clone git@github.com:TuoUsername/e-uscito-joypad.git`
+
+   `cd e-uscito-joypad`
+
+4. build dell'immagine: `docker build -t e-uscito-joypad .`
+
+   *(la prima volta potrebbe richiedere una decina di minuti)*
+5. esegui il backend: `docker run --rm -it -p 3000:3000 e-uscito-joypad`
+
+Questo farà partire un servizio sulla porta 3000. Per verificare che stia funzionando apri il browser su http://localhost:3000/
+
+### Seconda shell: frontend (React)
+
+Qui do per scontato che si conosca lo sviluppo in ambiente Javascript e siano già installati tool come [Yarn](https://yarnpkg.com/), [Node.js](https://nodejs.org/en/) e un editor adatto: io uso [Visual Studio Code](https://code.visualstudio.com/).
+
+1. entra nella directory del frontend:
+
+   `cd e-uscito-joypad/frontend/`
+
+2. solo la prima volta: `yarn install` per installare tutte le dipendenze
+3. `yarn start` per far partire il server di sviluppo. Attenzione: Yarn si lamenterà che la porta di default (3000) è già occupata ed è vero perché il backend ascolta proprio su quella porta. Domanderà se usarne un'altra, rispondere **Y**. Si metterà in ascolto sulla prima porta disponibile, tipicamente 3001. Per verificare che stia funzionando vai col browser su http://localhost:3001/ .
+
+A questo punto è possibile procedere col normale sviluppo del frontend, testando sulla porta 3001 anziché la 3000. A parte il numero della porta non cambia nulla rispetto al normale workflow.
+
 ## Dettagli tecnici
 
 ### Linguaggio e framework
