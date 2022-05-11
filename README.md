@@ -1,5 +1,9 @@
 [![Build Docker and push to registry](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-dream.yml/badge.svg)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-dream.yml)
 
+[![Build Docker and push to registry (Django)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-django.yml/badge.svg?branch=main)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-django.yml)
+
+[![CodeQL](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/codeql-analysis.yml)
+
 # È uscito Joypad?
 
 Semplice pagina di informazione per sapere se e quando è uscito Joypad, il podcast a tema videoludico di Matteo Bordone (Corri!), Francesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta).
