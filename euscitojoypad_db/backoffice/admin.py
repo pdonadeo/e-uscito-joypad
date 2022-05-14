@@ -1,8 +1,11 @@
 from django import forms
 from django.contrib import admin
+from django.db import models
+
+from django_json_widget.widgets import JSONEditorWidget
 
 
-from .models import Episodio  # , Videogame
+from .models import Episodio, Videogame, AssociazioneEpisodioVideogame
 
 
 class EpisodioAdminForm(forms.ModelForm):
@@ -12,6 +15,12 @@ class EpisodioAdminForm(forms.ModelForm):
             return data
         else:
             raise forms.ValidationError("Il file deve essere un'immagine PNG")
+
+
+class AssociazioneEpisodioVideogameInline(admin.TabularInline):
+    model = AssociazioneEpisodioVideogame
+    extra = 3
+    ordering = ["episodio__data_uscita", "istante"]
 
 
 @admin.register(Episodio)
@@ -27,10 +36,12 @@ class EpisodioAdmin(admin.ModelAdmin):
         "url_post_ok",
         "url_video_ok",
     )
+    filter_horizontal = ("giochi",)
     ordering = ("-data_uscita",)
     search_fields = ("episodio_numero", "titolo")
     list_per_page = 20
     list_display_links = ("episodio_numero", "titolo")
+    inlines = [AssociazioneEpisodioVideogameInline]
 
     def cover_presente(self, instance):
         return instance.cover != None and instance.cover != ""
@@ -57,6 +68,24 @@ class EpisodioAdmin(admin.ModelAdmin):
     url_video_ok.short_description = "URL video"
 
 
-# @admin.register(Videogame)
-# class VideogameAdmin(admin.ModelAdmin):
-#    pass
+@admin.register(Videogame)
+class VideogameAdmin(admin.ModelAdmin):
+    list_display = ("titolo", "rawg_slug")
+    search_fields = ("titolo", "descrizione_raw", "rawg_slug")
+    fields = (
+        "rawg_slug",
+        "titolo",
+        "descrizione_raw",
+        "descrizione_html",
+        "cover",
+        "rawg_json",
+    )
+    formfield_overrides = {
+        models.JSONField: {
+            "widget": JSONEditorWidget(
+                width="75%", height="400px", options={"mode": "view", "modes": ["view", "tree", "code"]}
+            )
+        },
+    }
+
+    inlines = [AssociazioneEpisodioVideogameInline]
