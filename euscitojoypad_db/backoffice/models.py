@@ -16,6 +16,7 @@ class Videogame(models.Model):
     class Meta:
         verbose_name = "Videogame"
         verbose_name_plural = "Videogame"
+        ordering = ["titolo"]
 
     ts_created = models.DateTimeField(auto_now_add=True)
     ts = models.DateTimeField(auto_now=True)
