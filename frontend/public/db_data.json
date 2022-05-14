@@ -1,1 +1,594 @@
-{"episodi": [{"titolo": "Il primo episodio del podcast di Joypad", "episodio_numero": "1", "data_uscita": "2019-12-15", "durata": 2640.0, "url": "https://www.ilpost.it/episodes/la-prima-puntata-del-podcast-di-joypad/", "url_post": "https://www.ilpost.it/2019/12/06/la-prima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-1-ep1_uZjJoSK.png"}, {"titolo": "quello con la PlayStation 5", "episodio_numero": "13-1", "data_uscita": "2020-06-12", "durata": 2400.0, "url": "https://www.ilpost.it/episodes/la-tredicesima-puntata-quella-con-la-playstation-5-parte-1/", "url_post": "https://www.ilpost.it/2020/06/12/la-tredicesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-13-1-ep13.png"}, {"titolo": "quello con Nintendo e i grandi giocattolai", "episodio_numero": "speciale", "data_uscita": "2020-12-14", "durata": 1680.0, "url": "https://www.ilpost.it/episodes/la-puntata-speciale-quella-con-nintendo-e-i-grandi-giocattolai/", "url_post": "https://www.ilpost.it/2020/12/14/la-puntata-natalizia-speciale-del-podcast-di-joypad/", "url_video": null, "cover": null}, {"titolo": "quello con i TGA e i migliori giochi dell\u2019anno", "episodio_numero": "2", "data_uscita": "2019-12-20", "durata": 2580.0, "url": "https://www.ilpost.it/episodes/la-seconda-puntata-del-podcast-di-joypad/", "url_post": "https://www.ilpost.it/2019/12/20/videogiochi-joypad-podcast/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-2-episodio-2.png"}, {"titolo": "quello con i giochi del decennio", "episodio_numero": "3", "data_uscita": "2020-01-17", "durata": 2640.0, "url": "https://www.ilpost.it/episodes/la-terza-puntata-quella-con-i-giochi-del-decennio/", "url_post": "https://www.ilpost.it/2020/01/17/la-terza-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-3-episodio-3.png"}, {"titolo": "i giochi che non arrivano e il tempo che passa", "episodio_numero": "4", "data_uscita": "2020-01-31", "durata": 3240.0, "url": "https://www.ilpost.it/episodes/la-quarta-puntata-quella-con-i-giochi-che-non-arrivano-mai-e-il-tempo-che-passa/", "url_post": "https://www.ilpost.it/2020/01/31/la-quarta-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-4-episodio-4.png"}, {"titolo": "quello con Stadia, Apple Arcade e GeForce Now", "episodio_numero": "5", "data_uscita": "2020-02-28", "durata": 3000.0, "url": "https://www.ilpost.it/episodes/la-quinta-puntata-quello-con-stadia-apple-arcade-e-geforce-now/", "url_post": "https://www.ilpost.it/2020/02/28/la-quinta-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-5-ep5.png"}, {"titolo": "quello con i giochi di virus mortali, per esorcizzare", "episodio_numero": "6", "data_uscita": "2020-03-13", "durata": 3120.0, "url": "https://www.ilpost.it/episodes/la-sesta-puntata-quella-con-i-giochi-di-virus-mortali-per-esorcizzare/", "url_post": "https://www.ilpost.it/2020/03/13/la-sesta-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-6-ep6.png"}, {"titolo": "quello dove torna a uscire qualcosa", "episodio_numero": "7", "data_uscita": "2020-03-20", "durata": 2760.0, "url": "https://www.ilpost.it/episodes/la-settima-puntata-quella-dove-torna-a-uscire-qualcosa/", "url_post": "https://www.ilpost.it/2020/03/20/la-settima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-7-ep7.png"}, {"titolo": "quello con la PlayStation 5", "episodio_numero": "13-2", "data_uscita": "2020-06-12", "durata": 2520.0, "url": "https://www.ilpost.it/episodes/la-tredicesima-puntata-quella-con-la-playstation-5-parte-2/", "url_post": "https://www.ilpost.it/2020/06/12/la-tredicesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-13-2-ep13.png"}, {"titolo": "Quello con i migliori giocattolai del mondo", "episodio_numero": "extra 1", "data_uscita": "2020-12-14", "durata": 1708.0, "url": "https://www.ilpost.it/2020/12/14/la-puntata-natalizia-speciale-del-podcast-di-joypad/", "url_post": "https://www.ilpost.it/2020/12/14/la-puntata-natalizia-speciale-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-extra_1-joypad_extra_ig_1.png"}, {"titolo": "quello con i giochi contro l\u2019ansia", "episodio_numero": "8", "data_uscita": "2020-03-27", "durata": 2760.0, "url": "https://www.ilpost.it/episodes/lottava-puntata-quella-con-i-giochi-contro-lansia/", "url_post": "https://www.ilpost.it/2020/03/27/lottava-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-8-ep8.png"}, {"titolo": "quello con Final Fantasy VII Remake e gli altri", "episodio_numero": "9", "data_uscita": "2020-04-10", "durata": 2820.0, "url": "https://www.ilpost.it/episodes/la-nona-puntata-quella-con-final-fantasy-vii-remake-e-gli-altri/", "url_post": "https://www.ilpost.it/2020/04/10/la-nona-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-9-ep9.png"}, {"titolo": "quello con i vichinghi", "episodio_numero": "11", "data_uscita": "2020-05-09", "durata": 2820.0, "url": "https://www.ilpost.it/episodes/lundicesima-puntata-quella-con-i-vichinghi/", "url_post": "https://www.ilpost.it/2020/05/09/lundicesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-11-ep11.png"}, {"titolo": "chiedere soldi per cose che non si sanno fare", "episodio_numero": "12", "data_uscita": "2020-05-23", "durata": 3240.0, "url": "https://www.ilpost.it/episodes/la-dodicesima-puntata-quella-dove-la-gente-chiede-soldi-per-fare-cose-che-forse-non-sa-fare/", "url_post": "https://www.ilpost.it/2020/05/23/la-dodicesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-12-ep12.png"}, {"titolo": "quello con il gioco di questa generazione", "episodio_numero": "14", "data_uscita": "2020-06-19", "durata": 2760.0, "url": "https://www.ilpost.it/episodes/la-quattordicesima-puntata-quella-con-il-gioco-di-questa-generazione/", "url_post": "https://www.ilpost.it/2020/06/19/la-quattordicesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-14-ep14.png"}, {"titolo": "Quello dove si chiude la stagione e si consiglia di bere tanta acqua", "episodio_numero": "35", "data_uscita": "2021-07-28", "durata": 3538.0, "url": "https://www.ilpost.it/episodes/ep-35-quello-dove-si-chiude-la-stagione-e-si-consiglia-di-bere-tanta-acqua/", "url_post": "https://www.ilpost.it/2021/07/28/la-trentacinquesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-35-joypad_ig_35.png"}, {"titolo": "quello per chi ha finito The Last of Us Parte 2", "episodio_numero": "15", "data_uscita": "2020-07-10", "durata": 3540.0, "url": "https://www.ilpost.it/episodes/la-quindicesima-puntata-quella-per-chi-ha-finito-the-last-of-us-parte-2/", "url_post": "https://www.ilpost.it/2020/07/10/la-quindicesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-15-ep15.png"}, {"titolo": "Quello con l\u2019E3 (e Xbox che fa il bullo)", "episodio_numero": "34", "data_uscita": "2021-06-23", "durata": 3538.0, "url": "https://www.ilpost.it/episodes/ep-34-quello-con-le3-e-xbox-che-fa-il-bullo/", "url_post": "https://www.ilpost.it/2021/06/23/la-trentaquattresima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-34-joypad_ig_34.png"}, {"titolo": "quello dove Apple e Epic Games litigano", "episodio_numero": "16", "data_uscita": "2020-08-28", "durata": 3060.0, "url": "https://www.ilpost.it/episodes/la-sedicesima-puntata-quella-dove-apple-e-epic-games-litigano/", "url_post": "https://www.ilpost.it/2020/08/28/joypad-apple-epic-games/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-16-ep16.png"}, {"titolo": "Quello prima dell\u2019E3", "episodio_numero": "33", "data_uscita": "2021-06-05", "durata": 3172.0, "url": "https://www.ilpost.it/episodes/ep-33-quello-prima-delle3/", "url_post": "https://www.ilpost.it/2021/06/05/la-trentatreesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-33-joypad_ig_33.png"}, {"titolo": "quello con Xbox Serie S e il compleanno di Mario", "episodio_numero": "17", "data_uscita": "2020-09-11", "durata": 2640.0, "url": "https://www.ilpost.it/episodes/la-diciassettesima-puntata-quella-con-xbox-serie-s-e-il-compleanno-di-mario/", "url_post": "https://www.ilpost.it/2020/09/11/la-diciassettesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-17-joypad_ig_17_result.png"}, {"titolo": "Quello con Deathloop e gli E3 dei sogni infranti", "episodio_numero": "32", "data_uscita": "2021-05-25", "durata": 2867.0, "url": "https://www.ilpost.it/episodes/ep-32-quello-con-deathloop-e-gli-e3-dei-sogni-infranti/", "url_post": "https://www.ilpost.it/2021/05/25/la-trentaduesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-32-joypad_ig_32.png"}, {"titolo": "quello con Microsoft che compra tutto", "episodio_numero": "18", "data_uscita": "2020-09-27", "durata": 3300.0, "url": "https://www.ilpost.it/episodes/la-diciottesima-puntata-quella-con-microsoft-che-compra-tutto/", "url_post": "https://www.ilpost.it/2020/09/27/la-diciottesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-18-joypad_ig_18_result.png"}, {"titolo": "Quello con Resident Evil Village e i giochi di spavento", "episodio_numero": "31", "data_uscita": "2021-05-10", "durata": 3416.0, "url": "https://www.ilpost.it/episodes/ep-31-quello-con-resident-evil-village-e-i-giochi-di-spavento/", "url_post": "https://www.ilpost.it/2021/05/10/la-trentunesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-31-joypad_ig_31.png"}, {"titolo": "quello con i giochi mortaccini", "episodio_numero": "19", "data_uscita": "2020-10-09", "durata": 2880.0, "url": "https://www.ilpost.it/episodes/la-diciannovesima-puntata-quella-con-i-giochi-mortaccini/", "url_post": "https://www.ilpost.it/2020/10/09/la-diciannovesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-19-joypad_ig_19_result.png"}, {"titolo": "Quello con Returnal e i giochi mortaccini", "episodio_numero": "30", "data_uscita": "2021-04-28", "durata": 2501.0, "url": "https://www.ilpost.it/episodes/ep-30-quello-con-returnal-e-i-giochi-mortaccini/", "url_post": "https://www.ilpost.it/2021/04/28/la-trentesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-30-joypad_ig_30.png"}, {"titolo": "quello hacker a spasso per Londra in motorino", "episodio_numero": "20", "data_uscita": "2020-11-02", "durata": 2820.0, "url": "https://www.ilpost.it/episodes/la-ventesima-puntata-quella-hacker-a-spasso-per-londra-in-motorino/", "url_post": "https://www.ilpost.it/2020/11/02/la-ventesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-20-joypad_ig_20_result.png"}, {"titolo": "quello (finalmente) con Xbox Serie X e S", "episodio_numero": "21", "data_uscita": "2020-11-16", "durata": 3480.0, "url": "https://www.ilpost.it/episodes/la-ventunesima-puntata-quella-finalmente-con-xbox-serie-x-e-s/", "url_post": "https://www.ilpost.it/2020/11/16/la-ventunesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-21-joypad_ig_21_result.png"}, {"titolo": "quello (finalmente) con PS5", "episodio_numero": "22", "data_uscita": "2020-11-23", "durata": 3000.0, "url": "https://www.ilpost.it/episodes/la-ventiduesima-puntata-quella-finalmente-con-ps5/", "url_post": "https://www.ilpost.it/2020/11/23/la-ventiduesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-22-joypad_ig_22_result.png"}, {"titolo": "quello con l\u2019altra nuova generazione", "episodio_numero": "23", "data_uscita": "2020-12-09", "durata": 2760.0, "url": "https://www.ilpost.it/episodes/la-ventitreesima-puntata-quella-con-laltra-nuova-generazione/", "url_post": "https://www.ilpost.it/2020/12/09/la-ventitreesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-23-joypad_ig_23_result.png"}, {"titolo": "quello con Cyberpunk 2077 e i TGA", "episodio_numero": "24", "data_uscita": "2020-12-23", "durata": 3000.0, "url": "https://www.ilpost.it/episodes/la-ventiquattresima-puntata-quella-con-cyberpunk-2077-e-i-tga/", "url_post": "https://www.ilpost.it/2020/12/23/la-ventiquattresima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-24-joypad_ig_24_result.png"}, {"titolo": "quello con la classifica insindacabile del 2020", "episodio_numero": "25", "data_uscita": "2021-01-15", "durata": 3300.0, "url": "https://www.ilpost.it/episodes/la-venticinquesima-puntata-quella-con-la-classifica-insindacabile-del-2020/", "url_post": "https://www.ilpost.it/2021/01/15/la-venticinquesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-25-joypad_ig_25_result.png"}, {"titolo": "quello con lo Spietato Torneo Infernale", "episodio_numero": "26", "data_uscita": "2021-01-30", "durata": 2880.0, "url": "https://www.ilpost.it/episodes/la-ventiseiesima-puntata-quella-con-lo-spietato-torneo-infernale-dei-migliori-giochi-di-sempre/", "url_post": "https://www.ilpost.it/2021/01/30/la-ventiseiesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-26-joypad_ig_26_result.png"}, {"titolo": "quello con la finanza videoludica e i manettini", "episodio_numero": "27", "data_uscita": "2021-02-13", "durata": 2880.0, "url": "https://www.ilpost.it/episodes/la-ventisettesima-puntata-quella-con-la-finanza-videoludica-e-i-manettini/", "url_post": "https://www.ilpost.it/2021/02/13/la-ventisettesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-27-joypad_ig_27_result.png"}, {"titolo": "quello con i primi, timidi, annunci", "episodio_numero": "28", "data_uscita": "2021-03-06", "durata": 2940.0, "url": "https://www.ilpost.it/episodes/la-ventottesima-puntata-quella-con-i-primi-timidi-annunci/", "url_post": "https://www.ilpost.it/2021/03/06/la-ventottesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-28-joypad_ig_28_result.png"}, {"titolo": "quello con Bordone che scopre Warzone", "episodio_numero": "29", "data_uscita": "2021-04-03", "durata": 3060.0, "url": "https://www.ilpost.it/episodes/la-ventinovesima-puntata-quella-con-bordone-che-scopre-warzone/", "url_post": "https://www.ilpost.it/2021/04/03/la-ventinovesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-29-joypad_ig_29_result.png"}, {"titolo": "quello in cui si ricomincia in presenza", "episodio_numero": "36", "data_uscita": "2021-09-04", "durata": 3600.0, "url": "https://www.ilpost.it/episodes/ep-36-quello-in-cui-si-ricomincia-in-presenza/", "url_post": "https://www.ilpost.it/2021/09/04/la-trentaseiesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-36-joypad_ig_36_result.png"}, {"titolo": "quello con il Playstation Showcase", "episodio_numero": "37", "data_uscita": "2021-09-11", "durata": 2520.0, "url": "https://www.ilpost.it/episodes/ep-37-quello-con-il-playstation-showcase/", "url_post": "https://www.ilpost.it/2021/09/11/la-trentasettesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-37-joypad_ig_37_result.png"}, {"titolo": "Quello con la console a manovella e il deserto intorno", "episodio_numero": "48", "data_uscita": "2022-04-30", "durata": 2745.0, "url": "https://www.ilpost.it/episodes/ep-48-quello-con-le-console-con-il-deserto-intorno/", "url_post": "https://www.ilpost.it/2022/04/30/la-quarantottesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-48-episodio-48.png"}, {"titolo": "Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo", "episodio_numero": "47", "data_uscita": "2022-04-09", "durata": 2562.0, "url": "https://www.ilpost.it/episodes/ep-48-quello-con-le-console-con-il-deserto-intorno/", "url_post": "https://www.ilpost.it/2022/04/09/la-quarantasettesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-47-episodio-47.png"}, {"titolo": "Quello con la guerra, Gran Turismo 7 e i dieci anni di Journey", "episodio_numero": "46", "data_uscita": "2022-03-19", "durata": 3111.0, "url": "https://www.ilpost.it/episodes/ep-46-quello-con-la-guerra-gran-turismo-7-e-i-dieci-anni-di-journey/", "url_post": "https://www.ilpost.it/2022/03/19/la-quarantaseiesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-46-episodio-46.png"}, {"titolo": "Quello con i giochi grossi", "episodio_numero": "45", "data_uscita": "2022-02-26", "durata": 3240.0, "url": "https://www.ilpost.it/episodes/ep-45-quello-con-i-giochi-grossi/", "url_post": "https://www.ilpost.it/2022/02/26/la-quarantacinquesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-45-episodio-45.png"}, {"titolo": "Quello (live) con Sony, Bungie, Sifu e il Nintendo Direct", "episodio_numero": "44", "data_uscita": "2022-02-12", "durata": 3000.0, "url": "https://www.ilpost.it/episodes/ep-44-quello-live-con-sony-bungie-sifu-e-il-nintendo-direct/", "url_post": "https://www.ilpost.it/2022/02/12/la-quarantaquattresima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-44-episodio-44.png"}, {"titolo": "Quello con Microsoft che compra Activision Blizzard", "episodio_numero": "43", "data_uscita": "2022-01-30", "durata": 2580.0, "url": "https://www.ilpost.it/episodes/ep-43-quello-con-microsoft-che-compra-activision-blizzard/", "url_post": "https://www.ilpost.it/2022/01/30/la-quarantatreesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-43-episodio-43.png"}, {"titolo": "Quello con il pc da gaming", "episodio_numero": "42", "data_uscita": "2021-12-05", "durata": 3120.0, "url": "https://www.ilpost.it/episodes/ep-42-quello-con-il-pc-da-gaming/", "url_post": "https://www.ilpost.it/2021/12/05/la-quarantaduesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-42-joypad_ig_42.png"}, {"titolo": "Quello con Elden Ring e il compleanno di Xbox", "episodio_numero": "41", "data_uscita": "2021-11-20", "durata": 3180.0, "url": "https://www.ilpost.it/episodes/ep-41-quello-con-elden-ring-e-il-compleanno-di-xbox/", "url_post": "https://www.ilpost.it/2021/11/20/la-quarantunesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-41-joypad_ig_41_result.png"}, {"titolo": "Quello con i giochi di paura per Halloween", "episodio_numero": "40", "data_uscita": "2021-10-30", "durata": 2700.0, "url": "https://www.ilpost.it/episodes/ep-40-quello-con-i-giochi-di-paura-per-halloween/", "url_post": "https://www.ilpost.it/2021/10/30/la-quarantesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-40-joypad_ig_40_result.png"}, {"titolo": "quello con FIFA e PES (che non \u00e8 pi\u00f9 PES)", "episodio_numero": "39", "data_uscita": "2021-10-17", "durata": 2880.0, "url": "https://www.ilpost.it/episodes/ep-39-quello-con-fifa-e-pes-che-non-e-piu-pes/", "url_post": "https://www.ilpost.it/2021/10/16/la-trentanovesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-39-joypad_ig_39_result.png"}, {"titolo": "quello con il ritorno di Death Stranding", "episodio_numero": "38", "data_uscita": "2021-09-25", "durata": 2700.0, "url": "https://www.ilpost.it/episodes/ep-38-quello-con-il-ritorno-di-death-stranding/", "url_post": "https://www.ilpost.it/2021/09/25/la-trentottesima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-38-joypad_ig_38_result.png"}, {"titolo": "quello con le nuove console (o quasi)", "episodio_numero": "10", "data_uscita": "2020-04-24", "durata": 3480.0, "url": "https://www.ilpost.it/episodes/la-decima-puntata-quella-con-le-nuove-console-o-quasi/", "url_post": "https://www.ilpost.it/2020/04/24/la-decima-puntata-del-podcast-di-joypad/", "url_video": null, "cover": "https://db.euscitojoypad.it/files/covers/episodi-10-ep10.png"}, {"titolo": "Il Super Nintendo Classic Mini, per adulti", "episodio_numero": "v1", "data_uscita": "2017-12-06", "durata": 311.0, "url": null, "url_post": "https://www.ilpost.it/2017/12/06/super-nes-mini-joypad/", "url_video": "https://www.youtube.com/watch?v=tkEf379bToU", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v1-ep-v1.png"}, {"titolo": "Gli sparatutto di questo inverno, provati e spiegati", "episodio_numero": "v2", "data_uscita": "2017-12-11", "durata": 1124.0, "url": null, "url_post": "https://www.ilpost.it/2017/12/11/spari-fine-anno/", "url_video": "https://www.youtube.com/watch?v=4mvqIggt5NA", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v2-ep-v2.png"}, {"titolo": "Regali di Natale per gli appassionati di videogiochi", "episodio_numero": "v3", "data_uscita": "2017-12-15", "durata": 420.0, "url": null, "url_post": "https://www.ilpost.it/2017/12/15/regali-natale-videogiochi-nintendo/", "url_video": "https://www.youtube.com/watch?v=Hx0Cb6R1AJw", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v3-ep-v3.png"}, {"titolo": "Videogiochi da regalare ai non impallinati di videogiochi", "episodio_numero": "v4", "data_uscita": "2017-12-18", "durata": 526.0, "url": null, "url_post": "https://www.ilpost.it/2017/12/18/videogiochi-regali-natale/", "url_video": "https://www.youtube.com/watch?time_continue=2&v=Eg8eO5SMUh4&feature=emb_logo", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v4-ep-v4.png"}, {"titolo": "Il gjallarhorn, spiegato", "episodio_numero": "v5", "data_uscita": "2017-12-22", "durata": 293.0, "url": null, "url_post": "https://www.ilpost.it/2017/12/22/il-gjallarhorn-spiegato/", "url_video": "https://www.youtube.com/watch?v=xWmi9OIlqMo", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v5-ep-v5.png"}, {"titolo": "I 10 migliori videogiochi del 2017, scelti da Joypad", "episodio_numero": "v6", "data_uscita": "2017-12-29", "durata": 1659.0, "url": null, "url_post": "https://www.ilpost.it/2017/12/29/migliori-videogiochi-2017-joypad/", "url_video": "https://www.youtube.com/watch?v=DbZ4QnvApU0", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v6-ep-v6.png"}, {"titolo": "Just Dance 2018, ballato bene", "episodio_numero": "v7", "data_uscita": "2018-01-09", "durata": 163.0, "url": null, "url_post": "https://www.ilpost.it/2018/01/09/just-dance-2018-recensione-joypad/", "url_video": "https://www.youtube.com/watch?v=UONKrqqgPj0", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v7-ep-v7.png"}, {"titolo": "La rivoluzione dei mondi aperti", "episodio_numero": "v8", "data_uscita": "2018-01-11", "durata": 1180.0, "url": null, "url_post": "https://www.ilpost.it/2018/01/11/joypad-mondi-aperti/", "url_video": "https://www.youtube.com/watch?v=mEXaZENh2-0", "cover": "https://db.euscitojoypad.it/files/covers/episodi-v8-ep-v8.png"}]}
+{
+  "episodi": [
+    {
+      "titolo": "Il primo episodio del podcast di Joypad",
+      "episodio_numero": "1",
+      "data_uscita": "2019-12-15",
+      "durata": 2640.0,
+      "url": "https://www.ilpost.it/episodes/la-prima-puntata-del-podcast-di-joypad/",
+      "url_post": "https://www.ilpost.it/2019/12/06/la-prima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-1-ep1_uZjJoSK.png"
+    },
+    {
+      "titolo": "quello con la PlayStation 5",
+      "episodio_numero": "13-1",
+      "data_uscita": "2020-06-12",
+      "durata": 2400.0,
+      "url": "https://www.ilpost.it/episodes/la-tredicesima-puntata-quella-con-la-playstation-5-parte-1/",
+      "url_post": "https://www.ilpost.it/2020/06/12/la-tredicesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-13-1-ep13.png"
+    },
+    {
+      "titolo": "quello con Nintendo e i grandi giocattolai",
+      "episodio_numero": "speciale",
+      "data_uscita": "2020-12-14",
+      "durata": 1680.0,
+      "url": "https://www.ilpost.it/episodes/la-puntata-speciale-quella-con-nintendo-e-i-grandi-giocattolai/",
+      "url_post": "https://www.ilpost.it/2020/12/14/la-puntata-natalizia-speciale-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": null
+    },
+    {
+      "titolo": "quello con i TGA e i migliori giochi dell\u2019anno",
+      "episodio_numero": "2",
+      "data_uscita": "2019-12-20",
+      "durata": 2580.0,
+      "url": "https://www.ilpost.it/episodes/la-seconda-puntata-del-podcast-di-joypad/",
+      "url_post": "https://www.ilpost.it/2019/12/20/videogiochi-joypad-podcast/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-2-episodio-2.png"
+    },
+    {
+      "titolo": "quello con i giochi del decennio",
+      "episodio_numero": "3",
+      "data_uscita": "2020-01-17",
+      "durata": 2640.0,
+      "url": "https://www.ilpost.it/episodes/la-terza-puntata-quella-con-i-giochi-del-decennio/",
+      "url_post": "https://www.ilpost.it/2020/01/17/la-terza-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-3-episodio-3.png"
+    },
+    {
+      "titolo": "i giochi che non arrivano e il tempo che passa",
+      "episodio_numero": "4",
+      "data_uscita": "2020-01-31",
+      "durata": 3240.0,
+      "url": "https://www.ilpost.it/episodes/la-quarta-puntata-quella-con-i-giochi-che-non-arrivano-mai-e-il-tempo-che-passa/",
+      "url_post": "https://www.ilpost.it/2020/01/31/la-quarta-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-4-episodio-4.png"
+    },
+    {
+      "titolo": "quello con Stadia, Apple Arcade e GeForce Now",
+      "episodio_numero": "5",
+      "data_uscita": "2020-02-28",
+      "durata": 3000.0,
+      "url": "https://www.ilpost.it/episodes/la-quinta-puntata-quello-con-stadia-apple-arcade-e-geforce-now/",
+      "url_post": "https://www.ilpost.it/2020/02/28/la-quinta-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-5-ep5.png"
+    },
+    {
+      "titolo": "quello con i giochi di virus mortali, per esorcizzare",
+      "episodio_numero": "6",
+      "data_uscita": "2020-03-13",
+      "durata": 3120.0,
+      "url": "https://www.ilpost.it/episodes/la-sesta-puntata-quella-con-i-giochi-di-virus-mortali-per-esorcizzare/",
+      "url_post": "https://www.ilpost.it/2020/03/13/la-sesta-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-6-ep6.png"
+    },
+    {
+      "titolo": "quello dove torna a uscire qualcosa",
+      "episodio_numero": "7",
+      "data_uscita": "2020-03-20",
+      "durata": 2760.0,
+      "url": "https://www.ilpost.it/episodes/la-settima-puntata-quella-dove-torna-a-uscire-qualcosa/",
+      "url_post": "https://www.ilpost.it/2020/03/20/la-settima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-7-ep7.png"
+    },
+    {
+      "titolo": "quello con la PlayStation 5",
+      "episodio_numero": "13-2",
+      "data_uscita": "2020-06-12",
+      "durata": 2520.0,
+      "url": "https://www.ilpost.it/episodes/la-tredicesima-puntata-quella-con-la-playstation-5-parte-2/",
+      "url_post": "https://www.ilpost.it/2020/06/12/la-tredicesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-13-2-ep13.png"
+    },
+    {
+      "titolo": "Quello con i migliori giocattolai del mondo",
+      "episodio_numero": "extra 1",
+      "data_uscita": "2020-12-14",
+      "durata": 1708.0,
+      "url": "https://www.ilpost.it/2020/12/14/la-puntata-natalizia-speciale-del-podcast-di-joypad/",
+      "url_post": "https://www.ilpost.it/2020/12/14/la-puntata-natalizia-speciale-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-extra_1-joypad_extra_ig_1.png"
+    },
+    {
+      "titolo": "quello con i giochi contro l\u2019ansia",
+      "episodio_numero": "8",
+      "data_uscita": "2020-03-27",
+      "durata": 2760.0,
+      "url": "https://www.ilpost.it/episodes/lottava-puntata-quella-con-i-giochi-contro-lansia/",
+      "url_post": "https://www.ilpost.it/2020/03/27/lottava-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-8-ep8.png"
+    },
+    {
+      "titolo": "quello con Final Fantasy VII Remake e gli altri",
+      "episodio_numero": "9",
+      "data_uscita": "2020-04-10",
+      "durata": 2820.0,
+      "url": "https://www.ilpost.it/episodes/la-nona-puntata-quella-con-final-fantasy-vii-remake-e-gli-altri/",
+      "url_post": "https://www.ilpost.it/2020/04/10/la-nona-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-9-ep9.png"
+    },
+    {
+      "titolo": "quello con i vichinghi",
+      "episodio_numero": "11",
+      "data_uscita": "2020-05-09",
+      "durata": 2820.0,
+      "url": "https://www.ilpost.it/episodes/lundicesima-puntata-quella-con-i-vichinghi/",
+      "url_post": "https://www.ilpost.it/2020/05/09/lundicesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-11-ep11.png"
+    },
+    {
+      "titolo": "chiedere soldi per cose che non si sanno fare",
+      "episodio_numero": "12",
+      "data_uscita": "2020-05-23",
+      "durata": 3240.0,
+      "url": "https://www.ilpost.it/episodes/la-dodicesima-puntata-quella-dove-la-gente-chiede-soldi-per-fare-cose-che-forse-non-sa-fare/",
+      "url_post": "https://www.ilpost.it/2020/05/23/la-dodicesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-12-ep12.png"
+    },
+    {
+      "titolo": "quello con il gioco di questa generazione",
+      "episodio_numero": "14",
+      "data_uscita": "2020-06-19",
+      "durata": 2760.0,
+      "url": "https://www.ilpost.it/episodes/la-quattordicesima-puntata-quella-con-il-gioco-di-questa-generazione/",
+      "url_post": "https://www.ilpost.it/2020/06/19/la-quattordicesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-14-ep14.png"
+    },
+    {
+      "titolo": "Quello dove si chiude la stagione e si consiglia di bere tanta acqua",
+      "episodio_numero": "35",
+      "data_uscita": "2021-07-28",
+      "durata": 3538.0,
+      "url": "https://www.ilpost.it/episodes/ep-35-quello-dove-si-chiude-la-stagione-e-si-consiglia-di-bere-tanta-acqua/",
+      "url_post": "https://www.ilpost.it/2021/07/28/la-trentacinquesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-35-joypad_ig_35.png"
+    },
+    {
+      "titolo": "quello per chi ha finito The Last of Us Parte 2",
+      "episodio_numero": "15",
+      "data_uscita": "2020-07-10",
+      "durata": 3540.0,
+      "url": "https://www.ilpost.it/episodes/la-quindicesima-puntata-quella-per-chi-ha-finito-the-last-of-us-parte-2/",
+      "url_post": "https://www.ilpost.it/2020/07/10/la-quindicesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-15-ep15.png"
+    },
+    {
+      "titolo": "Quello con l\u2019E3 (e Xbox che fa il bullo)",
+      "episodio_numero": "34",
+      "data_uscita": "2021-06-23",
+      "durata": 3538.0,
+      "url": "https://www.ilpost.it/episodes/ep-34-quello-con-le3-e-xbox-che-fa-il-bullo/",
+      "url_post": "https://www.ilpost.it/2021/06/23/la-trentaquattresima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-34-joypad_ig_34.png"
+    },
+    {
+      "titolo": "quello dove Apple e Epic Games litigano",
+      "episodio_numero": "16",
+      "data_uscita": "2020-08-28",
+      "durata": 3060.0,
+      "url": "https://www.ilpost.it/episodes/la-sedicesima-puntata-quella-dove-apple-e-epic-games-litigano/",
+      "url_post": "https://www.ilpost.it/2020/08/28/joypad-apple-epic-games/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-16-ep16.png"
+    },
+    {
+      "titolo": "Quello prima dell\u2019E3",
+      "episodio_numero": "33",
+      "data_uscita": "2021-06-05",
+      "durata": 3172.0,
+      "url": "https://www.ilpost.it/episodes/ep-33-quello-prima-delle3/",
+      "url_post": "https://www.ilpost.it/2021/06/05/la-trentatreesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-33-joypad_ig_33.png"
+    },
+    {
+      "titolo": "quello con Xbox Serie S e il compleanno di Mario",
+      "episodio_numero": "17",
+      "data_uscita": "2020-09-11",
+      "durata": 2640.0,
+      "url": "https://www.ilpost.it/episodes/la-diciassettesima-puntata-quella-con-xbox-serie-s-e-il-compleanno-di-mario/",
+      "url_post": "https://www.ilpost.it/2020/09/11/la-diciassettesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-17-joypad_ig_17_result.png"
+    },
+    {
+      "titolo": "Quello con Deathloop e gli E3 dei sogni infranti",
+      "episodio_numero": "32",
+      "data_uscita": "2021-05-25",
+      "durata": 2867.0,
+      "url": "https://www.ilpost.it/episodes/ep-32-quello-con-deathloop-e-gli-e3-dei-sogni-infranti/",
+      "url_post": "https://www.ilpost.it/2021/05/25/la-trentaduesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-32-joypad_ig_32.png"
+    },
+    {
+      "titolo": "quello con Microsoft che compra tutto",
+      "episodio_numero": "18",
+      "data_uscita": "2020-09-27",
+      "durata": 3300.0,
+      "url": "https://www.ilpost.it/episodes/la-diciottesima-puntata-quella-con-microsoft-che-compra-tutto/",
+      "url_post": "https://www.ilpost.it/2020/09/27/la-diciottesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-18-joypad_ig_18_result.png"
+    },
+    {
+      "titolo": "Quello con Resident Evil Village e i giochi di spavento",
+      "episodio_numero": "31",
+      "data_uscita": "2021-05-10",
+      "durata": 3416.0,
+      "url": "https://www.ilpost.it/episodes/ep-31-quello-con-resident-evil-village-e-i-giochi-di-spavento/",
+      "url_post": "https://www.ilpost.it/2021/05/10/la-trentunesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-31-joypad_ig_31.png"
+    },
+    {
+      "titolo": "quello con i giochi mortaccini",
+      "episodio_numero": "19",
+      "data_uscita": "2020-10-09",
+      "durata": 2880.0,
+      "url": "https://www.ilpost.it/episodes/la-diciannovesima-puntata-quella-con-i-giochi-mortaccini/",
+      "url_post": "https://www.ilpost.it/2020/10/09/la-diciannovesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-19-joypad_ig_19_result.png"
+    },
+    {
+      "titolo": "Quello con Returnal e i giochi mortaccini",
+      "episodio_numero": "30",
+      "data_uscita": "2021-04-28",
+      "durata": 2501.0,
+      "url": "https://www.ilpost.it/episodes/ep-30-quello-con-returnal-e-i-giochi-mortaccini/",
+      "url_post": "https://www.ilpost.it/2021/04/28/la-trentesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-30-joypad_ig_30.png"
+    },
+    {
+      "titolo": "quello hacker a spasso per Londra in motorino",
+      "episodio_numero": "20",
+      "data_uscita": "2020-11-02",
+      "durata": 2820.0,
+      "url": "https://www.ilpost.it/episodes/la-ventesima-puntata-quella-hacker-a-spasso-per-londra-in-motorino/",
+      "url_post": "https://www.ilpost.it/2020/11/02/la-ventesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-20-joypad_ig_20_result.png"
+    },
+    {
+      "titolo": "quello (finalmente) con Xbox Serie X e S",
+      "episodio_numero": "21",
+      "data_uscita": "2020-11-16",
+      "durata": 3480.0,
+      "url": "https://www.ilpost.it/episodes/la-ventunesima-puntata-quella-finalmente-con-xbox-serie-x-e-s/",
+      "url_post": "https://www.ilpost.it/2020/11/16/la-ventunesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-21-joypad_ig_21_result.png"
+    },
+    {
+      "titolo": "quello (finalmente) con PS5",
+      "episodio_numero": "22",
+      "data_uscita": "2020-11-23",
+      "durata": 3000.0,
+      "url": "https://www.ilpost.it/episodes/la-ventiduesima-puntata-quella-finalmente-con-ps5/",
+      "url_post": "https://www.ilpost.it/2020/11/23/la-ventiduesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-22-joypad_ig_22_result.png"
+    },
+    {
+      "titolo": "quello con l\u2019altra nuova generazione",
+      "episodio_numero": "23",
+      "data_uscita": "2020-12-09",
+      "durata": 2760.0,
+      "url": "https://www.ilpost.it/episodes/la-ventitreesima-puntata-quella-con-laltra-nuova-generazione/",
+      "url_post": "https://www.ilpost.it/2020/12/09/la-ventitreesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-23-joypad_ig_23_result.png"
+    },
+    {
+      "titolo": "quello con Cyberpunk 2077 e i TGA",
+      "episodio_numero": "24",
+      "data_uscita": "2020-12-23",
+      "durata": 3000.0,
+      "url": "https://www.ilpost.it/episodes/la-ventiquattresima-puntata-quella-con-cyberpunk-2077-e-i-tga/",
+      "url_post": "https://www.ilpost.it/2020/12/23/la-ventiquattresima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-24-joypad_ig_24_result.png"
+    },
+    {
+      "titolo": "quello con la classifica insindacabile del 2020",
+      "episodio_numero": "25",
+      "data_uscita": "2021-01-15",
+      "durata": 3300.0,
+      "url": "https://www.ilpost.it/episodes/la-venticinquesima-puntata-quella-con-la-classifica-insindacabile-del-2020/",
+      "url_post": "https://www.ilpost.it/2021/01/15/la-venticinquesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-25-joypad_ig_25_result.png"
+    },
+    {
+      "titolo": "quello con lo Spietato Torneo Infernale",
+      "episodio_numero": "26",
+      "data_uscita": "2021-01-30",
+      "durata": 2880.0,
+      "url": "https://www.ilpost.it/episodes/la-ventiseiesima-puntata-quella-con-lo-spietato-torneo-infernale-dei-migliori-giochi-di-sempre/",
+      "url_post": "https://www.ilpost.it/2021/01/30/la-ventiseiesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-26-joypad_ig_26_result.png"
+    },
+    {
+      "titolo": "quello con la finanza videoludica e i manettini",
+      "episodio_numero": "27",
+      "data_uscita": "2021-02-13",
+      "durata": 2880.0,
+      "url": "https://www.ilpost.it/episodes/la-ventisettesima-puntata-quella-con-la-finanza-videoludica-e-i-manettini/",
+      "url_post": "https://www.ilpost.it/2021/02/13/la-ventisettesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-27-joypad_ig_27_result.png"
+    },
+    {
+      "titolo": "quello con i primi, timidi, annunci",
+      "episodio_numero": "28",
+      "data_uscita": "2021-03-06",
+      "durata": 2940.0,
+      "url": "https://www.ilpost.it/episodes/la-ventottesima-puntata-quella-con-i-primi-timidi-annunci/",
+      "url_post": "https://www.ilpost.it/2021/03/06/la-ventottesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-28-joypad_ig_28_result.png"
+    },
+    {
+      "titolo": "quello con Bordone che scopre Warzone",
+      "episodio_numero": "29",
+      "data_uscita": "2021-04-03",
+      "durata": 3060.0,
+      "url": "https://www.ilpost.it/episodes/la-ventinovesima-puntata-quella-con-bordone-che-scopre-warzone/",
+      "url_post": "https://www.ilpost.it/2021/04/03/la-ventinovesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-29-joypad_ig_29_result.png"
+    },
+    {
+      "titolo": "quello in cui si ricomincia in presenza",
+      "episodio_numero": "36",
+      "data_uscita": "2021-09-04",
+      "durata": 3600.0,
+      "url": "https://www.ilpost.it/episodes/ep-36-quello-in-cui-si-ricomincia-in-presenza/",
+      "url_post": "https://www.ilpost.it/2021/09/04/la-trentaseiesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-36-joypad_ig_36_result.png"
+    },
+    {
+      "titolo": "quello con il Playstation Showcase",
+      "episodio_numero": "37",
+      "data_uscita": "2021-09-11",
+      "durata": 2520.0,
+      "url": "https://www.ilpost.it/episodes/ep-37-quello-con-il-playstation-showcase/",
+      "url_post": "https://www.ilpost.it/2021/09/11/la-trentasettesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-37-joypad_ig_37_result.png"
+    },
+    {
+      "titolo": "Quello con la console a manovella e il deserto intorno",
+      "episodio_numero": "48",
+      "data_uscita": "2022-04-30",
+      "durata": 2745.0,
+      "url": "https://www.ilpost.it/episodes/ep-48-quello-con-le-console-con-il-deserto-intorno/",
+      "url_post": "https://www.ilpost.it/2022/04/30/la-quarantottesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-48-episodio-48.png"
+    },
+    {
+      "titolo": "Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo",
+      "episodio_numero": "47",
+      "data_uscita": "2022-04-09",
+      "durata": 2562.0,
+      "url": "https://www.ilpost.it/episodes/ep-48-quello-con-le-console-con-il-deserto-intorno/",
+      "url_post": "https://www.ilpost.it/2022/04/09/la-quarantasettesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-47-episodio-47.png"
+    },
+    {
+      "titolo": "Quello con la guerra, Gran Turismo 7 e i dieci anni di Journey",
+      "episodio_numero": "46",
+      "data_uscita": "2022-03-19",
+      "durata": 3111.0,
+      "url": "https://www.ilpost.it/episodes/ep-46-quello-con-la-guerra-gran-turismo-7-e-i-dieci-anni-di-journey/",
+      "url_post": "https://www.ilpost.it/2022/03/19/la-quarantaseiesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-46-episodio-46.png"
+    },
+    {
+      "titolo": "Quello con i giochi grossi",
+      "episodio_numero": "45",
+      "data_uscita": "2022-02-26",
+      "durata": 3240.0,
+      "url": "https://www.ilpost.it/episodes/ep-45-quello-con-i-giochi-grossi/",
+      "url_post": "https://www.ilpost.it/2022/02/26/la-quarantacinquesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-45-episodio-45.png"
+    },
+    {
+      "titolo": "Quello (live) con Sony, Bungie, Sifu e il Nintendo Direct",
+      "episodio_numero": "44",
+      "data_uscita": "2022-02-12",
+      "durata": 3000.0,
+      "url": "https://www.ilpost.it/episodes/ep-44-quello-live-con-sony-bungie-sifu-e-il-nintendo-direct/",
+      "url_post": "https://www.ilpost.it/2022/02/12/la-quarantaquattresima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-44-episodio-44.png"
+    },
+    {
+      "titolo": "Quello con Microsoft che compra Activision Blizzard",
+      "episodio_numero": "43",
+      "data_uscita": "2022-01-30",
+      "durata": 2580.0,
+      "url": "https://www.ilpost.it/episodes/ep-43-quello-con-microsoft-che-compra-activision-blizzard/",
+      "url_post": "https://www.ilpost.it/2022/01/30/la-quarantatreesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-43-episodio-43.png"
+    },
+    {
+      "titolo": "Quello con il pc da gaming",
+      "episodio_numero": "42",
+      "data_uscita": "2021-12-05",
+      "durata": 3120.0,
+      "url": "https://www.ilpost.it/episodes/ep-42-quello-con-il-pc-da-gaming/",
+      "url_post": "https://www.ilpost.it/2021/12/05/la-quarantaduesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-42-joypad_ig_42.png"
+    },
+    {
+      "titolo": "Quello con Elden Ring e il compleanno di Xbox",
+      "episodio_numero": "41",
+      "data_uscita": "2021-11-20",
+      "durata": 3180.0,
+      "url": "https://www.ilpost.it/episodes/ep-41-quello-con-elden-ring-e-il-compleanno-di-xbox/",
+      "url_post": "https://www.ilpost.it/2021/11/20/la-quarantunesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-41-joypad_ig_41_result.png"
+    },
+    {
+      "titolo": "Quello con i giochi di paura per Halloween",
+      "episodio_numero": "40",
+      "data_uscita": "2021-10-30",
+      "durata": 2700.0,
+      "url": "https://www.ilpost.it/episodes/ep-40-quello-con-i-giochi-di-paura-per-halloween/",
+      "url_post": "https://www.ilpost.it/2021/10/30/la-quarantesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-40-joypad_ig_40_result.png"
+    },
+    {
+      "titolo": "quello con FIFA e PES (che non \u00e8 pi\u00f9 PES)",
+      "episodio_numero": "39",
+      "data_uscita": "2021-10-17",
+      "durata": 2880.0,
+      "url": "https://www.ilpost.it/episodes/ep-39-quello-con-fifa-e-pes-che-non-e-piu-pes/",
+      "url_post": "https://www.ilpost.it/2021/10/16/la-trentanovesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-39-joypad_ig_39_result.png"
+    },
+    {
+      "titolo": "quello con il ritorno di Death Stranding",
+      "episodio_numero": "38",
+      "data_uscita": "2021-09-25",
+      "durata": 2700.0,
+      "url": "https://www.ilpost.it/episodes/ep-38-quello-con-il-ritorno-di-death-stranding/",
+      "url_post": "https://www.ilpost.it/2021/09/25/la-trentottesima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-38-joypad_ig_38_result.png"
+    },
+    {
+      "titolo": "quello con le nuove console (o quasi)",
+      "episodio_numero": "10",
+      "data_uscita": "2020-04-24",
+      "durata": 3480.0,
+      "url": "https://www.ilpost.it/episodes/la-decima-puntata-quella-con-le-nuove-console-o-quasi/",
+      "url_post": "https://www.ilpost.it/2020/04/24/la-decima-puntata-del-podcast-di-joypad/",
+      "url_video": null,
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-10-ep10.png"
+    },
+    {
+      "titolo": "Il Super Nintendo Classic Mini, per adulti",
+      "episodio_numero": "v1",
+      "data_uscita": "2017-12-06",
+      "durata": 311.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2017/12/06/super-nes-mini-joypad/",
+      "url_video": "https://www.youtube.com/watch?v=tkEf379bToU",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v1-ep-v1.png"
+    },
+    {
+      "titolo": "Gli sparatutto di questo inverno, provati e spiegati",
+      "episodio_numero": "v2",
+      "data_uscita": "2017-12-11",
+      "durata": 1124.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2017/12/11/spari-fine-anno/",
+      "url_video": "https://www.youtube.com/watch?v=4mvqIggt5NA",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v2-ep-v2.png"
+    },
+    {
+      "titolo": "Regali di Natale per gli appassionati di videogiochi",
+      "episodio_numero": "v3",
+      "data_uscita": "2017-12-15",
+      "durata": 420.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2017/12/15/regali-natale-videogiochi-nintendo/",
+      "url_video": "https://www.youtube.com/watch?v=Hx0Cb6R1AJw",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v3-ep-v3.png"
+    },
+    {
+      "titolo": "Videogiochi da regalare ai non impallinati di videogiochi",
+      "episodio_numero": "v4",
+      "data_uscita": "2017-12-18",
+      "durata": 526.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2017/12/18/videogiochi-regali-natale/",
+      "url_video": "https://www.youtube.com/watch?time_continue=2&v=Eg8eO5SMUh4&feature=emb_logo",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v4-ep-v4.png"
+    },
+    {
+      "titolo": "Il gjallarhorn, spiegato",
+      "episodio_numero": "v5",
+      "data_uscita": "2017-12-22",
+      "durata": 293.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2017/12/22/il-gjallarhorn-spiegato/",
+      "url_video": "https://www.youtube.com/watch?v=xWmi9OIlqMo",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v5-ep-v5.png"
+    },
+    {
+      "titolo": "I 10 migliori videogiochi del 2017, scelti da Joypad",
+      "episodio_numero": "v6",
+      "data_uscita": "2017-12-29",
+      "durata": 1659.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2017/12/29/migliori-videogiochi-2017-joypad/",
+      "url_video": "https://www.youtube.com/watch?v=DbZ4QnvApU0",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v6-ep-v6.png"
+    },
+    {
+      "titolo": "Just Dance 2018, ballato bene",
+      "episodio_numero": "v7",
+      "data_uscita": "2018-01-09",
+      "durata": 163.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2018/01/09/just-dance-2018-recensione-joypad/",
+      "url_video": "https://www.youtube.com/watch?v=UONKrqqgPj0",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v7-ep-v7.png"
+    },
+    {
+      "titolo": "La rivoluzione dei mondi aperti",
+      "episodio_numero": "v8",
+      "data_uscita": "2018-01-11",
+      "durata": 1180.0,
+      "url": null,
+      "url_post": "https://www.ilpost.it/2018/01/11/joypad-mondi-aperti/",
+      "url_video": "https://www.youtube.com/watch?v=mEXaZENh2-0",
+      "cover": "https://db.euscitojoypad.it/files/covers/episodi-v8-ep-v8.png"
+    }
+  ]
+}

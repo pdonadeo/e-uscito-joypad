@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import RispostaSi from "./RispostaSi";
 import RispostaNo from "./RispostaNo";
 import EpisodeListing from "./components/EpisodeListing";
+import Search from "./components/SearchBar";
 
 function App() {
   const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
@@ -46,7 +47,7 @@ function App() {
         <a href="https://github.com/pdonadeo/e-uscito-joypad">GitHub</a> e potete fare tutte le richieste che volete{" "}
         <a href="https://github.com/pdonadeo/e-uscito-joypad/issues">qui</a>.
       </p>
-
+      <Search />
       <EpisodeListing />
     </>
   );
