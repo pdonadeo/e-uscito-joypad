@@ -6,7 +6,7 @@ import EpisodeSection from "./components/EpisodeSection";
 
 function App() {
   const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
-  const [dbData, setDbData] = useState({});
+  // const [dbData, setDbData] = useState({});
 
   useEffect(() => {
     fetch("/api/ultima-puntata")
@@ -16,17 +16,17 @@ function App() {
       });
   }, []);
 
-  useEffect(() => {
-    fetch("/api/db-data")
-      .then((response) => response.json())
-      .then((data) => {
-        setDbData(data);
-      });
-  }, []);
+  // useEffect(() => {
+  //   fetch("/api/db-data")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       setDbData(data);
+  //     });
+  // }, []);
 
   return (
     <div>
-      <RispostaSi dati={datiUltimaPuntata} />
+      {datiUltimaPuntata.uscito ? <RispostaSi dati={datiUltimaPuntata} /> : <RispostaNo dati={datiUltimaPuntata} />}
 
       <p>
         Ascolta la puntata <a href="https://www.ilpost.it/podcasts/joypad/">sulla pagina del Post</a>, sull’

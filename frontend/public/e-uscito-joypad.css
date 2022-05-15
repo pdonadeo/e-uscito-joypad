@@ -14,7 +14,6 @@ body {
   min-height: calc(100vh - 20px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   font-family: "Montserrat", sans-serif;
   text-align: left;
   background-color: #f7f7f8;

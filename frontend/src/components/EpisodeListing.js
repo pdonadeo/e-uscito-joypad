@@ -6,6 +6,8 @@ import Fuse from "fuse.js";
 import EpisodeItem from "./EpisodeItem";
 
 import classes from "./EpisodeListing.module.css";
+import { AnimatePresence } from "framer-motion";
+import ListTransition from "../CustomHooks/ListTransition";
 
 const EpisodeListing = () => {
   const [episodeList, setEpisodeList] = useState([]);
@@ -63,7 +65,7 @@ const EpisodeListing = () => {
   // } else filteredQuotes = episodeList;
 
   return (
-    <div className={classes.listBox}>
+    <ul className={classes.listBox}>
       {episodeResult.map((episode) => {
         return (
           <EpisodeItem
@@ -77,7 +79,7 @@ const EpisodeListing = () => {
           />
         );
       })}
-    </div>
+    </ul>
   );
 };
 
