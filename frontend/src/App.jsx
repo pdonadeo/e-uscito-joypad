@@ -26,7 +26,7 @@ function App() {
 
   return (
     <div>
-      {datiUltimaPuntata.uscito ? <RispostaSi dati={datiUltimaPuntata} /> : <RispostaNo dati={datiUltimaPuntata} />}
+      <RispostaSi dati={datiUltimaPuntata} />
 
       <p>
         Ascolta la puntata <a href="https://www.ilpost.it/podcasts/joypad/">sulla pagina del Post</a>, sull’

@@ -1,5 +1,4 @@
 .container {
-  background-color: lightblue;
   display: flex;
   flex-direction: column;
   align-items: center;

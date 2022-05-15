@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect, useContext } from "react";
 import SearchContext from "../store/search-context";
 
+import Fuse from "fuse.js";
+
 import EpisodeItem from "./EpisodeItem";
 
 import classes from "./EpisodeListing.module.css";
@@ -8,6 +10,7 @@ import classes from "./EpisodeListing.module.css";
 const EpisodeListing = () => {
   const [episodeList, setEpisodeList] = useState([]);
   const { searchInput } = useContext(SearchContext);
+  console.log("rendering");
 
   const fetchEpisode = useCallback(async () => {
     try {
@@ -25,29 +28,43 @@ const EpisodeListing = () => {
   }, []);
   useEffect(() => {
     fetchEpisode();
-  }, []);
+  }, [fetchEpisode]);
 
-  const arrInputs = searchInput.includes(" ") ? searchInput.split(" ") : [searchInput];
+  const fuse = new Fuse(episodeList, {
+    keys: ["titolo"],
+    includeScore: true,
+    includeMatches: true,
+    threshold: 0.5,
+    findAllMatches: true,
+  });
 
-  let filteredQuotes = [];
+  const results = fuse.search(searchInput);
 
-  const filterSearch = (words) =>
-    episodeList.filter((s) =>
-      words.some(
-        (w) => s.titolo.toLowerCase().includes(w.toLowerCase())
-        // || s.body.toLowerCase().includes(w.toLowerCase())
-      )
-    );
+  const episodeResult = searchInput ? results.map((result) => result.item) : episodeList;
 
-  const trimArr = arrInputs.join(" ").trim().split(" ");
+  console.log(episodeResult);
 
-  if (arrInputs.length > 0) {
-    filteredQuotes = filterSearch(trimArr);
-  } else filteredQuotes = episodeList;
+  // const arrInputs = searchInput.includes(" ") ? searchInput.split(" ") : [searchInput];
+
+  // let filteredQuotes = [];
+
+  // const filterSearch = (words) =>
+  //   episodeList.filter((s) =>
+  //     words.some(
+  //       (w) => s.titolo.toLowerCase().includes(w.toLowerCase())
+  //       // || s.body.toLowerCase().includes(w.toLowerCase())
+  //     )
+  //   );
+
+  // const trimArr = arrInputs.join(" ").trim().split(" ");
+
+  // if (arrInputs.length > 0) {
+  //   filteredQuotes = filterSearch(trimArr);
+  // } else filteredQuotes = episodeList;
 
   return (
     <div className={classes.listBox}>
-      {filteredQuotes.map((episode) => {
+      {episodeResult.map((episode) => {
         return (
           <EpisodeItem
             key={episode.episodio_numero}
