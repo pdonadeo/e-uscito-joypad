@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -17,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "django_json_widget",
     "backoffice",
 ]
 
@@ -94,4 +96,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 #####                      CONFIGURAZIONE SESSIONI                         #####
 ################################################################################
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+################################################################################
+
+################################################################################
+#####                           RAWG API KEY                               #####
+################################################################################
+RAWG_API_KEY = os.environ.get("RAWG_API_KEY", None)
 ################################################################################
