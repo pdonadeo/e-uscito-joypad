@@ -12,7 +12,6 @@ html {
 
 body {
   min-height: calc(100vh - 20px);
-  margin: 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

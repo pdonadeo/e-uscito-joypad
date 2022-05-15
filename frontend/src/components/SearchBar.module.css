@@ -1,0 +1,14 @@
+.searchBar {
+  width: 80%;
+  height: 3rem;
+  display: flex;
+  margin-top: 3rem;
+}
+
+.input {
+  font-family: inherit;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid black;
+  width: 100%;
+}
