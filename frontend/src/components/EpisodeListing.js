@@ -6,8 +6,6 @@ import Fuse from "fuse.js";
 import EpisodeItem from "./EpisodeItem";
 
 import classes from "./EpisodeListing.module.css";
-import { AnimatePresence } from "framer-motion";
-import ListTransition from "../CustomHooks/ListTransition";
 
 const EpisodeListing = () => {
   const [episodeList, setEpisodeList] = useState([]);
@@ -76,6 +74,7 @@ const EpisodeListing = () => {
             numero={episode.episodio_numero}
             cover={episode.cover}
             uscita={episode.data_uscita}
+            durata={episode.durata}
           />
         );
       })}

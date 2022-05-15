@@ -17,6 +17,7 @@ body {
   font-family: "Montserrat", sans-serif;
   text-align: left;
   background-color: #f7f7f8;
+  width: 100vw;
 }
 
 header {

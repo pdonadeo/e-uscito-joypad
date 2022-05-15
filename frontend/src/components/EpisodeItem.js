@@ -10,6 +10,7 @@ const EpisodeItem = (props) => {
       <div className={classes.textBox}>
         <p>{props.numero}</p>
         <p>{props.titolo}</p>
+        <p>{(props.durata / 60).toFixed(0)} min</p>
         <p>Data di uscita:{props.uscita}</p>
         <a href={props.url}>Ascolta Qua</a>
       </div>
