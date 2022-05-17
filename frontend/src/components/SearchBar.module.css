@@ -1,5 +1,5 @@
 .searchBar {
-  width: 80%;
+  width: 91.9rem;
   height: 5rem;
   display: flex;
   margin-top: 3rem;
@@ -16,9 +16,7 @@
   border: none;
   width: 100%;
   padding-left: 2rem;
-}
-
-.iconBox {
+  height: 4rem;
 }
 
 .searchIcon,

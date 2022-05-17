@@ -1,9 +1,9 @@
 .listBox {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   margin-top: 5rem;
-  width: 80%;
   max-width: 91.9rem;
+  gap: 2.4rem;
 }
