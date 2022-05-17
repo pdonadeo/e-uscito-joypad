@@ -1,14 +1,49 @@
 .searchBar {
   width: 80%;
-  height: 3rem;
+  height: 5rem;
   display: flex;
   margin-top: 3rem;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  gap: 1.6rem;
 }
 
 .input {
   font-family: inherit;
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid black;
   width: 100%;
+  padding-left: 2rem;
+}
+
+.iconBox {
+}
+
+.searchIcon,
+.sortIcon {
+  height: 4rem;
+  min-width: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchIcon {
+  position: relative;
+}
+
+.searchIcon:after {
+  content: "";
+  background-color: #f7f7f8;
+  height: 5rem;
+  width: 2px;
+  position: absolute;
+  top: -0.5rem;
+  right: -0.8rem;
+}
+
+.sortIcon {
+  margin-right: 0.8rem;
 }
