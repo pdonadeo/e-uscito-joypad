@@ -108,6 +108,12 @@ class Episodio(models.Model):
         help_text="""Cover dell'episodio. ATTENZIONE: l'immagine deve essere caricata in formato
                      PNG e dimensione 256x256px, non viene fatto il resize.""",
     )
+    note = models.TextField(
+        verbose_name="Note libere",
+        null=True,
+        blank=True,
+        help_text="Note per i redattori, non vengono visualizzate in alcun punto del sito",
+    )
     giochi = models.ManyToManyField(
         Videogame,
         verbose_name="Titoli di videogiochi",
