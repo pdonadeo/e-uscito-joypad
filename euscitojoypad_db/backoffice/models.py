@@ -1,3 +1,4 @@
+from curses.ascii import SP
 import datetime
 from http.client import ImproperConnectionState
 import json
@@ -107,6 +108,12 @@ class Episodio(models.Model):
         help_text="""Cover dell'episodio. ATTENZIONE: l'immagine deve essere caricata in formato
                      PNG e dimensione 256x256px, non viene fatto il resize.""",
     )
+    note = models.TextField(
+        verbose_name="Note libere",
+        null=True,
+        blank=True,
+        help_text="Note per i redattori, non vengono visualizzate in alcun punto del sito",
+    )
     giochi = models.ManyToManyField(
         Videogame,
         verbose_name="Titoli di videogiochi",
@@ -118,6 +125,27 @@ class Episodio(models.Model):
 
     def __str__(self):
         return f"Ep. {self.episodio_numero}, {self.titolo}"
+
+
+SPEAKER_CHOICES = [
+    ("TUTT", "Tutti"),
+    ("BORD", "Matteo Bordone (corri!)"),
+    ("FOSS", "Francesco Fossetti (salta!)"),
+    ("ZAMP", "Alessandro Zampini (spara!)"),
+]
+SPEAKER_CHOICES_DICT = {}
+for k, v in SPEAKER_CHOICES:
+    SPEAKER_CHOICES_DICT[k] = v
+
+
+TIPOLOGIA_CHOICES = [
+    ("FREE", "Chiacchiera libera"),
+    ("RECE", "Recensione"),
+    ("CONS", "Consiglio"),
+]
+TIPOLOGIA_CHOICES_DICT = {}
+for k, v in TIPOLOGIA_CHOICES:
+    TIPOLOGIA_CHOICES_DICT[k] = v
 
 
 class AssociazioneEpisodioVideogame(models.Model):
@@ -134,12 +162,7 @@ class AssociazioneEpisodioVideogame(models.Model):
         verbose_name="Istante citazione", null=True, blank=True, default=datetime.timedelta(minutes=0)
     )
     speaker = models.CharField(
-        choices=[
-            ("TUTT", "Tutti"),
-            ("BORD", "Matteo Bordone (corri!)"),
-            ("FOSS", "Francesco Fossetti (salta!)"),
-            ("ZAMP", "Alessandro Zampini (spara!)"),
-        ],
+        choices=SPEAKER_CHOICES,
         verbose_name="Speaker",
         max_length=4,
         null=False,
@@ -147,11 +170,7 @@ class AssociazioneEpisodioVideogame(models.Model):
         default="TUTT",
     )
     tipologia = models.CharField(
-        choices=[
-            ("FREE", "Chiacchiera libera"),
-            ("RECE", "Recensione"),
-            ("CONS", "Consiglio"),
-        ],
+        choices=TIPOLOGIA_CHOICES,
         verbose_name="Tipologia della citazione",
         max_length=4,
         null=False,

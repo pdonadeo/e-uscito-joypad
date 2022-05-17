@@ -1,7 +1,9 @@
 import json
 
 from django.core.management.base import BaseCommand, CommandError
-from backoffice.models import Episodio
+from backoffice.models import Episodio, Videogame
+
+from backoffice.models import SPEAKER_CHOICES_DICT, TIPOLOGIA_CHOICES_DICT
 
 
 class Command(BaseCommand):
@@ -9,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         episodi = []
-        for ep in Episodio.objects.all():
+        for ep in Episodio.objects.all().order_by("data_uscita"):
             ep_j = {}
             ep_j["titolo"] = ep.titolo
             ep_j["episodio_numero"] = ep.episodio_numero
@@ -22,11 +24,40 @@ class Command(BaseCommand):
                 ep_j["cover"] = f"https://db.euscitojoypad.it{ep.cover.url}"
             else:
                 ep_j["cover"] = None
+
+            giochi = []
+            for assoc in ep.associazioneepisodiovideogame_set.all().order_by("istante"):
+                gioco = assoc.videogame
+                gioco_j = {
+                    "titolo": gioco.titolo,
+                    "descizione_txt": gioco.descrizione_raw,
+                    "descrizione_html": gioco.descrizione_html,
+                    "cover": gioco.cover,
+                    "istante": assoc.istante.total_seconds(),
+                    "speaker": SPEAKER_CHOICES_DICT[assoc.speaker],
+                    "tipologia": TIPOLOGIA_CHOICES_DICT[assoc.tipologia],
+                }
+                giochi.append(gioco_j)
+
+            ep_j["giochi"] = giochi
             episodi.append(ep_j)
+
+        giochi = []
+        for gioco in Videogame.objects.all().order_by("rawg_slug"):
+            gioco_j = {
+                "titolo": gioco.titolo,
+                "descrizione_txt": gioco.descrizione_raw,
+                "descrizione_html": gioco.descrizione_html,
+                "cover": gioco.cover,
+                "rawg_slug": gioco.rawg_slug,
+            }
+            giochi.append(gioco_j)
+
         with open("db_data.json", "w") as f:
             json.dump(
                 {
                     "episodi": episodi,
+                    "giochi": giochi,
                 },
                 f,
             )
