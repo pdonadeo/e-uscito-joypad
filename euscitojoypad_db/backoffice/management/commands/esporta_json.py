@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 gioco = assoc.videogame
                 gioco_j = {
                     "titolo": gioco.titolo,
-                    "descizione_txt": gioco.descrizione_raw,
+                    "descrizione_txt": gioco.descrizione_raw,
                     "descrizione_html": gioco.descrizione_html,
                     "cover": gioco.cover,
                     "istante": assoc.istante.total_seconds(),
