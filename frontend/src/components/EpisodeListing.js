@@ -10,7 +10,7 @@ import classes from "./EpisodeListing.module.css";
 const EpisodeListing = () => {
   const [episodeList, setEpisodeList] = useState([]);
   const { searchInput } = useContext(SearchContext);
-  console.log("rendering");
+  const [interestedIndex, setInterestedIndex] = useState();
 
   const fetchEpisode = useCallback(async () => {
     try {
@@ -42,31 +42,25 @@ const EpisodeListing = () => {
 
   const episodeResult = searchInput ? results.map((result) => result.item) : episodeList;
 
-  console.log(episodeResult);
+  const activeListHandler = (index, status) => {
+    if (status) {
+      setInterestedIndex(null);
+      return;
+    }
 
-  // const arrInputs = searchInput.includes(" ") ? searchInput.split(" ") : [searchInput];
-
-  // let filteredQuotes = [];
-
-  // const filterSearch = (words) =>
-  //   episodeList.filter((s) =>
-  //     words.some(
-  //       (w) => s.titolo.toLowerCase().includes(w.toLowerCase())
-  //       // || s.body.toLowerCase().includes(w.toLowerCase())
-  //     )
-  //   );
-
-  // const trimArr = arrInputs.join(" ").trim().split(" ");
-
-  // if (arrInputs.length > 0) {
-  //   filteredQuotes = filterSearch(trimArr);
-  // } else filteredQuotes = episodeList;
+    if (index % 2 !== 0) setInterestedIndex(index);
+    else {
+      index = index + 1;
+      setInterestedIndex(index);
+    }
+  };
 
   return (
     <ul className={classes.listBox}>
-      {episodeResult.map((episode) => {
+      {episodeResult.map((episode, index) => {
         return (
           <EpisodeItem
+            index={index}
             key={episode.episodio_numero}
             id={episode.episodio_numero}
             titolo={episode.titolo}
@@ -75,6 +69,8 @@ const EpisodeListing = () => {
             cover={episode.cover}
             uscita={episode.data_uscita}
             durata={episode.durata}
+            onActive={activeListHandler}
+            involved={index === interestedIndex ? true : false}
           />
         );
       })}
