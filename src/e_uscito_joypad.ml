@@ -29,17 +29,44 @@ type dati_ultima_puntata = {
 }
 [@@deriving yojson]
 
+type gioco_episodio = {
+  titolo : string;
+  descrizione_txt : string;
+  descrizione_html : string;
+  cover : string option;
+  istante : float;
+  speaker : string;
+  tipologia : string;
+}
+[@@deriving yojson]
+
+type gioco = {
+  titolo : string;
+  descrizione_txt : string;
+  descrizione_html : string;
+  cover : string option;
+  rawg_slug : string;
+}
+[@@deriving yojson]
+
 type episode = {
-  titolo: string;
-  episodio_numero: string option;
-  data_uscita: string;
-  durata: float;
-  url: string option;
-  url_post: string option;
-  url_video: string option;
-  cover: string option;
-} [@@deriving yojson]
-type db_data = { episodi : episode list } [@@deriving yojson]
+  titolo : string;
+  episodio_numero : string option;
+  data_uscita : string;
+  durata : float;
+  url : string option;
+  url_post : string option;
+  url_video : string option;
+  cover : string option;
+  giochi : gioco_episodio list;
+}
+[@@deriving yojson]
+
+type db_data = {
+  episodi : episode list;
+  giochi : gioco list;
+}
+[@@deriving yojson]
 
 let server =
   Lwt.async (Joypad_monitor.monitor ~last_episode_data);
