@@ -78,6 +78,7 @@ let server =
   @@ router
        [
          get "/static/static/js/**" @@ static "assets/js";
+         get "/static/static/css/**" @@ static "assets/css";
          get "/static/**" @@ static "assets";
          get "/api/ultima-puntata" (fun _req ->
              let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
