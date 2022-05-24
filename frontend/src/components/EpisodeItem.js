@@ -1,5 +1,7 @@
 import { Fragment, useState } from "react";
 
+import { useMediaQuery } from "react-responsive";
+
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
 
@@ -7,6 +9,7 @@ import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
 import EpisodeContent from "./EpisodeContent/EpisodeContent";
 
 const EpisodeItem = (props) => {
+  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
   const [active, setActive] = useState(false);
   const activeHandler = () => {
     setActive(!active);
