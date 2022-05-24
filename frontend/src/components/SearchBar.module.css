@@ -46,3 +46,15 @@
   margin-right: 0.8rem;
   cursor: pointer;
 }
+
+@media screen and (max-width: 800px) {
+  .searchBar {
+    width: 100vw;
+    position: fixed;
+    background-color: #fff;
+    z-index: 10;
+    box-shadow: inset 0px 0px 16px rgba(0, 0, 0, 0.08);
+    bottom: 0;
+    left: 0;
+  }
+}

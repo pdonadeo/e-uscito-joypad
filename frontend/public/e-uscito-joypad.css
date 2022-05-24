@@ -28,7 +28,6 @@ body {
 header {
   display: flex;
   justify-content: center;
-  height: 30vh;
 }
 
 header img {
@@ -99,4 +98,11 @@ footer p {
   font-size: 10px;
   line-height: 12px;
   text-align: center;
+}
+
+@media screen and (max-width: 800px) {
+  header img {
+    width: 25.7rem;
+    height: 13.1rem;
+  }
 }
