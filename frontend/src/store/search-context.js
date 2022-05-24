@@ -16,12 +16,12 @@ export const SearchContextProvider = (props) => {
   };
 
   const setOrderList = () => {
-    setList((previousOrder) => console.log(!previousOrder));
+    setList((previousOrder) => !previousOrder);
   };
 
   return (
     <SearchContext.Provider
-      value={{ searchInput: searchInput, setSearch: setSearchHandler, reverseList: setOrderList }}
+      value={{ searchInput: searchInput, list: list, setSearch: setSearchHandler, reverseList: setOrderList }}
     >
       {props.children}
     </SearchContext.Provider>
