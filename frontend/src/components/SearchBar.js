@@ -12,6 +12,10 @@ const SearchBar = () => {
     searchCtx.setSearch(event.target.value);
   };
 
+  const reverseHandler = () => {
+    searchCtx.reverseList();
+  };
+
   return (
     <div className={classes.searchBar}>
       <input
@@ -23,7 +27,7 @@ const SearchBar = () => {
       <div className={classes.searchIcon}>
         <SearchIcon />
       </div>
-      <div className={classes.sortIcon}>
+      <div className={classes.sortIcon} onClick={reverseHandler}>
         <SortIcon />
       </div>
     </div>

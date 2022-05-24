@@ -4,15 +4,17 @@ import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
 
 import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
+import EpisodeContent from "./EpisodeContent/EpisodeContent";
 
 const EpisodeItem = (props) => {
   const [active, setActive] = useState(false);
   const activeHandler = () => {
     setActive(!active);
     props.onActive(props.index, active);
+    console.log(props);
   };
 
-  if (props.involved) console.log("ok", props.index);
+  // if (props.involved) console.log("ok", props.index);
 
   return (
     <Fragment>
@@ -33,7 +35,7 @@ const EpisodeItem = (props) => {
       </ListTransition>
       {props.involved ? (
         <li className={classes.adding}>
-          <p>PLACEHOLDER</p>
+          <EpisodeContent giochi={props.giochi} />
         </li>
       ) : (
         ""

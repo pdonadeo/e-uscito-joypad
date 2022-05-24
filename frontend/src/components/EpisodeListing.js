@@ -9,8 +9,10 @@ import classes from "./EpisodeListing.module.css";
 
 const EpisodeListing = () => {
   const [episodeList, setEpisodeList] = useState([]);
-  const { searchInput } = useContext(SearchContext);
+  const { searchInput, reversedList } = useContext(SearchContext);
   const [interestedIndex, setInterestedIndex] = useState();
+
+  console.log(reversedList);
 
   const fetchEpisode = useCallback(async () => {
     try {
@@ -55,6 +57,8 @@ const EpisodeListing = () => {
     }
   };
 
+  episodeResult.sort((a, b) => new Date(b.data_uscita) - new Date(a.data_uscita));
+
   return (
     <ul className={classes.listBox}>
       {episodeResult.map((episode, index) => {
@@ -69,6 +73,7 @@ const EpisodeListing = () => {
             cover={episode.cover}
             uscita={episode.data_uscita}
             durata={episode.durata}
+            giochi={episode.giochi}
             onActive={activeListHandler}
             involved={index === interestedIndex ? true : false}
           />
