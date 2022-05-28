@@ -24,8 +24,6 @@ function App() {
   //     });
   // }, []);
 
-  console.log(datiUltimaPuntata);
-
   return (
     <div>
       {datiUltimaPuntata.uscito ? <RispostaSi dati={datiUltimaPuntata} /> : <RispostaNo dati={datiUltimaPuntata} />}

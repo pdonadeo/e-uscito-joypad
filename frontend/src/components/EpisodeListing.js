@@ -14,8 +14,6 @@ const EpisodeListing = () => {
   const { searchInput, list } = useContext(SearchContext);
   const [interestedIndex, setInterestedIndex] = useState();
 
-  console.log(list);
-
   const fetchEpisode = useCallback(async () => {
     try {
       const response = await fetch("./api/db-data");

@@ -1,6 +1,4 @@
-import { Fragment, useState } from "react";
-
-import { useMediaQuery } from "react-responsive";
+import { useState, useRef } from "react";
 
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
@@ -9,21 +7,18 @@ import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
 import EpisodeContent from "./EpisodeContent/EpisodeContent";
 
 const EpisodeItem = (props) => {
-  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+  const cardRef = useRef();
   const [active, setActive] = useState(false);
+
   const activeHandler = () => {
     setActive(!active);
     props.onActive(props.index, active);
-    console.log(props);
+    const yBox = cardRef.current.offsetTop;
+    window.scrollTo({ top: yBox, behavior: "smooth" });
   };
 
-  // if (props.involved) console.log("ok", props.index);
-
-  // let index;
-  // if (isMobile) index = true;
-
   return (
-    <Fragment>
+    <li ref={cardRef} className={classes.cardBox}>
       <ListTransition className={`${classes.card} ${active && classes.active}`} onClick={activeHandler}>
         <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
         <div className={classes.textBox}>
@@ -40,13 +35,13 @@ const EpisodeItem = (props) => {
         </div>
       </ListTransition>
       {props.involved ? (
-        <li className={classes.adding}>
+        <div className={classes.adding}>
           <EpisodeContent giochi={props.giochi} />
-        </li>
+        </div>
       ) : (
         ""
       )}
-    </Fragment>
+    </li>
   );
 };
 

@@ -2,10 +2,11 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   margin-top: 5rem;
   max-width: 91.9rem;
   gap: 2.4rem;
+  list-style-type: none;
 }
 
 @media screen and (max-width: 800px) {
