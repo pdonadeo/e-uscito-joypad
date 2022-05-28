@@ -142,6 +142,7 @@ TIPOLOGIA_CHOICES = [
     ("FREE", "Chiacchiera libera"),
     ("RECE", "Recensione"),
     ("CONS", "Consiglio"),
+    ("STAR", "Osservatorio Start Citizen"),
 ]
 TIPOLOGIA_CHOICES_DICT = {}
 for k, v in TIPOLOGIA_CHOICES:
