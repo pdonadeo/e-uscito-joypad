@@ -10,8 +10,6 @@ const EpisodeItem = (props) => {
   const cardRef = useRef();
   const [active, setActive] = useState(false);
 
-  // console.log(props)
-
   const activeHandler = () => {
     setActive(!active);
     props.onActive(props.index, active);

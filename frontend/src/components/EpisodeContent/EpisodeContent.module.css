@@ -28,4 +28,28 @@
   background-color: #fff;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
+  width: max-content;
+  transition: all 0.4s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.control span {
+  font-size: 1rem;
+  border: 1px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.5rem;
+  width: 1.5rem;
+  padding: 0.1rem 0.2rem;
+  border-radius: 1000px;
+}
+
+.tagActive {
+  color: #fff;
+  background-color: #000;
+  transition: all 0.4s;
 }

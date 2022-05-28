@@ -70,8 +70,7 @@
   flex-grow: 5;
   width: 100%;
   list-style-type: none;
-  background-color: aquamarine;
-  height: 20rem;
+  height: fit-content;
   display: flex;
   justify-content: center;
   align-items: center;
