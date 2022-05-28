@@ -19,6 +19,9 @@ const EpisodeItem = (props) => {
 
   // if (props.involved) console.log("ok", props.index);
 
+  // let index;
+  // if (isMobile) index = true;
+
   return (
     <Fragment>
       <ListTransition className={`${classes.card} ${active && classes.active}`} onClick={activeHandler}>

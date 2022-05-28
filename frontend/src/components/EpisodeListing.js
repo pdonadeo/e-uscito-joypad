@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useContext } from "react";
 import SearchContext from "../store/search-context";
+import { useMediaQuery } from "react-responsive";
 
 import Fuse from "fuse.js";
 
@@ -8,6 +9,7 @@ import EpisodeItem from "./EpisodeItem";
 import classes from "./EpisodeListing.module.css";
 
 const EpisodeListing = () => {
+  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
   const [episodeList, setEpisodeList] = useState([]);
   const { searchInput, list } = useContext(SearchContext);
   const [interestedIndex, setInterestedIndex] = useState();
@@ -49,7 +51,10 @@ const EpisodeListing = () => {
       setInterestedIndex(null);
       return;
     }
-
+    if (isMobile) {
+      setInterestedIndex(index);
+      return;
+    }
     if (index % 2 !== 0) setInterestedIndex(index);
     else {
       index = index + 1;
