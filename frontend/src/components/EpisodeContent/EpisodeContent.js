@@ -1,19 +1,15 @@
 import { useState } from "react";
 
 import classes from "./EpisodeContent.module.css";
+import GameBox from "./GameBox";
 
 const EpisodeContent = (props) => {
-  const [section, setSection] = useState("consigli");
+  const [section, setSection] = useState("recensioni");
   const { giochi } = props;
-
-  console.log(giochi);
 
   const recensioni = giochi.filter((gioco) => gioco.tipologia === "Recensione");
   const chiacchiere = giochi.filter((gioco) => gioco.tipologia === "Chiacchiera libera");
   const consigli = giochi.filter((gioco) => gioco.tipologia === "Consiglio");
-  console.log("Recensioni", recensioni);
-  console.log("Consigli", consigli);
-  console.log("Chiacchiere", chiacchiere);
 
   let sectionContent;
 
@@ -21,7 +17,7 @@ const EpisodeContent = (props) => {
     sectionContent = (
       <div>
         {recensioni.map((recensione, index) => (
-          <h3 key={index}>{recensione.titolo}</h3>
+          <GameBox key={index} titolo={recensione.titolo} speaker={recensione.speaker} istante={recensione.istante} />
         ))}
       </div>
     );
@@ -30,7 +26,7 @@ const EpisodeContent = (props) => {
     sectionContent = (
       <div>
         {consigli.map((consiglio, index) => (
-          <h3 key={index}>{consiglio.titolo}</h3>
+          <GameBox key={index} titolo={consiglio.titolo} speaker={consiglio.speaker} istante={consiglio.istante} />
         ))}
       </div>
     );
@@ -39,7 +35,12 @@ const EpisodeContent = (props) => {
     sectionContent = (
       <div>
         {chiacchiere.map((chiacchiera, index) => (
-          <h3 key={index}>{chiacchiera.titolo}</h3>
+          <GameBox
+            key={index}
+            titolo={chiacchiera.titolo}
+            speaker={chiacchiera.speaker}
+            istante={chiacchiera.istante}
+          />
         ))}
       </div>
     );
@@ -51,13 +52,13 @@ const EpisodeContent = (props) => {
   if (section === "descrizione")
     sectionContent = (
       <div>
-        <h3>
+        <p className={classes.description}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
           magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
           consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
           est laborum
-        </h3>
+        </p>
       </div>
     );
 

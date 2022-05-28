@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 1.6rem;
+  margin: 1.6rem 0;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.speaker {
+  font-size: 1.4rem;
+  font-variant: small-caps;
+}
+
+.timeStamp {
+  font-size: 1.4rem;
+  font-weight: 600;
+}

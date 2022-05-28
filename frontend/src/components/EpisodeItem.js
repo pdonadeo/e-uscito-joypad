@@ -13,16 +13,9 @@ const EpisodeItem = (props) => {
   const activeHandler = () => {
     setActive(!active);
     props.onActive(props.index, active);
-    // console.log(cardRef.current?.getBoundingClientRect().top);
     const yBox = cardRef.current.offsetTop;
-    console.log(yBox);
     window.scrollTo({ top: yBox, behavior: "smooth" });
   };
-
-  // if (props.involved) console.log("ok", props.index);
-
-  // let index;
-  // if (isMobile) index = true;
 
   return (
     <li ref={cardRef} className={classes.cardBox}>
