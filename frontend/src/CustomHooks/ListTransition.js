@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const ListTransition = (props) => {
   return (
-    <motion.li
+    <motion.div
       {...props}
       layout
       animate={{ opacity: 1, scale: 1 }}
@@ -11,7 +11,7 @@ const ListTransition = (props) => {
       transition={{ duration: 0.6 }}
     >
       {props.children}
-    </motion.li>
+    </motion.div>
   );
 };
 

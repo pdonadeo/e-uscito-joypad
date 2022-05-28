@@ -72,17 +72,17 @@
   list-style-type: none;
   background-color: aquamarine;
   height: 20rem;
-
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: scroll;
 }
 
 @media screen and (max-width: 800px) {
   .card {
     border-radius: 8px;
     height: 13.2rem;
-    width: 100%;
+    width: 100vw;
     display: flex;
     align-items: center;
     justify-content: flex-start;

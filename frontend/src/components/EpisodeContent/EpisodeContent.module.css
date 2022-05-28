@@ -1,0 +1,31 @@
+.controls {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: nowrap;
+  max-width: 100vw;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  width: initial;
+}
+
+.controls::-webkit-scrollbar {
+  display: none;
+}
+
+.controls li {
+  height: 5rem;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #000;
+  background-color: #fff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
