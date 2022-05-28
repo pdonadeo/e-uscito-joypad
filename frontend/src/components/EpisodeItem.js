@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useRef } from "react";
 
 import { useMediaQuery } from "react-responsive";
 
@@ -9,12 +9,17 @@ import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
 import EpisodeContent from "./EpisodeContent/EpisodeContent";
 
 const EpisodeItem = (props) => {
+  const cardRef = useRef();
   const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
   const [active, setActive] = useState(false);
+
   const activeHandler = () => {
     setActive(!active);
     props.onActive(props.index, active);
-    console.log(props);
+    // console.log(cardRef.current?.getBoundingClientRect().top);
+    const yBox = cardRef.current.offsetTop;
+    console.log(yBox);
+    window.scrollTo({ top: yBox, behavior: "smooth" });
   };
 
   // if (props.involved) console.log("ok", props.index);
@@ -23,7 +28,7 @@ const EpisodeItem = (props) => {
   // if (isMobile) index = true;
 
   return (
-    <Fragment>
+    <div ref={cardRef}>
       <ListTransition className={`${classes.card} ${active && classes.active}`} onClick={activeHandler}>
         <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
         <div className={classes.textBox}>
@@ -46,7 +51,7 @@ const EpisodeItem = (props) => {
       ) : (
         ""
       )}
-    </Fragment>
+    </div>
   );
 };
 
