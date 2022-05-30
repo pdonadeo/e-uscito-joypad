@@ -1,0 +1,17 @@
+.number {
+  font-family: "Rokkitt", sans-serif;
+  font-size: 900;
+  font-size: 2.4rem;
+}
+
+.video {
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  background-color: red;
+  padding: 0.2rem 0.6rem;
+  line-height: 1.44rem;
+  color: #fff;
+  border-radius: 4px;
+  background: linear-gradient(94.31deg, #55aadd 4.48%, #4aa35a 41.64%, #dcb273 74.68%, #ca4649 117.74%);
+}

@@ -12,6 +12,7 @@
 
 .cover {
   height: 10rem;
+  max-width: 10rem;
   border-radius: 8px;
 }
 

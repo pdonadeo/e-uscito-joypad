@@ -5,6 +5,7 @@ import classes from "./EpisodeItem.module.css";
 
 import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
 import EpisodeContent from "./EpisodeContent/EpisodeContent";
+import EpisodeNumber from "./UI/EpisodeNumber";
 
 const EpisodeItem = (props) => {
   const cardRef = useRef();
@@ -22,7 +23,7 @@ const EpisodeItem = (props) => {
       <ListTransition className={`${classes.card} ${active && classes.active}`} onClick={activeHandler}>
         <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
         <div className={classes.textBox}>
-          <p className={classes.number}>{props.numero}.</p>
+          <EpisodeNumber numero={props.numero} />
           <p className={classes.title}>{props.titolo}</p>
           <div className={classes.additionalInfo}>
             <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
