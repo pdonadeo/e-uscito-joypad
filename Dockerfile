@@ -28,8 +28,7 @@ ADD ./e-uscito-joypad.opam.locked.docker /home/opam/e-uscito-joypad.opam.locked
 RUN opam install ./e-uscito-joypad.opam.locked --deps-only
 
 USER root
-ADD ./ /app
-RUN chown -R opam:opam /app
+ADD --chown=opam:opam ./ /app
 RUN apk add upx
 
 USER opam
@@ -41,8 +40,10 @@ COPY --from=build-stage-1 /app/build/* ./assets/
 COPY --from=build-stage-1 /app/build/* ./frontend/build/
 USER root
 RUN rm -Rf ./assets/js && mkdir ./assets/js
+RUN rm -Rf ./assets/css && mkdir ./assets/css
 USER opam
 COPY --from=build-stage-1 /app/build/static/js/* ./assets/js/
+COPY --from=build-stage-1 /app/build/static/css/* ./assets/css/
 RUN dune build @install
 RUN chmod +w /app/_build/default/src/e_uscito_joypad.exe && \
     upx /app/_build/default/src/e_uscito_joypad.exe
