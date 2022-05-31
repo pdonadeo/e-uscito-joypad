@@ -3,7 +3,7 @@ import classes from "./Message.module.css";
 const Message = (props) => {
   const { ep_num, giorni_fa, titolo, uscito, data_italiano, rompi_le_palle } = props.dati;
 
-  if (!uscito) {
+  if (uscito) {
     return (
       <div className={classes.wrapper}>
         <p className={classes.message}>
