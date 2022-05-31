@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import RispostaSi from "./RispostaSi";
 import RispostaNo from "./RispostaNo";
 import EpisodeSection from "./components/EpisodeSection";
+import Message from "./components/Hero/Message";
 
 function App() {
   const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
@@ -26,7 +27,8 @@ function App() {
 
   return (
     <div>
-      {datiUltimaPuntata.uscito ? <RispostaSi dati={datiUltimaPuntata} /> : <RispostaNo dati={datiUltimaPuntata} />}
+      <Message dati={datiUltimaPuntata} />
+      {/* {datiUltimaPuntata.uscito ? <RispostaSi dati={datiUltimaPuntata} /> : <RispostaNo dati={datiUltimaPuntata} />} */}
 
       <p>
         Ascolta la puntata <a href="https://www.ilpost.it/podcasts/joypad/">sulla pagina del Post</a>, sull’

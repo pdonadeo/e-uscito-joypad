@@ -9,7 +9,7 @@ const GameBox = (props) => {
   return (
     <div className={classes.container}>
       <div className={classes.textBox}>
-        <h3 className={classes.title}> &gt; {titolo}</h3>
+        <h3 className={classes.title}> &rsaquo; {titolo}</h3>
         <p className={classes.speaker}>SPEAKER: {speaker}</p>
       </div>
       <div className={classes.timeStamp}>

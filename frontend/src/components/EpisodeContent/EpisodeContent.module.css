@@ -39,7 +39,7 @@
 
 .control span {
   font-size: 1rem;
-  border: 1px solid #fff;
+  border: 1px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,6 +53,10 @@
   color: #fff;
   background-color: #000;
   transition: all 0.4s;
+}
+
+.tagActive.control span {
+  border: 1px solid #fff;
 }
 
 .description {
