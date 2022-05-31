@@ -23,7 +23,6 @@ const EpisodeListing = () => {
       const data = await response.json();
 
       setEpisodeList(data.episodi);
-      // console.log(data);
     } catch (error) {
       console.log(error.message);
     }
@@ -33,7 +32,7 @@ const EpisodeListing = () => {
   }, [fetchEpisode]);
 
   const fuse = new Fuse(episodeList, {
-    keys: ["titolo"],
+    keys: ["titolo", ["giochi", "titolo"]],
     includeScore: true,
     includeMatches: true,
     threshold: 0.5,

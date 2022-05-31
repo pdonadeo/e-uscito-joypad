@@ -16,9 +16,16 @@ const SearchBar = () => {
     searchCtx.reverseList();
   };
 
+  const focusHandler = () => {
+    window.scrollTo({ top: 567, behavior: "smooth" });
+  };
+
   return (
     <div className={classes.searchBar}>
       <input
+        initial-scale="1"
+        maximum-scale="1"
+        onFocus={focusHandler}
         type="text"
         placeholder={"| Trova quella con.."}
         className={classes.input}
