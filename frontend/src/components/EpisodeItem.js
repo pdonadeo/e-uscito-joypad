@@ -16,7 +16,6 @@ const EpisodeItem = (props) => {
     props.onActive(props.index, active);
     const yBox = cardRef.current.offsetTop;
     window.scrollTo({ top: yBox, behavior: "smooth" });
-    console.log(yBox);
   };
 
   return (
