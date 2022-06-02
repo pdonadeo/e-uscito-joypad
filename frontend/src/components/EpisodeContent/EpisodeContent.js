@@ -15,7 +15,6 @@ const EpisodeContent = (props) => {
     const groupsArr = [recensioni, consigli, chiacchiere];
 
     const firstActive = groupsArr.findIndex((group) => group.length !== 0);
-    console.log(firstActive);
     if (firstActive === -1) setSection("descrizione");
     if (firstActive === 0) setSection("recensioni");
     if (firstActive === 1) setSection("consigli");
@@ -28,7 +27,14 @@ const EpisodeContent = (props) => {
     sectionContent = (
       <div>
         {recensioni.map((recensione, index) => (
-          <GameBox key={index} titolo={recensione.titolo} speaker={recensione.speaker} istante={recensione.istante} />
+          <GameBox
+            key={index}
+            titolo={recensione.titolo}
+            speaker={recensione.speaker}
+            istante={recensione.istante}
+            descrizione={recensione.descrizione_txt}
+            cover={recensione.cover}
+          />
         ))}
       </div>
     );
@@ -37,7 +43,14 @@ const EpisodeContent = (props) => {
     sectionContent = (
       <div>
         {consigli.map((consiglio, index) => (
-          <GameBox key={index} titolo={consiglio.titolo} speaker={consiglio.speaker} istante={consiglio.istante} />
+          <GameBox
+            key={index}
+            titolo={consiglio.titolo}
+            speaker={consiglio.speaker}
+            istante={consiglio.istante}
+            descrizione={consiglio.descrizione_txt}
+            cover={consiglio.cover}
+          />
         ))}
       </div>
     );
@@ -51,6 +64,8 @@ const EpisodeContent = (props) => {
             titolo={chiacchiera.titolo}
             speaker={chiacchiera.speaker}
             istante={chiacchiera.istante}
+            descrizione={chiacchiera.descrizione_txt}
+            cover={chiacchiera.cover}
           />
         ))}
       </div>

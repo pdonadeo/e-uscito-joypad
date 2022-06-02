@@ -80,7 +80,7 @@
 
 @media screen and (max-width: 800px) {
   .card {
-    border-radius: 8px;
+    border-radius: 0px;
     height: 13.2rem;
     width: 100vw;
     display: flex;

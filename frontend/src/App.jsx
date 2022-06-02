@@ -35,7 +35,7 @@ function App() {
         .
       </p> */}
 
-      {datiUltimaPuntata.fretta ? <p>Corri! Se aspetti ancora un po' esce il prossimo episodio!</p> : ""}
+      {/* {datiUltimaPuntata.fretta ? <p>Corri! Se aspetti ancora un po' esce il prossimo episodio!</p> : ""} */}
 
       {/* <p className="nota">
         Nota per gli autori del podcast: il sito è pubblicato gratuitamente e con licenza open su{" "}

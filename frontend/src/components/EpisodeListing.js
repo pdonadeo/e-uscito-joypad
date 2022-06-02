@@ -13,6 +13,7 @@ const EpisodeListing = () => {
   const [episodeList, setEpisodeList] = useState([]);
   const { searchInput, list } = useContext(SearchContext);
   const [interestedIndex, setInterestedIndex] = useState();
+  const [allActive, setAllActive] = useState(false);
 
   const fetchEpisode = useCallback(async () => {
     try {
@@ -81,6 +82,7 @@ const EpisodeListing = () => {
             durata={episode.durata}
             giochi={episode.giochi}
             onActive={activeListHandler}
+            active={allActive}
             involved={index === interestedIndex ? true : false}
           />
         );
