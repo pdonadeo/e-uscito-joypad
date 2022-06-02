@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import classes from "./EpisodeContent.module.css";
 import GameBox from "./GameBox";
 
 const EpisodeContent = (props) => {
-  const [section, setSection] = useState("recensioni");
+  const [section, setSection] = useState("");
   const { giochi } = props;
 
   const recensioni = giochi.filter((gioco) => gioco.tipologia === "Recensione");
   const chiacchiere = giochi.filter((gioco) => gioco.tipologia === "Chiacchiera libera");
   const consigli = giochi.filter((gioco) => gioco.tipologia === "Consiglio");
+
+  useEffect(() => {
+    const groupsArr = [recensioni, consigli, chiacchiere];
+
+    const firstActive = groupsArr.findIndex((group) => group.length !== 0);
+    console.log(firstActive);
+    if (firstActive === -1) setSection("descrizione");
+    if (firstActive === 0) setSection("recensioni");
+    if (firstActive === 1) setSection("consigli");
+    if (firstActive === 2) setSection("chiacchiere");
+  }, []);
 
   let sectionContent;
 
@@ -65,21 +76,27 @@ const EpisodeContent = (props) => {
   return (
     <div>
       <ul className={classes.controls}>
-        <li onClick={sectionHandler.bind(this, "recensioni")}>
-          <p className={`${classes.control} ${section === "recensioni" && classes.tagActive}`}>
-            RECENSIONI <span>{recensioni.length}</span>
-          </p>
-        </li>
-        <li onClick={sectionHandler.bind(this, "consigli")}>
-          <p className={`${classes.control} ${section === "consigli" && classes.tagActive}`}>
-            CONSIGLI <span>{consigli.length}</span>
-          </p>
-        </li>
-        <li onClick={sectionHandler.bind(this, "chiacchiere")}>
-          <p className={`${classes.control} ${section === "chiacchiere" && classes.tagActive}`}>
-            CHIACCHIERE <span>{chiacchiere.length}</span>
-          </p>
-        </li>
+        {recensioni.length !== 0 && (
+          <li onClick={sectionHandler.bind(this, "recensioni")}>
+            <p className={`${classes.control} ${section === "recensioni" && classes.tagActive}`}>
+              RECENSIONI <span>{recensioni.length}</span>
+            </p>
+          </li>
+        )}
+        {consigli.length !== 0 && (
+          <li onClick={sectionHandler.bind(this, "consigli")}>
+            <p className={`${classes.control} ${section === "consigli" && classes.tagActive}`}>
+              CONSIGLI <span>{consigli.length}</span>
+            </p>
+          </li>
+        )}
+        {chiacchiere.length !== 0 && (
+          <li onClick={sectionHandler.bind(this, "chiacchiere")}>
+            <p className={`${classes.control} ${section === "chiacchiere" && classes.tagActive}`}>
+              CHIACCHIERE <span>{chiacchiere.length}</span>
+            </p>
+          </li>
+        )}
         <li onClick={sectionHandler.bind(this, "descrizione")}>
           <p className={`${classes.control} ${section === "descrizione" && classes.tagActive}`}>DESCRIZIONE</p>
         </li>
