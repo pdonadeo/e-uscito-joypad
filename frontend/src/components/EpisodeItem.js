@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
@@ -13,14 +13,26 @@ const EpisodeItem = (props) => {
 
   const activeHandler = () => {
     setActive(!active);
-    props.onActive(props.index, active);
-    const yBox = cardRef.current.offsetTop;
-    window.scrollTo({ top: yBox, behavior: "smooth" });
+    props.onActive(props.index, active, props.id);
+    // const yBox = cardRef.current.offsetTop;
+    // window.scrollTo({ top: yBox, behavior: "smooth" });
   };
+
+  // let activation = props.cardState;
+  // if (props.active) {
+  //   activation = true;
+  // } else {
+  //   activation = props.cardState;
+  // }
+
+  // useEffect(() => {
+  //   console.log("rendering");
+  //   console.log(activation);
+  // }, [activation]);
 
   return (
     <li ref={cardRef} className={classes.cardBox}>
-      <ListTransition className={`${classes.card} ${active && classes.active}`} onClick={activeHandler}>
+      <ListTransition className={`${classes.card} ${props.active && classes.active}`} onClick={activeHandler}>
         <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
         <div className={classes.textBox}>
           <EpisodeNumber numero={props.numero} />

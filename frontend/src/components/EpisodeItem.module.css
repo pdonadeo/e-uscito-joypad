@@ -69,11 +69,11 @@
 
 .adding {
   flex-grow: 5;
-  width: 100%;
+  width: 100vw;
   list-style-type: none;
   height: fit-content;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   overflow: scroll;
 }
