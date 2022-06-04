@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
@@ -9,13 +9,13 @@ import EpisodeNumber from "./UI/EpisodeNumber";
 
 const EpisodeItem = (props) => {
   const cardRef = useRef();
-  const [active, setActive] = useState(false);
+  // const [active, setActive] = useState(false);
 
   const activeHandler = () => {
-    setActive(!active);
-    props.onActive(props.index, active, props.id);
-    // const yBox = cardRef.current.offsetTop;
-    // window.scrollTo({ top: yBox, behavior: "smooth" });
+    // setActive(!active);
+    props.onActive(props.index, props.active, props.id);
+    const yBox = cardRef.current.offsetTop;
+    window.scrollTo({ top: yBox, behavior: "smooth" });
   };
 
   // let activation = props.cardState;
