@@ -1,26 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import classes from "./EpisodeContent.module.css";
 import GameBox from "./GameBox";
 
 const EpisodeContent = (props) => {
-  const [section, setSection] = useState("recensioni");
-  const { giochi } = props;
-
-  const recensioni = giochi.filter((gioco) => gioco.tipologia === "Recensione");
-  const chiacchiere = giochi.filter((gioco) => gioco.tipologia === "Chiacchiera libera");
-  const consigli = giochi.filter((gioco) => gioco.tipologia === "Consiglio");
-
-  let sectionContent;
-
-  // useEffect(() => {
-  //   const groupsArr = [recensioni, consigli, chiacchiere];
-  //   const firstActive = groupsArr.findIndex((group) => group.length !== 0);
-  //   if (firstActive === -1) setSection("descrizione");
-  //   if (firstActive === 0) setSection("recensioni");
-  //   if (firstActive === 1) setSection("consigli");
-  //   if (firstActive === 2) setSection("chiacchiere");
-  // }, []);
+  const [section, setSection] = useState(props.section);
+  const { recensioni, consigli, chiacchiere } = props;
 
   const createContent = (section) => {
     return (
@@ -39,9 +24,11 @@ const EpisodeContent = (props) => {
     );
   };
 
-  if (section === "recensioni") sectionContent = createContent(recensioni);
-  if (section === "consigli") sectionContent = createContent(consigli);
-  if (section === "chiacchiere") sectionContent = createContent(chiacchiere);
+  let sectionContent;
+
+  if (section === "recensioni") sectionContent = createContent(props.recensioni);
+  if (section === "consigli") sectionContent = createContent(props.consigli);
+  if (section === "chiacchiere") sectionContent = createContent(props.chiacchiere);
 
   if (section === "descrizione")
     sectionContent = (

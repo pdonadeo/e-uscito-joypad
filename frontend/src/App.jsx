@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 
 import EpisodeSection from "./components/EpisodeSection";
 import Message from "./components/Hero/Message";
@@ -16,12 +16,14 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      <Message dati={datiUltimaPuntata} />
-      <HeroLinks />
-      {/* {datiUltimaPuntata.fretta ? <p>Corri! Se aspetti ancora un po' esce il prossimo episodio!</p> : ""} */}
+    <Fragment>
+      <div>
+        <Message dati={datiUltimaPuntata} />
+        <HeroLinks />
+        {/* {datiUltimaPuntata.fretta ? <p>Corri! Se aspetti ancora un po' esce il prossimo episodio!</p> : ""} */}
+      </div>
       <EpisodeSection />
-    </div>
+    </Fragment>
   );
 };
 

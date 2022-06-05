@@ -8,7 +8,7 @@ const ListTransition = (props) => {
       animate={{ opacity: 1, scale: 1 }}
       initial={{ opacity: 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.5 }}
     >
       {props.children}
     </motion.div>
