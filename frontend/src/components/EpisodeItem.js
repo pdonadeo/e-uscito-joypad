@@ -14,8 +14,8 @@ const EpisodeItem = (props) => {
   const activeHandler = () => {
     // setActive(!active);
     props.onActive(props.index, props.active, props.id);
-    const yBox = cardRef.current.offsetTop;
-    window.scrollTo({ top: yBox, behavior: "smooth" });
+    // const yBox = cardRef.current.offsetTop;
+    // window.scrollTo({ top: yBox, behavior: "smooth" });
   };
 
   // let activation = props.cardState;

@@ -4,76 +4,44 @@ import classes from "./EpisodeContent.module.css";
 import GameBox from "./GameBox";
 
 const EpisodeContent = (props) => {
-  const [section, setSection] = useState("");
+  const [section, setSection] = useState("recensioni");
   const { giochi } = props;
 
   const recensioni = giochi.filter((gioco) => gioco.tipologia === "Recensione");
   const chiacchiere = giochi.filter((gioco) => gioco.tipologia === "Chiacchiera libera");
   const consigli = giochi.filter((gioco) => gioco.tipologia === "Consiglio");
 
-  useEffect(() => {
-    const groupsArr = [recensioni, consigli, chiacchiere];
-
-    const firstActive = groupsArr.findIndex((group) => group.length !== 0);
-    if (firstActive === -1) setSection("descrizione");
-    if (firstActive === 0) setSection("recensioni");
-    if (firstActive === 1) setSection("consigli");
-    if (firstActive === 2) setSection("chiacchiere");
-  }, []);
-
   let sectionContent;
 
-  if (section === "recensioni")
-    sectionContent = (
+  // useEffect(() => {
+  //   const groupsArr = [recensioni, consigli, chiacchiere];
+  //   const firstActive = groupsArr.findIndex((group) => group.length !== 0);
+  //   if (firstActive === -1) setSection("descrizione");
+  //   if (firstActive === 0) setSection("recensioni");
+  //   if (firstActive === 1) setSection("consigli");
+  //   if (firstActive === 2) setSection("chiacchiere");
+  // }, []);
+
+  const createContent = (section) => {
+    return (
       <div>
-        {recensioni.map((recensione, index) => (
+        {section.map((element, index) => (
           <GameBox
             key={index}
-            titolo={recensione.titolo}
-            speaker={recensione.speaker}
-            istante={recensione.istante}
-            descrizione={recensione.descrizione_txt}
-            cover={recensione.cover}
+            titolo={element.titolo}
+            speaker={element.speaker}
+            istante={element.istante}
+            descrizione={element.descrizione_txt}
+            cover={element.cover}
           />
         ))}
       </div>
     );
-
-  if (section === "consigli")
-    sectionContent = (
-      <div>
-        {consigli.map((consiglio, index) => (
-          <GameBox
-            key={index}
-            titolo={consiglio.titolo}
-            speaker={consiglio.speaker}
-            istante={consiglio.istante}
-            descrizione={consiglio.descrizione_txt}
-            cover={consiglio.cover}
-          />
-        ))}
-      </div>
-    );
-
-  if (section === "chiacchiere")
-    sectionContent = (
-      <div>
-        {chiacchiere.map((chiacchiera, index) => (
-          <GameBox
-            key={index}
-            titolo={chiacchiera.titolo}
-            speaker={chiacchiera.speaker}
-            istante={chiacchiera.istante}
-            descrizione={chiacchiera.descrizione_txt}
-            cover={chiacchiera.cover}
-          />
-        ))}
-      </div>
-    );
-
-  const sectionHandler = (section) => {
-    setSection(section);
   };
+
+  if (section === "recensioni") sectionContent = createContent(recensioni);
+  if (section === "consigli") sectionContent = createContent(consigli);
+  if (section === "chiacchiere") sectionContent = createContent(chiacchiere);
 
   if (section === "descrizione")
     sectionContent = (
@@ -88,8 +56,12 @@ const EpisodeContent = (props) => {
       </div>
     );
 
+  const sectionHandler = (section) => {
+    setSection(section);
+  };
+
   return (
-    <div>
+    <div className={classes.containerAnimation}>
       <ul className={classes.controls}>
         {recensioni.length !== 0 && (
           <li onClick={sectionHandler.bind(this, "recensioni")}>
