@@ -34,3 +34,4 @@ _opam/
 
 assets/
 data/
+.DS_Store
