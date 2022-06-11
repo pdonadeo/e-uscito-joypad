@@ -14,6 +14,9 @@ const EpisodeListing = () => {
   const { searchInput, list } = useContext(SearchContext);
   const [interestedIndex, setInterestedIndex] = useState();
 
+  ///////// ACTIVE TEST
+  const [activeCard, setActiveCard] = useState("");
+
   const fetchEpisode = useCallback(async () => {
     try {
       const response = await fetch("./api/db-data");
@@ -43,7 +46,12 @@ const EpisodeListing = () => {
 
   let episodeResult = searchInput ? results.map((result) => result.item) : episodeList;
 
-  const activeListHandler = (index, status) => {
+  const activeListHandler = (index, status, numBox) => {
+    if (numBox === activeCard) {
+      setActiveCard(null);
+    } else {
+      setActiveCard(numBox);
+    }
     if (status) {
       setInterestedIndex(null);
       return;
@@ -52,7 +60,7 @@ const EpisodeListing = () => {
       setInterestedIndex(index);
       return;
     }
-    if (index % 2 !== 0) setInterestedIndex(index);
+    if (!isMobile && index % 2 !== 0) setInterestedIndex(index);
     else {
       index = index + 1;
       setInterestedIndex(index);
@@ -80,7 +88,9 @@ const EpisodeListing = () => {
             uscita={episode.data_uscita}
             durata={episode.durata}
             giochi={episode.giochi}
+            // cardState={cardReset}
             onActive={activeListHandler}
+            active={activeCard === episode.episodio_numero}
             involved={index === interestedIndex ? true : false}
           />
         );

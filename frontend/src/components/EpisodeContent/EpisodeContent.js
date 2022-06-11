@@ -1,64 +1,34 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import classes from "./EpisodeContent.module.css";
 import GameBox from "./GameBox";
 
 const EpisodeContent = (props) => {
-  const [section, setSection] = useState("");
-  const { giochi } = props;
+  const [section, setSection] = useState(props.section);
+  const { recensioni, consigli, chiacchiere } = props;
 
-  const recensioni = giochi.filter((gioco) => gioco.tipologia === "Recensione");
-  const chiacchiere = giochi.filter((gioco) => gioco.tipologia === "Chiacchiera libera");
-  const consigli = giochi.filter((gioco) => gioco.tipologia === "Consiglio");
-
-  useEffect(() => {
-    const groupsArr = [recensioni, consigli, chiacchiere];
-
-    const firstActive = groupsArr.findIndex((group) => group.length !== 0);
-    console.log(firstActive);
-    if (firstActive === -1) setSection("descrizione");
-    if (firstActive === 0) setSection("recensioni");
-    if (firstActive === 1) setSection("consigli");
-    if (firstActive === 2) setSection("chiacchiere");
-  }, []);
-
-  let sectionContent;
-
-  if (section === "recensioni")
-    sectionContent = (
+  const createContent = (section) => {
+    return (
       <div>
-        {recensioni.map((recensione, index) => (
-          <GameBox key={index} titolo={recensione.titolo} speaker={recensione.speaker} istante={recensione.istante} />
-        ))}
-      </div>
-    );
-
-  if (section === "consigli")
-    sectionContent = (
-      <div>
-        {consigli.map((consiglio, index) => (
-          <GameBox key={index} titolo={consiglio.titolo} speaker={consiglio.speaker} istante={consiglio.istante} />
-        ))}
-      </div>
-    );
-
-  if (section === "chiacchiere")
-    sectionContent = (
-      <div>
-        {chiacchiere.map((chiacchiera, index) => (
+        {section.map((element, index) => (
           <GameBox
             key={index}
-            titolo={chiacchiera.titolo}
-            speaker={chiacchiera.speaker}
-            istante={chiacchiera.istante}
+            titolo={element.titolo}
+            speaker={element.speaker}
+            istante={element.istante}
+            descrizione={element.descrizione_txt}
+            cover={element.cover}
           />
         ))}
       </div>
     );
-
-  const sectionHandler = (section) => {
-    setSection(section);
   };
+
+  let sectionContent;
+
+  if (section === "recensioni") sectionContent = createContent(props.recensioni);
+  if (section === "consigli") sectionContent = createContent(props.consigli);
+  if (section === "chiacchiere") sectionContent = createContent(props.chiacchiere);
 
   if (section === "descrizione")
     sectionContent = (
@@ -73,8 +43,12 @@ const EpisodeContent = (props) => {
       </div>
     );
 
+  const sectionHandler = (section) => {
+    setSection(section);
+  };
+
   return (
-    <div>
+    <div className={classes.containerAnimation}>
       <ul className={classes.controls}>
         {recensioni.length !== 0 && (
           <li onClick={sectionHandler.bind(this, "recensioni")}>
