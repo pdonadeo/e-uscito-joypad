@@ -20,6 +20,7 @@ const GameBox = (props) => {
 
     const showGameHandler = () => {
         setShowGame((previousState) => !previousState);
+        document.querySelector("body").style = `overflow: ${!showGame ? "hidden" : "scroll"}`;
     };
 
     return (

@@ -14,8 +14,6 @@ const EpisodeListing = () => {
     const { searchInput, list } = useContext(SearchContext);
     const [interestedIndex, setInterestedIndex] = useState();
 
-    console.log(list);
-
     ///////// ACTIVE TEST
     const [activeCard, setActiveCard] = useState("");
 
