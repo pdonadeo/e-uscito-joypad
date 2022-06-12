@@ -18,7 +18,7 @@ const App = () => {
 
     return (
         <Fragment>
-            <header style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <header style={{ display: "flex", flexDirection: "column", justifyContent: "center", height: "605px" }}>
                 <Logo />
                 <Message dati={datiUltimaPuntata} />
                 <HeroLinks />

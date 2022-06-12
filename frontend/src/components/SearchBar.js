@@ -7,38 +7,38 @@ import { ReactComponent as SortIcon } from "../icons/ICN_Sort.svg";
 import classes from "./SearchBar.module.css";
 
 const SearchBar = () => {
-  const searchCtx = useContext(SearchContext);
-  const searchHandler = (event) => {
-    searchCtx.setSearch(event.target.value);
-  };
+    const searchCtx = useContext(SearchContext);
+    const searchHandler = (event) => {
+        searchCtx.setSearch(event.target.value);
+    };
 
-  const reverseHandler = () => {
-    searchCtx.reverseList();
-  };
+    const reverseHandler = () => {
+        searchCtx.reverseList();
+    };
 
-  const focusHandler = () => {
-    window.scrollTo({ top: 567, behavior: "smooth" });
-  };
+    const focusHandler = () => {
+        window.scrollTo({ top: 605, behavior: "smooth" });
+    };
 
-  return (
-    <div className={classes.searchBar}>
-      <input
-        initial-scale="1"
-        maximum-scale="1"
-        onFocus={focusHandler}
-        type="text"
-        placeholder={"| Trova quella con.."}
-        className={classes.input}
-        onChange={searchHandler}
-      ></input>
-      <div className={classes.searchIcon}>
-        <SearchIcon />
-      </div>
-      <div className={classes.sortIcon} onClick={reverseHandler}>
-        <SortIcon />
-      </div>
-    </div>
-  );
+    return (
+        <div className={classes.searchBar}>
+            <input
+                initial-scale="1"
+                maximum-scale="1"
+                onFocus={focusHandler}
+                type="text"
+                placeholder={"| Trova quella con.."}
+                className={classes.input}
+                onChange={searchHandler}
+            ></input>
+            <div className={classes.searchIcon}>
+                <SearchIcon />
+            </div>
+            <div className={classes.sortIcon} onClick={reverseHandler}>
+                <SortIcon />
+            </div>
+        </div>
+    );
 };
 
 export default SearchBar;

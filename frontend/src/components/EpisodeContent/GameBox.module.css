@@ -1,75 +1,76 @@
 .container {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 0 1.6rem;
-  margin: 1.6rem 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 0 1.6rem;
+    margin: 1.6rem 0;
 }
 
 .title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 0.2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
 }
 
 .speaker span {
-  font-size: 1.6rem;
-  font-variant: small-caps;
-  margin-right: 0.1rem;
-  margin-left: 1rem;
+    font-size: 1.6rem;
+    font-variant: small-caps;
+    margin-right: 0.1rem;
+    margin-left: 1rem;
 }
 
 p.speaker {
-  font-size: 1.2rem;
+    font-size: 1.2rem;
 }
 
 .timeStamp {
-  font-size: 1.4rem;
-  font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
 
 .modal {
-  background-color: #fff;
-  height: 100vh;
-  width: 100vw;
-  position: fixed;
-  top: 0;
-  left: 0;
-  transform: translateY(100vh);
-  z-index: 100;
-  transition: all 0.4s;
+    background-color: #fff;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateY(100vh);
+    z-index: 100;
+    transition: all 0.4s;
+    overflow-y: scroll;
 }
 
 .showModalGame {
-  transform: translateY(0);
-  transition: all 0.4s;
+    transform: translateY(0);
+    transition: all 0.4s;
 }
 
 .firstRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 1.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.6rem;
 }
 
 .gameTitle {
-  font-family: "Rokkitt", serif;
-  font-size: 2.4rem;
-  font-weight: 900;
+    font-family: "Rokkitt", serif;
+    font-size: 2.4rem;
+    font-weight: 900;
 }
 
 .closeButton svg {
-  width: 2rem;
-  height: 2rem;
+    width: 2rem;
+    height: 2rem;
 }
 
 .gameImage {
-  width: 100%;
+    width: 100%;
 }
 
 .gameDescription {
-  font-size: 1.4rem;
-  padding: 1.6rem;
-  line-height: 2.52rem;
-  font-weight: 400;
+    font-size: 1.4rem;
+    padding: 1.6rem;
+    line-height: 2.52rem;
+    font-weight: 400;
 }

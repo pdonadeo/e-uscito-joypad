@@ -1,31 +1,31 @@
 import React, { useState } from "react";
 
 const SearchContext = React.createContext({
-  searchInput: "",
-  list: false,
-  reverseList: () => {},
-  setSearch: () => {},
+    searchInput: "",
+    list: false,
+    reverseList: () => {},
+    setSearch: () => {},
 });
 
 export const SearchContextProvider = (props) => {
-  const [searchInput, setSearchInput] = useState("");
-  const [list, setList] = useState(false);
+    const [searchInput, setSearchInput] = useState("");
+    const [list, setList] = useState(false);
 
-  const setSearchHandler = (input) => {
-    setSearchInput(input);
-  };
+    const setSearchHandler = (input) => {
+        setSearchInput(input);
+    };
 
-  const setOrderList = () => {
-    setList((previousOrder) => !previousOrder);
-  };
+    const setOrderList = () => {
+        setList((previousOrder) => !previousOrder);
+    };
 
-  return (
-    <SearchContext.Provider
-      value={{ searchInput: searchInput, list: list, setSearch: setSearchHandler, reverseList: setOrderList }}
-    >
-      {props.children}
-    </SearchContext.Provider>
-  );
+    return (
+        <SearchContext.Provider
+            value={{ searchInput: searchInput, list: list, setSearch: setSearchHandler, reverseList: setOrderList }}
+        >
+            {props.children}
+        </SearchContext.Provider>
+    );
 };
 
 export default SearchContext;
