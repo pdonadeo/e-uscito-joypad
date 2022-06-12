@@ -1,90 +1,105 @@
 .card {
-  background-color: #fff;
-  padding: 1.6rem;
-  border-radius: 8px;
-  height: 13.2rem;
-  width: 48%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 1.6rem;
-}
-
-.cover {
-  height: 10rem;
-  max-width: 10rem;
-  border-radius: 8px;
-}
-
-.textBox {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  height: 100%;
-  color: #313131;
-  position: relative;
-  flex-grow: 2;
-}
-
-.number {
-  font-family: "Rokkitt", sans-serif;
-  font-size: 900;
-  font-size: 2.4rem;
-}
-
-.title {
-  font-size: 1.4rem;
-}
-
-.additionalInfo {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.releaseDate {
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.duration {
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.actions {
-  display: flex;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 1rem;
-  cursor: pointer;
-}
-
-.active {
-  box-shadow: inset 0px 0px 16px rgba(0, 0, 0, 0.08);
-  background-color: transparent;
-}
-
-.adding {
-  flex-grow: 5;
-  width: 100vw;
-  list-style-type: none;
-  height: fit-content;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  overflow: scroll;
-}
-
-@media screen and (max-width: 800px) {
-  .card {
-    border-radius: 0px;
+    background-color: #fff;
+    padding: 1.6rem;
+    border-radius: 8px;
     height: 13.2rem;
-    width: 100vw;
+    width: 48%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-  }
+    gap: 1.6rem;
+    position: relative;
+}
+
+.cover {
+    height: 10rem;
+    max-width: 10rem;
+    border-radius: 8px;
+}
+
+.textBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100%;
+    color: #313131;
+    flex-grow: 2;
+}
+
+.number {
+    font-family: "Rokkitt", sans-serif;
+    font-size: 900;
+    font-size: 2.4rem;
+}
+
+.title {
+    font-size: 1.4rem;
+}
+
+.additionalInfo {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.releaseDate {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.duration {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 1rem;
+    cursor: pointer;
+    height: 5rem;
+    width: 5rem;
+    z-index: 5;
+}
+
+.actions svg {
+    transition: all 0.3s;
+}
+
+.active .actions svg {
+    transform: rotate(45deg);
+    transition: all 0.3s;
+}
+
+.active {
+    box-shadow: inset 0px 0px 16px rgba(0, 0, 0, 0.08);
+    background-color: transparent;
+    transition: all 0.3s;
+}
+
+.adding {
+    flex-grow: 5;
+    width: 100vw;
+    list-style-type: none;
+    height: fit-content;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    overflow: scroll;
+}
+
+@media screen and (max-width: 800px) {
+    .card {
+        border-radius: 0px;
+        height: 13.2rem;
+        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
 }
