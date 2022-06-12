@@ -61,7 +61,7 @@ const EpisodeListing = () => {
             setInterestedIndex(index);
             setTimeout(() => {
                 setActiveCard(numBox);
-            }, 500);
+            }, 600);
             return;
         }
         if (!isMobile && index % 2 !== 0) setInterestedIndex(index);

@@ -12,7 +12,7 @@ export const SearchContextProvider = (props) => {
     const [list, setList] = useState(false);
 
     const setSearchHandler = (input) => {
-        setSearchInput(input);
+        if (input.length > 3) setSearchInput(input);
     };
 
     const setOrderList = () => {

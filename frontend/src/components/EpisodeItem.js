@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
@@ -8,10 +8,7 @@ import EpisodeContent from "./EpisodeContent/EpisodeContent";
 import EpisodeNumber from "./UI/EpisodeNumber";
 
 const EpisodeItem = (props) => {
-    const cardRef = useRef();
     const [section, setSection] = useState("recensioni");
-
-    // console.log(props);
 
     const y = 605 + props.index * 133;
 
@@ -20,10 +17,11 @@ const EpisodeItem = (props) => {
 
     // const [active, setActive] = useState(false);
 
-    const activeHandler = () => {
+    const activeHandler = (event) => {
         // window.scrollTo({ top: y, behavior: "smooth" });
         // setActive(!active);
         // setTimeout(() => {
+        event.preventDefault();
         props.onActive(props.index, props.active, props.id, y);
         // }, 500);
     };
@@ -54,22 +52,24 @@ const EpisodeItem = (props) => {
     }, []);
 
     return (
-        <li ref={cardRef} className={classes.cardBox}>
-            <ListTransition className={`${classes.card} ${props.active && classes.active}`} onClick={activeHandler}>
-                <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
-                <div className={classes.textBox}>
-                    <EpisodeNumber numero={props.numero} />
-                    <p className={classes.title}>{props.titolo}</p>
-                    <div className={classes.additionalInfo}>
-                        <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
-                        <p>&middot;</p>
-                        <p className={classes.duration}>{(props.durata / 60).toFixed(0)} min.</p>
+        <li className={classes.cardBox}>
+            <a href={props.url}>
+                <ListTransition className={`${classes.card} ${props.active && classes.active}`}>
+                    <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
+                    <div className={classes.textBox}>
+                        <EpisodeNumber numero={props.numero} />
+                        <p className={classes.title}>{props.titolo}</p>
+                        <div className={classes.additionalInfo}>
+                            <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
+                            <p>&middot;</p>
+                            <p className={classes.duration}>{(props.durata / 60).toFixed(0)} min.</p>
+                        </div>
+                        <div className={classes.actions} onClick={activeHandler}>
+                            <PlusIcon />
+                        </div>
                     </div>
-                    <div className={classes.actions}>
-                        <PlusIcon />
-                    </div>
-                </div>
-            </ListTransition>
+                </ListTransition>
+            </a>
             {props.active ? (
                 <div className={classes.adding}>
                     <EpisodeContent

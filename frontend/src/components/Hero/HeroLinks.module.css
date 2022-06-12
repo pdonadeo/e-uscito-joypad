@@ -2,6 +2,12 @@
     font-size: 1.6rem;
     text-align: center;
     margin-top: 3.2rem;
+    letter-spacing: -0.03em;
+}
+
+.listenMessage a {
+    color: #29abe2;
+    font-weight: 800;
 }
 
 .linkBoxes {
@@ -38,4 +44,9 @@ p.service {
     width: 34.5rem;
     margin: 0 auto 1.6rem;
     letter-spacing: -0.03em;
+}
+
+.note a {
+    color: #29abe2;
+    font-weight: 700;
 }

@@ -75,11 +75,11 @@ h1 em {
 }
 
 a {
-    color: #29abe2;
-    font-weight: 700;
+    /* color: #29abe2; */
+    /* font-weight: 700; */
     text-decoration: unset;
-    transition: color 0.2s;
-    -webkit-transition: color 0.2s;
+    /* transition: color 0.2s;
+    -webkit-transition: color 0.2s; */
 }
 
 a:hover {
