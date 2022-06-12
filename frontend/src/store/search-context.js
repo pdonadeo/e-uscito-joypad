@@ -2,21 +2,21 @@ import React, { useState } from "react";
 
 const SearchContext = React.createContext({
     searchInput: "",
-    list: false,
+    list: "",
     reverseList: () => {},
     setSearch: () => {},
 });
 
 export const SearchContextProvider = (props) => {
     const [searchInput, setSearchInput] = useState("");
-    const [list, setList] = useState(false);
+    const [list, setList] = useState("ascending");
 
     const setSearchHandler = (input) => {
         if (input.length > 3) setSearchInput(input);
     };
 
-    const setOrderList = () => {
-        setList((previousOrder) => !previousOrder);
+    const setOrderList = (order) => {
+        setList(order);
     };
 
     return (

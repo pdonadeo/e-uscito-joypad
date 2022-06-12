@@ -14,6 +14,8 @@ const EpisodeListing = () => {
     const { searchInput, list } = useContext(SearchContext);
     const [interestedIndex, setInterestedIndex] = useState();
 
+    console.log(list);
+
     ///////// ACTIVE TEST
     const [activeCard, setActiveCard] = useState("");
 
@@ -73,9 +75,9 @@ const EpisodeListing = () => {
 
     episodeResult.sort((a, b) => new Date(b.data_uscita) - new Date(a.data_uscita));
     let episodes = [];
-    if (!list) {
+    if (list === "ascending") {
         episodes = episodeResult;
-    } else episodes = episodeResult.reverse();
+    } else if (list === "descending") episodes = episodeResult.reverse();
 
     return (
         <ul className={classes.listBox}>
