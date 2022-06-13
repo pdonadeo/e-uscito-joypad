@@ -40,9 +40,9 @@ const GameBox = (props) => {
             </div>
             <ListTransition>
                 <div className={`${classes.modal} ${showGame ? classes.showModalGame : ""} `}>
-                    <div className={classes.firstRow}>
+                    <div className={classes.firstRow} onClick={showGameHandler}>
                         <h2 className={classes.gameTitle}>{titolo}</h2>
-                        <div onClick={showGameHandler} className={classes.closeButton}>
+                        <div className={classes.closeButton}>
                             <IconClose />
                         </div>
                     </div>
