@@ -63,6 +63,13 @@
     border-radius: 16px 16px 0px 0px;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
+    transform: translateY(100%);
+    transition: transform 0.5s;
+}
+
+.show {
+    transform: translateY(0);
+    transition: transform 0.5s;
 }
 
 .sortText {

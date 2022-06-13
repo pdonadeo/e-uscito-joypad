@@ -22,16 +22,16 @@ const SearchBar = () => {
         showModalHandler();
     };
 
-    const focusHandler = () => {
-        window.scrollTo({ top: 605, behavior: "smooth" });
-    };
+    // const focusHandler = () => {
+    //     window.scrollTo({ top: 605, behavior: "smooth" });
+    // };
 
     return (
         <div className={classes.searchBar}>
             <input
                 initial-scale="1"
                 maximum-scale="1"
-                onFocus={focusHandler}
+                // onFocus={focusHandler}
                 type="text"
                 placeholder={"| Trova quella con.."}
                 className={classes.input}
@@ -43,20 +43,18 @@ const SearchBar = () => {
             <div className={classes.sortIcon} onClick={showModalHandler}>
                 <SortIcon />
             </div>
-            {showModal && (
-                <div className={classes.sortModal}>
-                    <p className={classes.sortText}>ORDINA PER</p>
-                    <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>
-                        Più recenti
-                    </p>
-                    <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>
-                        Meno recenti
-                    </p>
-                    <button className={classes.sortButton} onClick={showModalHandler}>
-                        Chiudi
-                    </button>
-                </div>
-            )}
+            <div className={`${classes.sortModal} ${showModal && classes.show}`}>
+                <p className={classes.sortText}>ORDINA PER</p>
+                <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>
+                    Più recenti
+                </p>
+                <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>
+                    Meno recenti
+                </p>
+                <button className={classes.sortButton} onClick={showModalHandler}>
+                    Chiudi
+                </button>
+            </div>
         </div>
     );
 };
