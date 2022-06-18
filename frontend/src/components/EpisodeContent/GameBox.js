@@ -18,6 +18,10 @@ const GameBox = (props) => {
     //   document.getElementById("modal")
     // );
 
+    const createDescription = (description) => {
+        return { __html: description };
+    };
+
     const showGameHandler = () => {
         setShowGame((previousState) => !previousState);
         document.querySelector("body").style = `overflow: ${!showGame ? "hidden" : "scroll"}`;
@@ -47,7 +51,7 @@ const GameBox = (props) => {
                         </div>
                     </div>
                     <img src={cover} alt={`cover di ${titolo}`} className={classes.gameImage} />
-                    <p className={classes.gameDescription}>{descrizione}</p>
+                    <p className={classes.gameDescription} dangerouslySetInnerHTML={createDescription(descrizione)}></p>
                 </div>
             </ListTransition>
         </Fragment>
