@@ -1,8 +1,19 @@
+.cardBox {
+    position: relative;
+}
+
+.playButton {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    padding: 1.6rem;
+}
 .card {
     background-color: #fff;
     padding: 1.6rem;
     border-radius: 8px;
-    height: 13.2rem;
+    height: 13.7rem;
     width: 48%;
     display: flex;
     align-items: center;
@@ -25,6 +36,12 @@
     height: 100%;
     color: #313131;
     flex-grow: 2;
+}
+
+.firstRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .number {
@@ -58,13 +75,18 @@
     justify-content: center;
     align-items: center;
     position: absolute;
+    gap: 0.75rem;
     bottom: 0;
     right: 0;
-    width: 1rem;
     cursor: pointer;
-    height: 5rem;
-    width: 5rem;
+    height: 4.8rem;
     z-index: 5;
+    padding-right: 1.6rem;
+}
+
+.actions p {
+    letter-spacing: -1%;
+    font-weight: 700;
 }
 
 .actions svg {
@@ -96,7 +118,7 @@
 @media screen and (max-width: 800px) {
     .card {
         border-radius: 0px;
-        height: 13.2rem;
+        height: 13.7rem;
         width: 100vw;
         display: flex;
         align-items: center;

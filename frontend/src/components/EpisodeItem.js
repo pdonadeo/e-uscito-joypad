@@ -6,11 +6,12 @@ import classes from "./EpisodeItem.module.css";
 import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
 import EpisodeContent from "./EpisodeContent/EpisodeContent";
 import EpisodeNumber from "./UI/EpisodeNumber";
+import PlayButton from "./UI/PlayButton";
 
 const EpisodeItem = (props) => {
     const [section, setSection] = useState("recensioni");
 
-    const y = 605 + props.index * 133;
+    const y = 605 + props.index * 138;
 
     // const yBox = cardRef.current?.offsetTop;
     // yBox ? console.log(props.numero, yBox) : console.log(null);
@@ -21,7 +22,7 @@ const EpisodeItem = (props) => {
         // window.scrollTo({ top: y, behavior: "smooth" });
         // setActive(!active);
         // setTimeout(() => {
-        event.preventDefault();
+        // event.preventDefault();
         props.onActive(props.index, props.active, props.id, y);
         // }, 500);
     };
@@ -53,23 +54,27 @@ const EpisodeItem = (props) => {
 
     return (
         <li className={classes.cardBox}>
-            <a href={props.url}>
-                <ListTransition className={`${classes.card} ${props.active && classes.active}`}>
-                    <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
-                    <div className={classes.textBox}>
-                        <EpisodeNumber numero={props.numero} />
-                        <p className={classes.title}>{props.titolo}</p>
-                        <div className={classes.additionalInfo}>
-                            <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
-                            <p>&middot;</p>
-                            <p className={classes.duration}>{(props.durata / 60).toFixed(0)} min.</p>
-                        </div>
-                        <div className={classes.actions} onClick={activeHandler}>
-                            <PlusIcon />
-                        </div>
+            <div className={classes.playButton}>
+                <PlayButton url={props.url} />
+            </div>
+            <ListTransition className={`${classes.card} ${props.active && classes.active}`} onClick={activeHandler}>
+                <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
+                <div className={classes.textBox}>
+                    <EpisodeNumber numero={props.numero} />
+                    <p className={classes.title}>{props.titolo}</p>
+                    <div className={classes.additionalInfo}>
+                        <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
+                        <p>&middot;</p>
+                        <p className={classes.duration}>{(props.durata / 60).toFixed(0)} min.</p>
                     </div>
-                </ListTransition>
-            </a>
+                    <div className={classes.actions}>
+                        {/* <a href={props.url}> */}
+                        <p>DETTAGLI</p>
+                        <PlusIcon />
+                        {/* </a> */}
+                    </div>
+                </div>
+            </ListTransition>
             {props.active ? (
                 <div className={classes.adding}>
                     <EpisodeContent
