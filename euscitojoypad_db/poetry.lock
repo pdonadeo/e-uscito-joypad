@@ -105,7 +105,7 @@ python-versions = "*"
 name = "beautifulsoup4"
 version = "4.11.1"
 description = "Screen-scraping library"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.0"
 
@@ -1040,7 +1040,7 @@ python-versions = ">=3.5"
 name = "soupsieve"
 version = "2.3.2.post1"
 description = "A modern CSS selector implementation for Beautiful Soup."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -1259,7 +1259,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "589579ca4793613787ef76894d10fd4671f8bcf8a084bbc2a5a91950da2eaddb"
+content-hash = "17ae2c4fbaab6aa19527ed4f0a7e1d30a8248f11df109c3555d971b89efdb49f"
 
 [metadata.files]
 anyio = [

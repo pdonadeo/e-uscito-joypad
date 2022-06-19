@@ -16,6 +16,8 @@ class Command(BaseCommand):
             ep_j["titolo"] = ep.titolo
             ep_j["episodio_numero"] = ep.episodio_numero
             ep_j["data_uscita"] = ep.data_uscita.isoformat()
+            ep_j["descrizione_txt"] = ep.descrizione_txt
+            ep_j["descrizione_html"] = ep.descrizione_html
             ep_j["durata"] = ep.durata.total_seconds()
             ep_j["url"] = ep.url
             ep_j["url_post"] = ep.url_post

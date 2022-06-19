@@ -86,6 +86,12 @@ class Episodio(models.Model):
     data_uscita = models.DateField(
         verbose_name="Data uscita", blank=False, null=False, default=datetime.date(2019, 12, 15)
     )
+    descrizione_html = models.TextField(
+        verbose_name="Descrizione (HTML)", null=True, blank=True, help_text="Testo che riassume l'episodio (HTML)"
+    )
+    descrizione_txt = models.TextField(
+        verbose_name="Descrizione (TXT)", null=True, blank=True, help_text="Testo che riassume l'episodio (TXT)"
+    )
     durata = models.DurationField(
         verbose_name="Durata", null=False, blank=False, default=datetime.timedelta(minutes=30)
     )
