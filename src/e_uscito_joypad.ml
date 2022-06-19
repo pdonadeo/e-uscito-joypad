@@ -53,6 +53,8 @@ type episode = {
   titolo : string;
   episodio_numero : string option;
   data_uscita : string;
+  descrizione_html : string;
+  descrizione_txt : string;
   durata : float;
   url : string option;
   url_post : string option;
