@@ -54,13 +54,15 @@ const EpisodeItem = (props) => {
 
     return (
         <li className={classes.cardBox}>
-            <div className={classes.playButton}>
-                <PlayButton url={props.url} />
-            </div>
             <ListTransition className={`${classes.card} ${props.active && classes.active}`} onClick={activeHandler}>
                 <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
                 <div className={classes.textBox}>
-                    <EpisodeNumber numero={props.numero} />
+                    <div className={classes.firstBox}>
+                        <EpisodeNumber numero={props.numero} />
+                        <div className={classes.playButton}>
+                            <PlayButton url={props.url} />
+                        </div>
+                    </div>
                     <p className={classes.title}>{props.titolo}</p>
                     <div className={classes.additionalInfo}>
                         <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
