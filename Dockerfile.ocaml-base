@@ -1,0 +1,15 @@
+FROM ocaml/opam:alpine-ocaml-4.14
+
+USER root
+RUN apk update && apk upgrade
+RUN apk add libgmpxx gmp-dev \
+    libev-dev libev \
+    openssl-dev \
+    zlib-dev
+
+USER opam
+WORKDIR /home/opam
+RUN opam repo set-url default https://opam.ocaml.org
+RUN opam update -y && opam upgrade -y
+ADD ./e-uscito-joypad.opam.locked.docker /home/opam/e-uscito-joypad.opam.locked
+RUN opam install ./e-uscito-joypad.opam.locked --deps-only
