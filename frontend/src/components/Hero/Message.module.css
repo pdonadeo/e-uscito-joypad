@@ -1,36 +1,42 @@
 .wrapper {
-  width: 90%;
-  margin: 0 auto;
-  background: linear-gradient(258.12deg, #55aadd 0%, #4aa35a 32.81%, #f1b456 61.98%, #ca4649 100%);
-  border-radius: 8px;
-  padding: 0.5rem;
+    width: 90%;
+    margin: 0 auto;
+    background: linear-gradient(258.12deg, #55aadd 0%, #4aa35a 32.81%, #f1b456 61.98%, #ca4649 100%);
+    border-radius: 8px;
+    padding: 0.5rem;
 }
 
 .message {
-  padding: 1.6rem 2.4rem;
-  font-size: 1.6rem;
-  text-align: center;
-  background-color: #f7f7f8;
-  font-weight: 400;
-  line-height: 2rem;
+    padding: 1.6rem 2.4rem;
+    font-size: 1.6rem;
+    text-align: center;
+    background-color: #f7f7f8;
+    font-weight: 400;
+    line-height: 2rem;
 }
 
 .bold,
 .date {
-  font-family: "Rokkitt", serif;
-  font-size: 2.5rem;
-  font-weight: 900;
-  line-height: 2.5rem;
+    font-family: "Rokkitt", serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 2.5rem;
 }
 
 .comment {
-  display: block;
-  margin-top: 2rem;
-  font-weight: 400;
-  font-style: italic;
+    display: block;
+    margin-top: 2rem;
+    font-weight: 400;
+    font-style: italic;
 }
 /* 
 border: 3px solid;
 
 border-image-source: linear-gradient(258.12deg, #55AADD 0%, #4AA35A 32.81%, #F1B456 61.98%, #CA4649 100%);
  */
+
+@media screen and (min-width: 800px) {
+    .wrapper {
+        width: 40%;
+    }
+}
