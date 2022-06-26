@@ -51,7 +51,7 @@ const EpisodeListing = () => {
             setActiveCard(null);
         } else {
             setActiveCard(null);
-            window.scrollTo({ top: y, behavior: "smooth" });
+            if (isMobile) window.scrollTo({ top: y, behavior: "smooth" });
         }
         if (status) {
             setInterestedIndex(null);
@@ -64,10 +64,17 @@ const EpisodeListing = () => {
             }, 600);
             return;
         }
-        if (!isMobile && index % 2 !== 0) setInterestedIndex(index);
-        else {
+        if (!isMobile && index % 2 !== 0) {
+            setInterestedIndex(index);
+            setTimeout(() => {
+                setActiveCard(numBox);
+            }, 600);
+        } else {
             index = index + 1;
             setInterestedIndex(index);
+            setTimeout(() => {
+                setActiveCard(numBox);
+            }, 600);
         }
     };
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
+import { useMediaQuery } from "react-responsive";
 
 import { ReactComponent as PlusIcon } from "../icons/ICN_Plus.svg";
 import EpisodeContent from "./EpisodeContent/EpisodeContent";
@@ -10,6 +11,7 @@ import PlayButton from "./UI/PlayButton";
 
 const EpisodeItem = (props) => {
     const [section, setSection] = useState("recensioni");
+    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
 
     const y = 605 + props.index * 138;
 
@@ -25,6 +27,10 @@ const EpisodeItem = (props) => {
         // event.preventDefault();
         props.onActive(props.index, props.active, props.id, y);
         // }, 500);
+    };
+
+    const checkEvenIndex = (index) => {
+        return index % 2 === 0;
     };
 
     // let activation = props.cardState;
@@ -78,7 +84,12 @@ const EpisodeItem = (props) => {
                 </div>
             </ListTransition>
             {props.active ? (
-                <div className={classes.adding}>
+                <div
+                    className={classes.adding}
+                    style={
+                        !isMobile ? { transform: `translateX(${checkEvenIndex(props.index) ? "50%" : "-50%"})` } : ""
+                    }
+                >
                     <EpisodeContent
                         section={section}
                         recensioni={recensioni}

@@ -106,7 +106,7 @@
 
 .adding {
     flex-grow: 5;
-    width: 100vw;
+    /* width: 100vw; */
     list-style-type: none;
     height: fit-content;
     display: flex;

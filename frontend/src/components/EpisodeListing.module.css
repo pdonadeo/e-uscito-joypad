@@ -2,7 +2,7 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    align-items: center;
+    align-items: flex-start;
     max-width: 91.9rem;
     gap: 2.4rem;
     list-style-type: none;
