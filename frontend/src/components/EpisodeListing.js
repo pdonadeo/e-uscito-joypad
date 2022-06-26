@@ -92,7 +92,6 @@ const EpisodeListing = () => {
                         uscita={episode.data_uscita}
                         durata={episode.durata}
                         giochi={episode.giochi}
-                        // cardState={cardReset}
                         onActive={activeListHandler}
                         active={activeCard === episode.episodio_numero}
                         involved={index === interestedIndex ? true : false}
