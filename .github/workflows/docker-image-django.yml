@@ -3,6 +3,7 @@ on:
   push:
     branch:
       - 'main'
+      - 'staging'
   release:
     types: [published, created, edited]
 jobs:
