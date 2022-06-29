@@ -29,8 +29,18 @@ def scrape(url):
     for s in soup.find_all("div", attrs={"class": "adv_inread"}):
         s.extract()
 
+    # Primo paragrafo
+    try:
+        primo_p = content.find_all("p")[0]
+        primo_testo = primo_p.getText()
+        if primo_testo.strip().startswith("Joypad è il posto in cui Matteo Bordone"):
+
+            primo_p.extract()
+    except:
+        print(f"Eccezione mentre scaricavo {url}")
+
     txt = content.getText(" ", strip=True).strip()
-    html = str(content).strip()
+    html = str(content.prettify()).strip()
     return (txt, html)
 
 
