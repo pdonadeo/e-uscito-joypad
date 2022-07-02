@@ -34,10 +34,10 @@ const EpisodeListing = () => {
     }, [fetchEpisode]);
 
     const fuse = new Fuse(episodeList, {
-        keys: ["titolo", ["giochi", "titolo"]],
+        keys: ["giochi.titolo"],
         includeScore: true,
         includeMatches: true,
-        threshold: 0.5,
+        threshold: 0.3936363,
         findAllMatches: true,
     });
 
