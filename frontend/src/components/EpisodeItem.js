@@ -86,9 +86,9 @@ const EpisodeItem = (props) => {
             {props.active ? (
                 <div
                     className={classes.adding}
-                    style={
+                    /* style={
                         !isMobile ? { transform: `translateX(${checkEvenIndex(props.index) ? "50%" : "-50%"})` } : {}
-                    }
+                    } */
                 >
                     <EpisodeContent
                         section={section}
