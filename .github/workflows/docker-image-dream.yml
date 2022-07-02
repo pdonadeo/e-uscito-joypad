@@ -1,8 +1,8 @@
 name: Build Docker and push to registry (Dream)
 on:
   push:
-    tags:
-      - '*'
+    branch:
+      - 'main'
   release:
     types: [published, created, edited]
 jobs:
