@@ -1,0 +1,76 @@
+---
+version: '3.7'
+services:
+
+  # Backoffice (Django)
+  web:
+    depends_on:
+      - "db"
+    container_name: 'e-uscito-joypad-backoffice'
+    build: ./euscitojoypad_db/
+    command: /venv/bin/python /app/manage.py runserver_plus --nopin --threaded --force-color 0.0.0.0:8000
+    networks:
+      - e-uscito-joypad
+    env_file: ./django_env
+    volumes:
+      - ./euscitojoypad_db:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.priority=10"
+      - "traefik.http.routers.web.rule=PathPrefix(`/`,`/admin`, `/files`, `/static`)"
+      - "traefik.http.routers.web.entrypoints=web"
+
+  # È uscito Joypad? (Backend Dream + React SPA)
+  spa_app:
+    depends_on:
+      - "web"
+    container_name: 'e-uscito-joypad'
+    build: ./
+    networks:
+      - e-uscito-joypad
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.spa_app.rule=PathPrefix(`/it/carrello/`,`/en/cart/`, `/fr/corbeille/`, `/es/cesta/`, `/react-static-bundle/`)"
+      - "traefik.http.routers.spa_app.entrypoints=web"
+
+  # PostgreSQL
+  db:
+    image: postgres:14-alpine
+    container_name: 'e-uscito-joypad-postgresql'
+    networks:
+      - e-uscito-joypad
+    environment:
+      POSTGRES_PASSWORD: pippo120
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/db/init_db/:/docker-entrypoint-initdb.d/
+    #command: postgres -c 'log_statement=all' -c 'log_min_messages=INFO'
+    ports:
+      - 5432:5432
+
+  # Load balancer
+  reverse-proxy:
+    image: traefik:v2.5
+    container_name: 'e-uscito-joypad-loadbalancer'
+    privileged: true
+    networks:
+      - e-uscito-joypad
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--entrypoints.web.address=:5000"
+    ports:
+      - "5000:5000"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:z"
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  e-uscito-joypad:
+    name: e-uscito-joypad
