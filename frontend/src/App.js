@@ -6,32 +6,51 @@ import HeroLinks from "./components/Hero/HeroLinks";
 import Logo from "./components/Hero/Logo";
 
 const App = () => {
-    const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
-    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+  const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
+  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
 
-    useEffect(() => {
-        fetch("/api/ultima-puntata")
-            .then((response) => response.json())
-            .then((data) => {
-                setDatiUltimaPuntata(data);
-            });
-    }, []);
+  useEffect(() => {
+    fetch("/api/ultima-puntata")
+      .then((response) => response.json())
+      .then((data) => {
+        setDatiUltimaPuntata(data);
+      });
+  }, []);
 
-    const style = isMobile
-        ? { display: "flex", flexDirection: "column", justifyContent: "center", height: "605px" }
-        : {};
+  const style = isMobile
+    ? {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "605px",
+      }
+    : {};
 
-    return (
-        <Fragment>
-            <header style={style}>
-                <Logo />
-                <Message dati={datiUltimaPuntata} />
-                <HeroLinks />
-                {/* {datiUltimaPuntata.fretta ? <p>Corri! Se aspetti ancora un po' esce il prossimo episodio!</p> : ""} */}
-            </header>
-            <EpisodeSection />
-        </Fragment>
-    );
+  return (
+    <Fragment>
+      <header style={style}>
+        <Logo />
+        <div
+          style={
+            !isMobile
+              ? {
+                  display: "flex",
+                  flexDirection: "row",
+                  margin: "0 auto",
+                  width: "91.9rem",
+                  justifyContent: "space-between",
+                }
+              : {}
+          }
+        >
+          <Message dati={datiUltimaPuntata} />
+          <HeroLinks />
+        </div>
+        {/* {datiUltimaPuntata.fretta ? <p>Corri! Se aspetti ancora un po' esce il prossimo episodio!</p> : ""} */}
+      </header>
+      <EpisodeSection />
+    </Fragment>
+  );
 };
 
 export default App;
