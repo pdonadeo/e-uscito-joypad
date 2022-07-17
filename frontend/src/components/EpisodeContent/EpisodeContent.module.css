@@ -1,5 +1,6 @@
 .containerAnimation {
    animation: fadeIn 0.4s ease-in;
+   width: 51.4rem;
 }
 
 .controls {
@@ -74,6 +75,9 @@
 }
 
 @media screen and (max-width: 800px) {
+   .containerAnimation {
+      width: fit-content;
+   }
 }
 
 @keyframes fadeIn {

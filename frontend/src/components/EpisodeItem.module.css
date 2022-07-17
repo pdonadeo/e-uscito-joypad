@@ -111,11 +111,12 @@
    list-style-type: none;
    height: fit-content;
    display: flex;
-   justify-content: flex-start;
+   justify-content: center;
    align-items: center;
    overflow: scroll;
    grid-column-start: 1;
    grid-column-end: -1;
+   background-color: red;
 }
 
 @media screen and (max-width: 800px) {
