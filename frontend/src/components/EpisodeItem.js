@@ -59,34 +59,35 @@ const EpisodeItem = (props) => {
    }, []);
 
    return (
-      <li className={classes.cardBox}>
-         <ListTransition className={`${classes.card} ${props.active && classes.active}`} onClick={activeHandler}>
-            <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
-            <div className={classes.textBox}>
-               <div className={classes.firstBox}>
-                  <EpisodeNumber numero={props.numero} />
-                  <div className={classes.playButton}>
-                     <PlayButton url={props.url} />
+      <>
+         <li className={classes.cardBox}>
+            <ListTransition className={`${classes.card} ${props.active && classes.active}`} onClick={activeHandler}>
+               <img className={classes.cover} src={props.cover} alt={`cover dell'episodio ${props.numero}`} />
+               <div className={classes.textBox}>
+                  <div className={classes.firstBox}>
+                     <EpisodeNumber numero={props.numero} />
+                     <div className={classes.playButton}>
+                        <PlayButton url={props.url} />
+                     </div>
+                  </div>
+                  <p className={classes.title}>{props.titolo}</p>
+                  <div className={classes.additionalInfo}>
+                     <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
+                     <p>&middot;</p>
+                     <p className={classes.duration}>{(props.durata / 60).toFixed(0)} min.</p>
+                  </div>
+                  <div className={classes.actions}>
+                     <p>DETTAGLI</p>
+                     <PlusIcon />
                   </div>
                </div>
-               <p className={classes.title}>{props.titolo}</p>
-               <div className={classes.additionalInfo}>
-                  <p className={classes.releaseDate}>{props.uscita.replaceAll("-", ".")} </p>
-                  <p>&middot;</p>
-                  <p className={classes.duration}>{(props.durata / 60).toFixed(0)} min.</p>
-               </div>
-               <div className={classes.actions}>
-                  {/* <a href={props.url}> */}
-                  <p>DETTAGLI</p>
-                  <PlusIcon />
-                  {/* </a> */}
-               </div>
-            </div>
-         </ListTransition>
+            </ListTransition>
+         </li>
          {props.active ? (
-            <div
+            <li
                className={classes.adding}
-               style={!isMobile ? { transform: `translateX(${checkEvenIndex(props.index) ? "50%" : "-50%"})` } : {}}
+               // style={!isMobile ? { transform: `translateX(${checkEvenIndex(props.index) ? "50%" : "-50%"})` } : {}}
+               style={!isMobile ? { gridRowStart: `${Math.floor(props.index / 2 + 2)}` } : {}}
             >
                <EpisodeContent
                   section={section}
@@ -96,11 +97,11 @@ const EpisodeItem = (props) => {
                   giochi={props.giochi}
                   descrizione={props.descrizione}
                />
-            </div>
+            </li>
          ) : (
             ""
          )}
-      </li>
+      </>
    );
 };
 

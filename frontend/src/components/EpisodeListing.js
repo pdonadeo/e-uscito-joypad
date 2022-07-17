@@ -24,7 +24,7 @@ const EpisodeListing = () => {
             throw new Error("Something went wrong!");
          }
          const data = await response.json();
-         console.log(data);
+         // console.log(data);
          setEpisodeList(data.episodi);
       } catch (error) {
          console.error(error.message);

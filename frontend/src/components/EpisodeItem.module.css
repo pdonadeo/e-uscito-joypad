@@ -20,6 +20,7 @@
    justify-content: flex-start;
    gap: 1.6rem;
    position: relative;
+   cursor: pointer;
 }
 
 .cover {
@@ -105,7 +106,7 @@
 }
 
 .adding {
-   flex-grow: 5;
+   /* flex-grow: 5; */
    /* width: 100vw; */
    list-style-type: none;
    height: fit-content;
@@ -113,6 +114,8 @@
    justify-content: flex-start;
    align-items: center;
    overflow: scroll;
+   grid-column-start: 1;
+   grid-column-end: -1;
 }
 
 @media screen and (max-width: 800px) {

@@ -1,17 +1,21 @@
 .listBox {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    max-width: 91.9rem;
-    gap: 2.4rem;
-    list-style-type: none;
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   max-width: 91.9rem;
+   gap: 2.4rem;
+   list-style-type: none;
 }
 
 @media screen and (max-width: 800px) {
-    .listBox {
-        width: 100%;
-        gap: 0.1rem;
-        flex-direction: column;
-    }
+   .listBox {
+      width: 100%;
+      gap: 0.1rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      max-width: 91.9rem;
+      list-style-type: none;
+      flex-direction: column;
+   }
 }
