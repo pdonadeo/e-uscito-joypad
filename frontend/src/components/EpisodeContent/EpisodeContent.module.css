@@ -1,6 +1,6 @@
 .containerAnimation {
    animation: fadeIn 0.4s ease-in;
-   width: 51.4rem;
+   width: 100vw;
 }
 
 .controls {
@@ -74,9 +74,21 @@
    max-width: 44.4rem;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (min-width: 800px) {
    .containerAnimation {
-      width: fit-content;
+      width: 55rem;
+   }
+   .controls {
+      overflow: initial;
+      max-width: 70rem;
+      justify-content: flex-start;
+   }
+   .control {
+      padding: 0.8rem 1.6rem;
+      cursor: pointer;
+   }
+   .description {
+      max-width: initial;
    }
 }
 
