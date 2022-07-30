@@ -14,6 +14,7 @@
     "framer-motion": "^6.3.3",
     "fuse.js": "^6.6.2",
     "react": "^18.0.0",
+    "react-debounce-input": "^3.3.0",
     "react-dom": "^18.0.0",
     "react-responsive": "^9.0.0-beta.8",
     "react-scripts": "5.0.1",
