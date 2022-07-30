@@ -29,9 +29,10 @@ const EpisodeItem = (props) => {
       // }, 500);
    };
 
-   const checkEvenIndex = (index) => {
-      return index % 2 === 0;
-   };
+   /* Commentato perché inutilizzato */
+   // const checkEvenIndex = (index) => {
+   //    return index % 2 === 0;
+   // };
 
    // let activation = props.cardState;
    // if (props.active) {
@@ -56,7 +57,7 @@ const EpisodeItem = (props) => {
       if (firstActive === 0) setSection("recensioni");
       if (firstActive === 1) setSection("consigli");
       if (firstActive === 2) setSection("chiacchiere");
-   }, []);
+   }, [recensioni, consigli, chiacchiere]);
 
    return (
       <>
