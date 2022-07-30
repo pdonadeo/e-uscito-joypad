@@ -37,7 +37,16 @@ const EpisodeListing = () => {
    }, [fetchEpisode]);
 
    const fuse = new Fuse(episodeList, {
-      keys: ["giochi.titolo"],
+      keys: [
+         {
+            name: "giochi.titolo",
+            weight: 1,
+         },
+         {
+            name: "titolo",
+            weight: 3,
+         }
+      ],
       includeScore: true,
       includeMatches: true,
       threshold: 0.3936363,
