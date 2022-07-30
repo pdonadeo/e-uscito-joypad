@@ -8,6 +8,8 @@ import EpisodeItem from "./EpisodeItem";
 
 import classes from "./EpisodeListing.module.css";
 
+const MAX_NUMBER_OF_EPISODES = 7;
+
 const EpisodeListing = () => {
    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
    const [episodeList, setEpisodeList] = useState([]);
@@ -42,9 +44,27 @@ const EpisodeListing = () => {
       findAllMatches: true,
    });
 
-   const results = fuse.search(searchInput);
+   let episodes = [];
+   if (searchInput) {
+      /* C'è un input, facciamo effettivamente una ricerca. Non scartiamo nessun risultato
+         ma non ordiniamo per data gli episodi perché Fuse.js li ordina già per rilevanza */
+      const results = fuse.search(searchInput);
+      episodes = results.map((result) => result.item);
+      if (list === "descending") {
+         episodes = episodes.reverse();
+      }
+   } else {
+      /* Non c'è un input, mostriamo tutti gli episodi. In questo caso consentiamo
+         di ordinare per data ma prendiamo solo un certo numero di episodi,
+         per una migliore visualizzazione */
+      episodes = episodeList;
+      episodes.sort((a, b) => new Date(b.data_uscita) - new Date(a.data_uscita));
 
-   let episodeResult = searchInput ? results.map((result) => result.item) : episodeList;
+      if (list === "descending") {
+         episodes = episodes.reverse();
+      }
+      episodes = episodes.slice(0, MAX_NUMBER_OF_EPISODES);
+   }
 
    const activeListHandler = (index, status, numBox, y) => {
       if (numBox === activeCard) {
@@ -77,12 +97,6 @@ const EpisodeListing = () => {
          }, 600);
       }
    };
-
-   episodeResult.sort((a, b) => new Date(b.data_uscita) - new Date(a.data_uscita));
-   let episodes = [];
-   if (list === "ascending") {
-      episodes = episodeResult;
-   } else if (list === "descending") episodes = episodeResult.reverse();
 
    return (
       <ul className={classes.listBox}>
