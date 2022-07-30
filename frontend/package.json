@@ -8,17 +8,17 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.14.1",
-    "@testing-library/react": "^13.0.0",
-    "@testing-library/user-event": "^13.2.1",
-    "framer-motion": "^6.3.3",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "framer-motion": "^6.5.1",
     "fuse.js": "^6.6.2",
-    "react": "^18.0.0",
+    "react": "^18.2.0",
     "react-debounce-input": "^3.3.0",
-    "react-dom": "^18.0.0",
-    "react-responsive": "^9.0.0-beta.8",
+    "react-dom": "^18.2.0",
+    "react-responsive": "^9.0.0-beta.10",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.0"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
