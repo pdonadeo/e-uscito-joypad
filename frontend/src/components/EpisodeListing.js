@@ -8,9 +8,8 @@ import EpisodeItem from "./EpisodeItem";
 
 import classes from "./EpisodeListing.module.css";
 
-const MAX_NUMBER_OF_EPISODES = 7;
 
-const EpisodeListing = () => {
+const EpisodeListing = ({ listLength }) => {
    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
    const [episodeList, setEpisodeList] = useState([]);
    const { searchInput, list } = useContext(SearchContext);
@@ -74,7 +73,7 @@ const EpisodeListing = () => {
       if (list === "descending") {
          episodes = episodes.reverse();
       }
-      episodes = episodes.slice(0, MAX_NUMBER_OF_EPISODES);
+      episodes = episodes.slice(0, listLength);
    }
 
    const activeListHandler = (index, status, numBox, y) => {
