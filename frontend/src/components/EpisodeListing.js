@@ -57,7 +57,9 @@ const EpisodeListing = () => {
    if (searchInput) {
       /* C'è un input, facciamo effettivamente una ricerca. Non scartiamo nessun risultato
          ma non ordiniamo per data gli episodi perché Fuse.js li ordina già per rilevanza */
-      const results = fuse.search(searchInput);
+      let results = fuse.search(searchInput);
+      /* Tagliamo i risultati con uno score > 0.2 */
+      results = results.filter((r) => r.score <= 0.2);
       episodes = results.map((result) => result.item);
       if (list === "descending") {
          episodes = episodes.reverse();
