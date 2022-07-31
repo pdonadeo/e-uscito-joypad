@@ -116,7 +116,7 @@ const EpisodeListing = () => {
                   key={episode.episodio_numero}
                   id={episode.episodio_numero}
                   titolo={episode.titolo}
-                  url={episode.url_post}
+                  url={episode.url_video ? episode.url_video : episode.url}
                   numero={episode.episodio_numero}
                   cover={episode.cover}
                   uscita={episode.data_uscita}
