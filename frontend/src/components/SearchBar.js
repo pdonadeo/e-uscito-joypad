@@ -35,7 +35,7 @@ const SearchBar = () => {
                 maximum-scale="1"
                 // onFocus={focusHandler}
                 type="text"
-                placeholder={"| Trova quella con…"}
+                placeholder={"| Cerca un gioco…"}
                 className={classes.input}
 
                 minLength={4}
