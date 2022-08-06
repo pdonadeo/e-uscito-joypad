@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import classes from "./HeroLinks.module.css";
 
 import { ReactComponent as IlPost } from "../../icons/ICN_IlPost.svg";
@@ -8,9 +7,13 @@ import { ReactComponent as Google } from "../../icons/ICN_Google.svg";
 
 const HeroLinks = () => {
   return (
-    <Fragment>
+    <div className={classes.container}>
       <p className={classes.listenMessage}>
-        Ascolta la puntata <a href="https://www.ilpost.it/podcasts/joypad/">sulla pagina del Post</a>,<br /> oppure
+        Ascolta la puntata{" "}
+        <a href="https://www.ilpost.it/podcasts/joypad/">
+          sulla pagina del Post
+        </a>
+        ,<br /> oppure
       </p>
       <div className={classes.linkBoxes}>
         <a href="https://app.ilpost.it/">
@@ -27,11 +30,13 @@ const HeroLinks = () => {
         </a>
       </div>
       <p className={classes.note}>
-        Nota per gli autori del podcast: il sito è pubblicato gratuitamente e con licenza open su
-        <a href="https://github.com/pdonadeo/e-uscito-joypad"> GitHub</a> e potete fare tutte le richieste che volete
+        Nota per gli autori del podcast: il sito è pubblicato gratuitamente e
+        con licenza open su
+        <a href="https://github.com/pdonadeo/e-uscito-joypad"> GitHub</a> e
+        potete fare tutte le richieste che volete
         <a href="https://github.com/pdonadeo/e-uscito-joypad/issues"> qui</a>.
       </p>
-    </Fragment>
+    </div>
   );
 };
 

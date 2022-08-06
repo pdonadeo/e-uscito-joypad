@@ -1,91 +1,107 @@
 .containerAnimation {
-    animation: fadeIn 0.4s ease-in;
+   animation: fadeIn 0.4s ease-in;
+   width: 100vw;
 }
 
 .controls {
-    list-style-type: none;
-    display: flex;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    max-width: 100vw;
-    min-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
-    width: initial;
-    padding: 0 1.1rem;
+   list-style-type: none;
+   display: flex;
+   justify-content: flex-start;
+   flex-wrap: nowrap;
+   max-width: 100vw;
+   min-width: 100%;
+   overflow-x: auto;
+   overflow-y: hidden;
+   scroll-behavior: smooth;
+   width: initial;
+   padding: 0 1.1rem;
 }
 
 .controls::-webkit-scrollbar {
-    display: none;
+   display: none;
 }
 
 .controls li {
-    height: 5rem;
-    padding: 0 0.4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+   height: 5rem;
+   padding: 0 0.4rem;
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
 
 .control {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: #000;
-    background-color: #fff;
-    padding: 0.2rem 0.6rem;
-    border-radius: 4px;
-    width: max-content;
-    transition: all 0.4s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+   font-size: 1.2rem;
+   font-weight: 800;
+   color: #000;
+   background-color: #fff;
+   padding: 0.2rem 0.6rem;
+   border-radius: 4px;
+   width: max-content;
+   transition: all 0.4s;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 0.5rem;
 }
 
 .control span {
-    font-size: 1rem;
-    border: 1px solid #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 1.5rem;
-    width: 1.5rem;
-    padding: 0.1rem 0.2rem;
-    border-radius: 1000px;
+   font-size: 1rem;
+   border: 1px solid #000;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   height: 1.5rem;
+   width: 1.5rem;
+   padding: 0.1rem 0.2rem;
+   border-radius: 1000px;
 }
 
 .tagActive {
-    color: #fff;
-    background-color: #000;
-    transition: all 0.4s;
+   color: #fff;
+   background-color: #000;
+   transition: all 0.4s;
 }
 
 .tagActive.control span {
-    border: 1px solid #fff;
+   border: 1px solid #fff;
 }
 
 .description {
-    font-size: 1.4rem;
-    font-weight: 400;
-    line-height: 2.5rem;
-    padding: 1.6rem;
-    max-width: 44.4rem;
+   font-size: 1.4rem;
+   font-weight: 400;
+   line-height: 2.5rem;
+   padding: 1.6rem;
+   max-width: 44.4rem;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (min-width: 800px) {
+   .containerAnimation {
+      width: 55rem;
+   }
+   .controls {
+      overflow: initial;
+      max-width: 70rem;
+      justify-content: flex-start;
+   }
+   .control {
+      padding: 0.8rem 1.6rem;
+      cursor: pointer;
+   }
+   .description {
+      max-width: initial;
+   }
 }
 
 @keyframes fadeIn {
-    0% {
-        opacity: 0;
-        display: none;
-    }
-    50% {
-        display: block;
-        opacity: 0.6;
-    }
-    100% {
-        opacity: 1;
-    }
+   0% {
+      opacity: 0;
+      display: none;
+   }
+   50% {
+      display: block;
+      opacity: 0.6;
+   }
+   100% {
+      opacity: 1;
+   }
 }

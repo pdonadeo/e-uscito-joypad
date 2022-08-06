@@ -1,4 +1,6 @@
 import { useContext, useState } from "react";
+import { DebounceInput } from 'react-debounce-input';
+
 import SearchContext from "../store/search-context";
 
 import { ReactComponent as SearchIcon } from "../icons/ICN_Search.svg";
@@ -28,15 +30,18 @@ const SearchBar = () => {
 
     return (
         <div className={classes.searchBar}>
-            <input
+            <DebounceInput
                 initial-scale="1"
                 maximum-scale="1"
                 // onFocus={focusHandler}
                 type="text"
-                placeholder={"| Trova quella con.."}
+                placeholder={"| Cerca un gioco…"}
                 className={classes.input}
+
+                minLength={4}
+                debounceTimeout={300}
                 onChange={searchHandler}
-            ></input>
+            />
             <div className={classes.searchIcon}>
                 <SearchIcon />
             </div>
