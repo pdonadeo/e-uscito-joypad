@@ -20,6 +20,17 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", None).split(",")
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", None).split(",")
 SECRET_KEY = os.environ.get("SECRET_KEY", None)
 
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "HOST": os.environ.get("PGHOST", None),
+        "PORT": os.environ.get("PGPORT", "5432"),
+        "USER": os.environ.get("PGUSER", None),
+        "PASSWORD": os.environ.get("PGPASSWORD", None),
+        "NAME": os.environ.get("PGDATABASE", None),
+    }
+}
+
 ################################################################################
 #####                      CONFIGURAZIONE SESSIONI                         #####
 ################################################################################

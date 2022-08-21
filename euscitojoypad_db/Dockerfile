@@ -27,7 +27,8 @@ RUN apk update \
         openssl-dev \
         python3-dev \
         unixodbc-dev \
-        zlib-dev
+        zlib-dev \
+        libpq-dev
 
 
 RUN /usr/local/bin/pip install poetry
@@ -40,6 +41,8 @@ WORKDIR $HOME
 COPY pyproject.toml poetry.lock ./
 
 RUN python3 -m venv $VIRTUAL_ENV            \
+ && source $VIRTUAL_ENV/bin/activate        \
+ && pip install --upgrade pip               \
  && poetry config virtualenvs.create false  \
  && poetry install --no-interaction --no-dev --no-root
 
@@ -55,7 +58,6 @@ ENV HOME="/app"
 ENV VIRTUAL_ENV=/venv
 ENV GUNICORN_TIMEOUT 30
 ENV GUNICORN_WORKERS 4
-ENV DJANGO_COLLECTSTATIC: "True"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR $HOME
@@ -64,7 +66,7 @@ RUN apk update                                                          \
     && apk add --no-cache                                               \
         bash sudo jpeg zlib libtool unixodbc                            \
         libffi czmq libxml2 libxslt openssl libwebp-dev libwebp ncdu    \
-        htop gettext mailcap                                            \
+        htop gettext mailcap libpq                                      \
     && addgroup -g "$GID" -S "$USER"                                    \
     && adduser                                                          \
        --disabled-password                                              \
@@ -93,6 +95,9 @@ ENV SECRET_KEY="CHANGE THIS IN PRODUCTION"
 ENV DJANGO_SUPERUSER_USERNAME="admin"
 ENV DJANGO_SUPERUSER_PASSWORD="admin"
 ENV RAWG_API_KEY="CHANGE THIS IN PRODUCTION"
+ENV PGUSER="CHANGE ME IN PRODUCTION"
+ENV PGPASSWORD="CHANGE ME IN PRODUCTION"
+ENV PGDATABASE="CHANGE ME IN PRODUCTION"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD /venv/bin/gunicorn --bind :8000 --workers $GUNICORN_WORKERS     \

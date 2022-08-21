@@ -19,19 +19,16 @@ echo "+-----------------------------------------------------------------------+"
 
 echo "Dockerentrypoint | Preflight | show startup environment"
 
-
-SHOW_DJANGO_SUPERUSER_PASSWORD=$(echo "${DJANGO_SUPERUSER_PASSWORD}" | base64)
-
 echo "DJANGO_SUPERUSER_USERNAME:        $DJANGO_SUPERUSER_USERNAME"
 echo "DJANGO_SUPERUSER_EMAIL:           $DJANGO_SUPERUSER_EMAIL"
-echo "DJANGO_SUPERUSER_PASSWORD_BASE64: $SHOW_DJANGO_SUPERUSER_PASSWORD"
+echo "DJANGO_SUPERUSER_PASSWORD_BASE64: $DJANGO_SUPERUSER_PASSWORD"
 
-echo "Dockerentrypoint | Django App --> START Migration"
+echo "Dockerentrypoint | Django App --> START migrate"
 /venv/bin/python manage.py migrate
-echo "Dockerentrypoint | Django App -->   END Migration"
+echo "Dockerentrypoint | Django App -->   END migrate"
 
 echo "Dockerentrypoint | Django App --> START collectstatic"
-/venv/bin/python manage.py collectstatic
+/venv/bin/python manage.py collectstatic --no-input
 echo "Dockerentrypoint | Django App -->   END collectstatic"
 
 echo "Dockerentrypoint | Django App --> chown -R joypad:joypad MEDIA/ STATIC/"
@@ -50,7 +47,7 @@ django_superuser_password=os.environ['DJANGO_SUPERUSER_PASSWORD']
 
 
 if User.objects.filter(username=django_superuser_username).exists():
-    print(f"Super User {django_superuser_username} exist do nothing")
+    print(f"Django superuser {django_superuser_username} already exists, nothing to do")
 else:
     print(f"Create Superuser: {django_superuser_username}")
     user=User.objects.create_user(django_superuser_username, password=django_superuser_password)

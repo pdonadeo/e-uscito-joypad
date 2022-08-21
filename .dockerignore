@@ -3,5 +3,7 @@
 .vscode
 _build
 _opam/
-frontend/node_modules
 data/
+euscitojoypad_db/
+frontend/node_modules
+docker-compose.yml

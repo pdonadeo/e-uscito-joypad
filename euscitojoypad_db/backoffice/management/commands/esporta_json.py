@@ -23,7 +23,7 @@ class Command(BaseCommand):
             ep_j["url_post"] = ep.url_post
             ep_j["url_video"] = ep.url_video
             if ep.cover:
-                ep_j["cover"] = f"https://db.euscitojoypad.it{ep.cover.url}"
+                ep_j["cover"] = ep.cover.url
             else:
                 ep_j["cover"] = None
 
