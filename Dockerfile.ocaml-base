@@ -5,7 +5,9 @@ RUN apk update && apk upgrade
 RUN apk add libgmpxx gmp-dev \
     libev-dev libev \
     openssl-dev \
-    zlib-dev
+    zlib-dev \
+    libpq-dev \
+    libffi-dev
 
 USER opam
 WORKDIR /home/opam

@@ -14,7 +14,8 @@ RUN yarn build
 FROM pdonadeo/e-uscito-joypad-base:latest AS build-stage-2
 
 USER root
-ADD --chown=opam:opam ./ /app
+ADD --chown=opam:opam ./dune ./dune-project /app/
+ADD --chown=opam:opam ./src /app/src
 RUN apk add upx
 
 USER opam
@@ -45,7 +46,11 @@ FROM alpine:latest
 COPY --from=build-stage-2 /usr/local/bin/e_uscito_joypad /usr/local/bin/
 COPY --from=build-stage-2 /app/assets /assets
 RUN apk update
-RUN apk add gmp libev ca-certificates ca-certificates-bundle libstdc++
+RUN apk add --no-cache                                  \
+    gmp libev ca-certificates ca-certificates-bundle    \
+    libstdc++ libpq libffi tzdata
+ENV TZ=Europe/Rome
+
 COPY Dockerfile /Dockerfile
 
 WORKDIR /
