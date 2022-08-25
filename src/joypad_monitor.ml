@@ -6,7 +6,19 @@ type data = {
   date : Timedesc.Date.t;
 }
 
+type dati_ultima_puntata = {
+  uscito : bool;
+  fretta : bool;
+  giorni_fa : string;
+  data_italiano : string;
+  ep_num : int;
+  titolo : string;
+  rompi_le_palle : bool;
+}
+[@@deriving yojson]
+
 let log = Dream.sub_log "joypad.monitor"
+let last_episode_data : data option ref = ref None
 
 let body () =
   let%lwt _, body = Client.get (Uri.of_string Settings.joypad_page) in
@@ -46,8 +58,8 @@ let extract_data_from_page () =
     Lwt.return (data_title, data_desc)
   | None -> failwith "TODO: MANCANO I DATI"
 
-let elabora_risposta last_episode_data =
-  match last_episode_data with
+let elabora_risposta () =
+  match !last_episode_data with
   | Some last_episode_data ->
     let tz = Timedesc.Time_zone.make_exn "Europe/Rome" in
     let adesso = Timedesc.now ~tz_of_date_time:tz () in
@@ -61,7 +73,7 @@ let elabora_risposta last_episode_data =
     (uscito, fretta, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, rompi_le_palle)
   | None -> (false, false, "", "", 1999, "", false)
 
-let rec monitor ~last_episode_data () =
+let rec monitor () =
   log.debug (fun l -> l "Scarico info ultima puntata...");
 
   let%lwt () =
@@ -81,4 +93,4 @@ let rec monitor ~last_episode_data () =
   in
 
   let%lwt () = Lwt_unix.sleep Settings.monitor_period_sec in
-  monitor ~last_episode_data ()
+  monitor ()

@@ -1,5 +1,12 @@
 let spf = Printf.sprintf
 let () = Gc.set { (Gc.get ()) with Gc.allocation_policy = 2; Gc.space_overhead = 85 }
+
+let getenv ~default ~f v_name =
+  try
+    let v_val = Unix.getenv v_name in
+    try f v_val with _ -> default
+  with Not_found -> default
+
 let log = Dream.sub_log "utils"
 
 let iter_backtrace f backtrace =
@@ -123,3 +130,27 @@ let yojson_ok_exn (res : 'a Ppx_deriving_yojson_runtime.error_or) =
   match res with
   | Ok res -> res
   | Error msg -> failwith (spf "Cannot read JSON: %s" msg)
+
+module Lwt_result = struct
+  include Lwt_result
+
+  let combine_errors xs =
+    let rec loop xs oks errs =
+      match xs with
+      | [] -> (List.rev oks, List.rev errs)
+      | x :: xs -> (
+        match x with
+        | Ok v -> loop xs (v :: oks) errs
+        | Error e -> loop xs oks (e :: errs))
+    in
+    let oks, errs = loop xs [] [] in
+    match errs with
+    | [] -> Ok oks
+    | e :: _ -> Error e
+
+  module List = struct
+    let map_s (f : 'a -> ('b, 'err) t) (xs : 'a list) : ('b list, 'err) t =
+      let%lwt _results = Lwt_list.map_s (fun x -> f x) xs in
+      Lwt.return (combine_errors _results)
+  end
+end

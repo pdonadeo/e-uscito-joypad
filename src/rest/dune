@@ -1,0 +1,12 @@
+(library
+ (name rest)
+ (modules rest)
+ (preprocess
+  (pps
+   lwt_ppx
+   ppx_deriving_yojson
+   ppx_deriving.show
+   ppx_sexp_conv
+   ppx_enumerate
+   ppx_rapper))
+ (libraries decimal timedesc dream db settings ppx_rapper_lwt caqti-lwt))

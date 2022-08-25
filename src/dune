@@ -1,11 +1,14 @@
 (executable
  (name e_uscito_joypad)
  (public_name e_uscito_joypad)
- (modules e_uscito_joypad utils views settings joypad_monitor react)
+ (modules e_uscito_joypad views joypad_monitor react middlewares)
  (preprocess
   (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
  (libraries
   dream
+  db
+  rest
+  settings
   batteries
   malloc
   timedesc
@@ -13,7 +16,21 @@
   lambdasoup
   re2
   tyxml
-  ppx_deriving_yojson.runtime))
+  ppx_deriving_yojson.runtime
+  caqti-driver-postgresql
+  caqti-lwt))
+
+(library
+ (name settings)
+ (modules settings)
+ (libraries utils))
+
+(library
+ (name utils)
+ (modules utils)
+ (preprocess
+  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
+ (libraries dream batteries malloc timedesc))
 
 (rule
  (targets index.html)
