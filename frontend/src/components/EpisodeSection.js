@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 
 import SearchContext from "../store/search-context";
 import EpisodeListing from "./EpisodeListing";
@@ -9,7 +9,34 @@ import classes from "./EpisodeSection.module.css";
 const MAX_NUMBER_OF_EPISODES = 8;
 
 const EpisodeSection = () => {
-  const { searchInput } = useContext(SearchContext);
+  const { searchInput, sortOrder } = useContext(SearchContext);
+  const [episodeList, setEpisodeList] = useState([]);
+
+  useEffect(() => {
+    const fetchEpisode = async () => {
+      try {
+        let response = null;
+        if (searchInput.trim() !== "") {
+          response = await fetch(`/api/search-game/${searchInput}`);
+        } else {
+          response = await fetch(`/api/last-episodes/${MAX_NUMBER_OF_EPISODES}`);
+        }
+
+        if (!response.ok) {
+          throw new Error("Something went wrong!");
+        }
+        const data = await response.json();
+        if (sortOrder === "descending") {
+          data.result = data.result.reverse();
+        }
+        setEpisodeList(data.result);
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    fetchEpisode();
+  }, [searchInput, sortOrder]);
 
   return (
     <div className={classes.container}>
@@ -19,7 +46,10 @@ const EpisodeSection = () => {
       ) : (
         <p className={classes.title}>Se ne è parlato qui…</p>
       )}
-      <EpisodeListing listLength={MAX_NUMBER_OF_EPISODES} />
+      <EpisodeListing
+        listLength={MAX_NUMBER_OF_EPISODES}
+        episodeList={episodeList}
+      />
     </div>
   );
 };

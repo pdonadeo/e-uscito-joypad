@@ -17,24 +17,36 @@ echo "|               D O C K E R   E N T R Y   P O I N T                     |"
 echo "|                                                                       |"
 echo "+-----------------------------------------------------------------------+"
 
-echo "Dockerentrypoint | Preflight | show startup environment"
+echo "Docker entrypoint | Preflight | show startup environment"
 
 echo "DJANGO_SUPERUSER_USERNAME:        $DJANGO_SUPERUSER_USERNAME"
 echo "DJANGO_SUPERUSER_EMAIL:           $DJANGO_SUPERUSER_EMAIL"
 echo "DJANGO_SUPERUSER_PASSWORD_BASE64: $DJANGO_SUPERUSER_PASSWORD"
 
-echo "Dockerentrypoint | Django App --> START migrate"
+echo "Docker entrypoint | Preflight | PostgreSQL check --> Waiting for postgres"
+
+while ! echo -e '\x1dclose\x0d' | nc -z "${PGHOST}" "${PGPORT}";
+do
+  echo PostgreSQL still not ready at PGHOST = "${PGHOST}" and PGPORT = "${PGPORT}": waiting...
+  sleep 1 ;
+done
+
+echo "Docker entrypoint | Django App --> START migrate"
 /venv/bin/python manage.py migrate
-echo "Dockerentrypoint | Django App -->   END migrate"
+echo "Docker entrypoint | Django App -->   END migrate"
 
-echo "Dockerentrypoint | Django App --> START collectstatic"
+echo "Docker entrypoint | Django App --> START load fixtures"
+/venv/bin/python manage.py loaddata ./backoffice/fixtures/euscitojoypad_db.json
+echo "Docker entrypoint | Django App -->   END load fixtures"
+
+echo "Docker entrypoint | Django App --> START collectstatic"
 /venv/bin/python manage.py collectstatic --no-input
-echo "Dockerentrypoint | Django App -->   END collectstatic"
+echo "Docker entrypoint | Django App -->   END collectstatic"
 
-echo "Dockerentrypoint | Django App --> chown -R joypad:joypad MEDIA/ STATIC/"
+echo "Docker entrypoint | Django App --> chown -R joypad:joypad MEDIA/ STATIC/"
 sudo chown -R joypad:joypad MEDIA/ STATIC/
 
-echo "Dockerentrypoint | Django App --> Super User"
+echo "Docker entrypoint | Django App --> Super User"
 
 cat <<EOF | /venv/bin/python manage.py shell
 from django.contrib.auth import get_user_model
@@ -56,7 +68,7 @@ else:
     user.save()
 EOF
 
-echo "Dockerentrypoint | Django App --> END"
+echo "Docker entrypoint | Django App --> END"
 echo ""
 echo ""
 echo "#########################################################################"

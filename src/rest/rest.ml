@@ -92,13 +92,12 @@ let decorator request view =
   in
   Dream.json ~status (Yojson.Safe.to_string json)
 
-module Last_episodes = struct
-  let get_games_by_episode db ~episodio_id =
-    let open Lwt_result.Syntax in
-    let q =
-      [%rapper
-        get_many
-          {sql|
+let get_games_by_episode db ~episodio_id =
+  let open Lwt_result.Syntax in
+  let q =
+    [%rapper
+      get_many
+        {sql|
             SELECT
                 @string{game.titolo},
                 @string{game.descrizione_raw},
@@ -112,29 +111,72 @@ module Last_episodes = struct
             WHERE ass.episodio_id = %int64{episodio_id}
             ORDER BY ass.istante
           |sql}]
-    in
-    let* records = q db ~episodio_id in
-    let records =
-      ListLabels.map records ~f:(fun r ->
-          let titolo, descrizione_txt, descrizione_html, cover, istante, speaker, tipologia = r in
-          Types.
-            {
-              titolo;
-              descrizione_txt;
-              descrizione_html;
-              cover;
-              istante = Db.Common.span_pg_parser istante |> Timedesc.Timestamp.to_float_s;
-              speaker = decode_speaker speaker;
-              tipologia = decode_tipologia tipologia;
-            })
-    in
-    Lwt_result.return records
+  in
+  let* records = q db ~episodio_id in
+  let records =
+    ListLabels.map records ~f:(fun r ->
+        let titolo, descrizione_txt, descrizione_html, cover, istante, speaker, tipologia = r in
+        Types.
+          {
+            titolo;
+            descrizione_txt;
+            descrizione_html;
+            cover;
+            istante = Db.Common.span_pg_parser istante |> Timedesc.Timestamp.to_float_s;
+            speaker = decode_speaker speaker;
+            tipologia = decode_tipologia tipologia;
+          })
+  in
+  Lwt_result.return records
 
+module Last_episodes = struct
   let view (request : Dream.request) (db : Caqti_lwt.connection) =
     let open Lwt_result.Syntax in
     let num = Dream.param request "num" |> int_of_string in
 
     let* episodi_db = Db.Django.Episodio.get_last_episods db ~n:num () in
+
+    let* episodi =
+      Utils.Lwt_result.List.map_s
+        (fun ep_db ->
+          let cover =
+            Option.map (fun s -> Printf.sprintf "/%s%s" Settings.media_url s) ep_db.Db.Django.Episodio.cover
+          in
+
+          let* giochi = get_games_by_episode db ~episodio_id:ep_db.id in
+
+          let ep =
+            {
+              Types.titolo = ep_db.Db.Django.Episodio.titolo;
+              episodio_numero = ep_db.Db.Django.Episodio.episodio_numero;
+              data_uscita = ep_db.Db.Django.Episodio.data_uscita |> Timedesc.Date.to_rfc3339;
+              descrizione_html = Option.value ~default:"" ep_db.Db.Django.Episodio.descrizione_html;
+              descrizione_txt = Option.value ~default:"" ep_db.Db.Django.Episodio.descrizione_txt;
+              durata = ep_db.Db.Django.Episodio.durata |> Timedesc.Span.to_float_s;
+              url = ep_db.Db.Django.Episodio.url;
+              url_post = ep_db.Db.Django.Episodio.url_post;
+              url_video = ep_db.Db.Django.Episodio.url_video;
+              cover;
+              giochi;
+            }
+            |> Types.episode_to_yojson
+          in
+          Lwt_result.return ep)
+        episodi_db
+    in
+
+    Lwt_result.return (`List episodi)
+end
+
+module Search_game = struct
+  let log = Dream.sub_log "search"
+
+  let view (request : Dream.request) (db : Caqti_lwt.connection) =
+    let open Lwt_result.Syntax in
+    let search_input = Dream.param request "searchInput" in
+    log.debug (fun m -> m "Searching for \"%s\"" search_input);
+
+    let* episodi_db = Db.Django.Episodio.search_episodes_by_game_title db ~search_input () in
 
     let* episodi =
       Utils.Lwt_result.List.map_s

@@ -1,80 +1,15 @@
-import { useState, useCallback, useEffect, useContext } from "react";
-import SearchContext from "../store/search-context";
+import { useState } from "react";
+
 import { useMediaQuery } from "react-responsive";
 
-import Fuse from "fuse.js";
-
 import EpisodeItem from "./EpisodeItem";
-
 import classes from "./EpisodeListing.module.css";
 
 
-const EpisodeListing = ({ listLength }) => {
+const EpisodeListing = ({ /* listLength, */ episodeList }) => {
    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
-   const [episodeList, setEpisodeList] = useState([]);
-   const { searchInput, list } = useContext(SearchContext);
    const [interestedIndex, setInterestedIndex] = useState();
-
-   ///////// ACTIVE TEST
    const [activeCard, setActiveCard] = useState("");
-
-   const fetchEpisode = useCallback(async () => {
-      try {
-         const response = await fetch("./api/db-data");
-         if (!response.ok) {
-            throw new Error("Something went wrong!");
-         }
-         const data = await response.json();
-         // console.log(data);
-         setEpisodeList(data.episodi);
-      } catch (error) {
-         console.error(error.message);
-      }
-   }, []);
-   useEffect(() => {
-      fetchEpisode();
-   }, [fetchEpisode]);
-
-   const fuse = new Fuse(episodeList, {
-      keys: [
-         {
-            name: "giochi.titolo",
-            weight: 1,
-         },
-         {
-            name: "titolo",
-            weight: 3,
-         }
-      ],
-      includeScore: true,
-      includeMatches: true,
-      threshold: 0.3936363,
-      findAllMatches: true,
-   });
-
-   let episodes = [];
-   if (searchInput) {
-      /* C'è un input, facciamo effettivamente una ricerca. Non scartiamo nessun risultato
-         ma non ordiniamo per data gli episodi perché Fuse.js li ordina già per rilevanza */
-      let results = fuse.search(searchInput);
-      /* Tagliamo i risultati con uno score > 0.2 */
-      results = results.filter((r) => r.score <= 0.2);
-      episodes = results.map((result) => result.item);
-      if (list === "descending") {
-         episodes = episodes.reverse();
-      }
-   } else {
-      /* Non c'è un input, mostriamo tutti gli episodi. In questo caso consentiamo
-         di ordinare per data ma prendiamo solo un certo numero di episodi,
-         per una migliore visualizzazione */
-      episodes = episodeList;
-      episodes.sort((a, b) => new Date(b.data_uscita) - new Date(a.data_uscita));
-
-      if (list === "descending") {
-         episodes = episodes.reverse();
-      }
-      episodes = episodes.slice(0, listLength);
-   }
 
    const activeListHandler = (index, status, numBox, y) => {
       if (numBox === activeCard) {
@@ -110,7 +45,7 @@ const EpisodeListing = ({ listLength }) => {
 
    return (
       <ul className={classes.listBox}>
-         {episodes.map((episode, index) => {
+         {episodeList.map((episode, index) => {
             return (
                <EpisodeItem
                   index={index}

@@ -51,6 +51,17 @@ RUN apk add --no-cache                                  \
     libstdc++ libpq libffi tzdata
 ENV TZ=Europe/Rome
 
+ENV REST_LISTEN_ADDRESS=0.0.0.0
+ENV REST_LISTEN_PORT=3000
+ENV DEBUG=True
+ENV MEDIA_URL="bo/files/"
+ENV GC_PERIOD_SEC=60
+ENV PGHOST=postgresql
+ENV PGPORT=5432
+ENV PGUSER=django_db_user
+ENV PGPASSWORD=admin
+ENV PGDATABASE=euj
+
 COPY Dockerfile /Dockerfile
 
 WORKDIR /

@@ -27,6 +27,6 @@ let gc_period_sec : seconds = getenv ~default:(3600.0 *. 24.0) ~f:float_of_strin
 let pghost = getenv ~default:"localhost" ~f:Fun.id "PGHOST"
 let pgport = getenv ~default:5432 ~f:int_of_string "PGPORT"
 let pguser = getenv ~default:"" ~f:Fun.id "PGUSER"
-let pgpassword = getenv ~default:"" ~f:Fun.id "PGPGPASSWORD"
+let pgpassword = getenv ~default:"" ~f:Fun.id "PGPASSWORD"
 let pgdatabase = getenv ~default:"" ~f:Fun.id "PGDATABASE"
 let django_connection_string = spf "postgresql://%s:%s@%s:%d/%s" pguser pgpassword pghost pgport pgdatabase

@@ -4,12 +4,12 @@ services:
   balancer:
     depends_on:
       - "backoffice"
+      - "app"
     image: nginx:stable-alpine
     container_name: "euj-balancer"
     networks:
       - euj
     ports:
-      - "8080:80"
       - "5000:80"
     volumes:
       - ./euscitojoypad_db/MEDIA:/usr/share/nginx/html/bo/files
@@ -33,14 +33,15 @@ services:
   # È uscito Joypad? (Backend Dream + React SPA)
   app:
     depends_on:
-      - "balancer"
       - "postgresql"
     container_name: "euj-app"
     build: ./
-    ports:
-      - "3000:3000"
     networks:
       - euj
+    environment:
+      PGHOST: "postgresql"
+      PGPORT: "5432"
+    env_file: ./docker_compose_env
 
   # Backoffice (Django)
   backoffice:
