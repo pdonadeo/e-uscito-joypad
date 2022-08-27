@@ -49,7 +49,6 @@ services:
       - "postgresql"
     container_name: "euj-backoffice"
     build: ./euscitojoypad_db/
-    command: /venv/bin/python /app/manage.py runserver_plus --nopin --threaded --force-color 0.0.0.0:8000
     networks:
       - euj
     environment:
