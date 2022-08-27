@@ -10,6 +10,8 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 
+from django.contrib.postgres.indexes import GinIndex
+
 from django.conf import settings
 
 
@@ -18,6 +20,14 @@ class Videogame(models.Model):
         verbose_name = "Videogame"
         verbose_name_plural = "Videogame"
         ordering = ["titolo"]
+        indexes = [
+            GinIndex(
+                fields=[
+                    "titolo",
+                ]
+            )
+        ]
+
 
     ts_created = models.DateTimeField(auto_now_add=True)
     ts = models.DateTimeField(auto_now=True)

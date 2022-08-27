@@ -109,26 +109,54 @@ let search_episodes_by_game_title db ~search_input () =
     [%rapper
       get_many
         {sql|
-            SELECT DISTINCT
-                @int64{ep.id},
-                to_char(ep.ts_created, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS @string{ts_created},
-                to_char(ep.ts, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS @string{ts},
-                @string{ep.titolo},
-                @string?{ep.episodio_numero},
-                @string{ep.data_uscita},
-                @string{ep.durata},
-                @string?{ep.cover},
-                @string?{ep.url},
-                @string?{ep.url_video},
-                @string?{ep.url_post},
-                @string?{ep.note},
-                @string?{ep.descrizione_html},
-                @string?{ep.descrizione_txt}
-            FROM backoffice_episodio ep
-                JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
-                JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
-            WHERE game.titolo ILIKE %string{search_input}
-            ORDER BY ep.data_uscita DESC
+            SELECT
+              @int64{id},
+              @string{ts_created},
+              @string{ts},
+              @string{titolo},
+              @string?{episodio_numero},
+              @string{data_uscita},
+              @string{durata},
+              @string?{cover},
+              @string?{url},
+              @string?{url_video},
+              @string?{url_post},
+              @string?{note},
+              @string?{descrizione_html},
+              @string?{descrizione_txt},
+              @float{similarity},
+              @int{pri}
+            FROM (
+                SELECT DISTINCT ON (ep.id)
+                  ep.id AS id,
+                  to_char(ep.ts_created, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts_created,
+                  to_char(ep.ts, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts,
+                  ep.titolo,
+                  ep.episodio_numero,
+                  ep.data_uscita,
+                  ep.durata,
+                  ep.cover,
+                  ep.url,
+                  ep.url_video,
+                  ep.url_post,
+                  ep.note,
+                  ep.descrizione_html,
+                  ep.descrizione_txt,
+                  SIMILARITY(UNACCENT(game.titolo), %string{search_input}) AS similarity,
+                  (
+                    CASE
+                      WHEN ass.tipologia = 'RECE' THEN 1
+                      WHEN ass.tipologia = 'CONS' THEN 2
+                      WHEN ass.tipologia = 'FREE' THEN 3
+                      ELSE 4
+                    END
+                  ) AS pri
+                FROM backoffice_episodio ep
+                  JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
+                  JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
+                WHERE SIMILARITY(UNACCENT(game.titolo), %string{search_input}) > 0.25
+              ) t
+            ORDER BY similarity DESC, pri ASC
           |sql}]
   in
   let* records = q db ~search_input in
@@ -147,7 +175,9 @@ let search_episodes_by_game_title db ~search_input () =
               url_post,
               note,
               descrizione_html,
-              descrizione_txt ) =
+              descrizione_txt,
+              _similarity,
+              _priority ) =
           r
         in
         {
