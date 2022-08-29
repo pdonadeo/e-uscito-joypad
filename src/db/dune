@@ -9,4 +9,4 @@
    ppx_sexp_conv
    ppx_rapper
    ppx_enumerate))
- (libraries decimal timedesc ppx_rapper_lwt caqti-lwt))
+ (libraries decimal timedesc ppx_rapper_lwt caqti-lwt dream))

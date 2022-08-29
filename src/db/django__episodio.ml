@@ -103,62 +103,129 @@ let get_last_episods db ?n () =
 
 let search_episodes_by_game_title db ~search_input () =
   let open Lwt_result.Syntax in
-  let search_input = search_input |> String.split_on_char ' ' |> List.map String.trim |> String.concat "%" in
-  let search_input = Printf.sprintf "%%%s%%" search_input in
-  let q =
-    [%rapper
-      get_many
-        {sql|
-            SELECT
-              @int64{id},
-              @string{ts_created},
-              @string{ts},
-              @string{titolo},
-              @string?{episodio_numero},
-              @string{data_uscita},
-              @string{durata},
-              @string?{cover},
-              @string?{url},
-              @string?{url_video},
-              @string?{url_post},
-              @string?{note},
-              @string?{descrizione_html},
-              @string?{descrizione_txt},
-              @float{similarity},
-              @int{pri}
-            FROM (
-                SELECT DISTINCT ON (ep.id)
-                  ep.id AS id,
-                  to_char(ep.ts_created, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts_created,
-                  to_char(ep.ts, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts,
-                  ep.titolo,
-                  ep.episodio_numero,
-                  ep.data_uscita,
-                  ep.durata,
-                  ep.cover,
-                  ep.url,
-                  ep.url_video,
-                  ep.url_post,
-                  ep.note,
-                  ep.descrizione_html,
-                  ep.descrizione_txt,
-                  SIMILARITY(UNACCENT(game.titolo), %string{search_input}) AS similarity,
-                  (
-                    CASE
-                      WHEN ass.tipologia = 'RECE' THEN 1
-                      WHEN ass.tipologia = 'CONS' THEN 2
-                      WHEN ass.tipologia = 'FREE' THEN 3
-                      ELSE 4
-                    END
-                  ) AS pri
-                FROM backoffice_episodio ep
-                  JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
-                  JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
-                WHERE SIMILARITY(UNACCENT(game.titolo), %string{search_input}) > 0.25
-              ) t
-            ORDER BY similarity DESC, pri ASC
-          |sql}]
+  let search_input = String.trim search_input in
+
+  let search_input, q =
+    if String.length search_input < 6
+    then begin
+      let search_input =
+        search_input |> String.split_on_char ' ' |> List.map String.trim |> String.concat "%" |> Printf.sprintf "%%%s%%"
+      in
+      let q =
+        [%rapper
+          get_many
+            {sql|
+                SELECT
+                  @int64{id},
+                  @string{ts_created},
+                  @string{ts},
+                  @string{titolo},
+                  @string?{episodio_numero},
+                  @string{data_uscita},
+                  @string{durata},
+                  @string?{cover},
+                  @string?{url},
+                  @string?{url_video},
+                  @string?{url_post},
+                  @string?{note},
+                  @string?{descrizione_html},
+                  @string?{descrizione_txt},
+                  @float{similarity},
+                  @int{pri}
+                FROM (
+                    SELECT DISTINCT ON (ep.id)
+                      ep.id AS id,
+                      to_char(ep.ts_created, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts_created,
+                      to_char(ep.ts, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts,
+                      ep.titolo,
+                      ep.episodio_numero,
+                      ep.data_uscita,
+                      ep.durata,
+                      ep.cover,
+                      ep.url,
+                      ep.url_video,
+                      ep.url_post,
+                      ep.note,
+                      ep.descrizione_html,
+                      ep.descrizione_txt,
+                      0.0 AS similarity,
+                      (
+                        CASE
+                          WHEN ass.tipologia = 'RECE' THEN 1
+                          WHEN ass.tipologia = 'CONS' THEN 2
+                          WHEN ass.tipologia = 'FREE' THEN 3
+                          ELSE 4
+                        END
+                      ) AS pri
+                    FROM backoffice_episodio ep
+                      JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
+                      JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
+                    WHERE unaccent(game.titolo) ILIKE unaccent(%string{search_input})
+                  ) t
+                ORDER BY similarity DESC, pri ASC
+              |sql}]
+      in
+      (search_input, q)
+    end
+    else begin
+      let q =
+        [%rapper
+          get_many
+            {sql|
+                SELECT
+                  @int64{id},
+                  @string{ts_created},
+                  @string{ts},
+                  @string{titolo},
+                  @string?{episodio_numero},
+                  @string{data_uscita},
+                  @string{durata},
+                  @string?{cover},
+                  @string?{url},
+                  @string?{url_video},
+                  @string?{url_post},
+                  @string?{note},
+                  @string?{descrizione_html},
+                  @string?{descrizione_txt},
+                  @float{similarity},
+                  @int{pri}
+                FROM (
+                    SELECT DISTINCT ON (ep.id)
+                      ep.id AS id,
+                      to_char(ep.ts_created, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts_created,
+                      to_char(ep.ts, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts,
+                      ep.titolo,
+                      ep.episodio_numero,
+                      ep.data_uscita,
+                      ep.durata,
+                      ep.cover,
+                      ep.url,
+                      ep.url_video,
+                      ep.url_post,
+                      ep.note,
+                      ep.descrizione_html,
+                      ep.descrizione_txt,
+                      similarity(unaccent(game.titolo), unaccent(%string{search_input})) AS similarity,
+                      (
+                        CASE
+                          WHEN ass.tipologia = 'RECE' THEN 1
+                          WHEN ass.tipologia = 'CONS' THEN 2
+                          WHEN ass.tipologia = 'FREE' THEN 3
+                          ELSE 4
+                        END
+                      ) AS pri
+                    FROM backoffice_episodio ep
+                      JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
+                      JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
+                    WHERE similarity(unaccent(game.titolo), unaccent(%string{search_input})) > 0.25
+                  ) t
+                ORDER BY similarity DESC, pri ASC
+              |sql}]
+      in
+      (search_input, q)
+    end
   in
+
   let* records = q db ~search_input in
   let records =
     ListLabels.map records ~f:(fun r ->

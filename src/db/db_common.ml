@@ -1,3 +1,5 @@
+let log = Dream.sub_log "REST"
+
 (* Utility per timestamp *)
 let format =
   "{year}-{mon:0X}-{day:0X} {hour:0X}:{min:0X}:{sec:0X}{sec-frac:.} {tzoff-sign}{tzoff-hour:0X}{tzoff-min:0X}"
