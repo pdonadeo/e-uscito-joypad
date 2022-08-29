@@ -32,6 +32,7 @@ services:
 
   # È uscito Joypad? (Backend Dream + React SPA)
   app:
+    image: ghcr.io/pdonadeo/e-uscito-joypad:latest
     depends_on:
       - "postgresql"
     container_name: "euj-app"
@@ -45,6 +46,7 @@ services:
 
   # Backoffice (Django)
   backoffice:
+    image: ghcr.io/pdonadeo/e-uscito-joypad-db:latest
     depends_on:
       - "postgresql"
     container_name: "euj-backoffice"
