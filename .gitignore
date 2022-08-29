@@ -35,3 +35,4 @@ _opam/
 assets/
 data/
 .DS_Store
+compose_env_prod
