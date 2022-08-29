@@ -49,12 +49,6 @@ module Types = struct
     giochi : gioco_episodio list;
   }
   [@@deriving yojson]
-
-  type db_data = {
-    episodi : episode list;
-    giochi : gioco list;
-  }
-  [@@deriving yojson]
 end
 
 let decorator request view =

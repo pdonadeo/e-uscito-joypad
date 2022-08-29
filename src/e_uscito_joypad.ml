@@ -28,8 +28,6 @@ let server =
   Lwt.async Joypad_monitor.monitor (* TODO ELIMINARE Lwt.async *);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec) (* TODO ELIMINARE Lwt.async *);
 
-  let%lwt db_data_string = Utils.read_all "assets/db_data.json" in
-  let db_data = Yojson.Safe.from_string db_data_string |> Rest.Types.db_data_of_yojson |> Utils.yojson_ok_exn in
   serve
     ~interface:Settings.listen_address
     ~port:Settings.listen_port
@@ -52,7 +50,6 @@ let server =
              in
              let dati = Joypad_monitor.{ uscito; fretta; giorni_fa; data_italiano; ep_num; titolo; rompi_le_palle } in
              Joypad_monitor.dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
-         get "/api/db-data" (fun _req -> db_data |> Rest.Types.db_data_to_yojson |> Yojson.Safe.to_string |> Dream.json);
          get "/api/last-episodes/:num" (fun r -> Rest.decorator r Rest.Last_episodes.view);
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
          get "/" (fun _req ->
