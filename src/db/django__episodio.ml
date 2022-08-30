@@ -205,7 +205,7 @@ let search_episodes_by_game_title db ~search_input () =
                       ep.note,
                       ep.descrizione_html,
                       ep.descrizione_txt,
-                      similarity(unaccent(game.titolo), unaccent(%string{search_input})) AS similarity,
+                      word_similarity(unaccent(%string{search_input}), unaccent(game.titolo)) AS similarity,
                       (
                         CASE
                           WHEN ass.tipologia = 'RECE' THEN 1
@@ -217,7 +217,7 @@ let search_episodes_by_game_title db ~search_input () =
                     FROM backoffice_episodio ep
                       JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
                       JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
-                    WHERE similarity(unaccent(game.titolo), unaccent(%string{search_input})) > 0.25
+                    WHERE word_similarity(unaccent(%string{search_input}), unaccent(game.titolo)) > 0.25
                   ) t
                 ORDER BY similarity DESC, pri ASC
               |sql}]
