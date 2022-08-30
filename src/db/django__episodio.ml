@@ -265,3 +265,86 @@ let search_episodes_by_game_title db ~search_input () =
         })
   in
   Lwt_result.return records
+
+let search_episodes_by_game_id db ~game_id () =
+  let open Lwt_result.Syntax in
+  let q =
+    [%rapper
+      get_many
+        {sql|
+            SELECT
+                @int64{id},
+                @string{ts_created},
+                @string{ts},
+                @string{titolo},
+                @string?{episodio_numero},
+                @string{data_uscita},
+                @string{durata},
+                @string?{cover},
+                @string?{url},
+                @string?{url_video},
+                @string?{url_post},
+                @string?{note},
+                @string?{descrizione_html},
+                @string?{descrizione_txt}
+            FROM (
+                    SELECT DISTINCT ON (ep.id)
+                        ep.id,
+                        to_char(ep.ts_created, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts_created,
+                        to_char(ep.ts, 'YYYY-MM-DD HH24:MI:SS.USTZH:TZM') AS ts,
+                        ep.titolo,
+                        ep.episodio_numero,
+                        ep.data_uscita,
+                        ep.durata,
+                        ep.cover,
+                        ep.url,
+                        ep.url_video,
+                        ep.url_post,
+                        ep.note,
+                        ep.descrizione_html,
+                        ep.descrizione_txt
+                    FROM backoffice_episodio ep
+                        JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
+                        JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
+                    WHERE game.id = %int64{game_id}
+                ) t
+            ORDER BY data_uscita DESC
+          |sql}]
+  in
+  let* records = q db ~game_id in
+  let records =
+    ListLabels.map records ~f:(fun r ->
+        let ( id,
+              ts_created,
+              ts,
+              titolo,
+              episodio_numero,
+              data_uscita,
+              durata,
+              cover,
+              url,
+              url_video,
+              url_post,
+              note,
+              descrizione_html,
+              descrizione_txt ) =
+          r
+        in
+        {
+          id;
+          ts_created = Timedesc.Timestamp.of_iso8601_exn ts_created;
+          ts = Timedesc.Timestamp.of_iso8601_exn ts;
+          titolo;
+          episodio_numero;
+          data_uscita = Timedesc.Date.of_iso8601_exn data_uscita;
+          durata = span_pg_parser durata;
+          cover;
+          url;
+          url_video;
+          url_post;
+          note;
+          descrizione_html;
+          descrizione_txt;
+        })
+  in
+  Lwt_result.return records

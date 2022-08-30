@@ -52,6 +52,8 @@ let server =
              Joypad_monitor.dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
          get "/api/last-episodes/:num" (fun r -> Rest.decorator r Rest.Last_episodes.view);
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
+         get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
+         get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
          get "/" (fun _req ->
              let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
                Joypad_monitor.elabora_risposta ()
