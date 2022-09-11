@@ -15,23 +15,16 @@ let%html risposta_si giorni_fa data_italiano ep_num titolo =
   </h1>
   |}
 
-let%html non_rompere_msg = {|
-    <h2><em>Però adesso non torturare Zampa, aspetta ancora qualche giorno…</em></h2>
-  |}
+let%html h2_italic msg = {| <h2><em>|} [txt msg] {|</em></h2> |}
 
-let%html rompi_pure_msg = {|
-    <h2><em>Mi duole ammetterlo ma è giunto il momento di protestare!</em></h2>
-  |}
-
-let%html risposta_no giorni_fa data_italiano rompi_le_palle =
-
+let%html risposta_no giorni_fa data_italiano msg_risposta_no =
   {|
   <div>
   <h1>No. L'ultimo episodio è uscito |} [txt giorni_fa] {|, |} [txt data_italiano] {|.</h1>
   |}[(
-    if rompi_le_palle
-    then rompi_pure_msg
-    else non_rompere_msg
+    match msg_risposta_no with
+    | None -> Html.p []
+    | Some msg -> h2_italic msg
   )]{| </div> |}
 
 let%html dove_ascoltare () =
@@ -46,13 +39,13 @@ let%html corri () = {|<p>
     Corri! Se aspetti ancora un po' esce il prossimo episodio!
   </p>|}
 
-let%html main uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle =
+let%html main uscito fretta giorni_fa data_italiano ep_num titolo msg_risposta_no =
   {|
     <main id="root">
     |}[(
       if uscito
         then risposta_si giorni_fa data_italiano ep_num titolo
-        else risposta_no giorni_fa data_italiano rompi_le_palle
+        else risposta_no giorni_fa data_italiano msg_risposta_no
       )]
     {|
 
@@ -68,14 +61,14 @@ let%html main uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle
 </main>
   |}
 
-let index uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle =
+let index uscito fretta giorni_fa data_italiano ep_num titolo msg_risposta_no =
   let open Soup in
 
   let index = React.react_build_index () in
   let index_s = Format.asprintf "%a" (pp ()) index in
   let soup_i = parse index_s in
 
-  let main = main uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle in
+  let main = main uscito fretta giorni_fa data_italiano ep_num titolo msg_risposta_no in
   let main_s =  Format.asprintf "%a" (pp_elt ()) main in
   let soup_m = parse main_s in
 

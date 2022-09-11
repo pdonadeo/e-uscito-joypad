@@ -1,7 +1,7 @@
 import classes from "./Message.module.css";
 
 const Message = (props) => {
-  const { ep_num, giorni_fa, titolo, uscito, data_italiano, rompi_le_palle } = props.dati;
+  const { ep_num, giorni_fa, titolo, uscito, data_italiano, msg_risposta_no } = props.dati;
 
   if (uscito) {
     return (
@@ -20,10 +20,10 @@ const Message = (props) => {
         <p className={classes.message}>
           <span className={classes.bold}>No.</span> <br /> L'ultimo episodio è uscito {giorni_fa},
           <br /> <span className={classes.date}> {data_italiano}.</span> <br />
-          {rompi_le_palle ? (
-            <span className={classes.comment}>Mi duole ammetterlo ma è giunto il momento di protestare!</span>
+          {msg_risposta_no ? (
+            <span className={classes.comment}>{ msg_risposta_no }</span>
           ) : (
-            <span className={classes.comment}>Però adesso non torturare Zampa, aspetta ancora qualche giorno…</span>
+            <span></span>
           )}
         </p>
       </div>

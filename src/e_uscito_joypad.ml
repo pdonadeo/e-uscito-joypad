@@ -45,20 +45,20 @@ let server =
          get "/static/static/css/**" @@ static "assets/css";
          get "/static/**" @@ static "assets";
          get "/api/ultima-puntata" (fun _r ->
-             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no =
                Joypad_monitor.elabora_risposta ()
              in
-             let dati = Joypad_monitor.{ uscito; fretta; giorni_fa; data_italiano; ep_num; titolo; rompi_le_palle } in
+             let dati = Joypad_monitor.{ uscito; fretta; giorni_fa; data_italiano; ep_num; titolo; msg_risposta_no } in
              Joypad_monitor.dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
          get "/api/last-episodes/:num" (fun r -> Rest.decorator r Rest.Last_episodes.view);
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
          get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
          get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
          get "/" (fun _req ->
-             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, rompi_le_palle =
+             let uscito, fretta, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no =
                Joypad_monitor.elabora_risposta ()
              in
-             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo rompi_le_palle));
+             Dream.html (Views.index uscito fretta giorni_fa data_italiano ep_num titolo msg_risposta_no));
        ]
 
 let () = Lwt_main.run server
