@@ -8,7 +8,6 @@ type data = {
 
 type dati_ultima_puntata = {
   uscito : bool;
-  fretta : bool;
   giorni_fa : string;
   data_italiano : string;
   ep_num : int;
@@ -69,7 +68,6 @@ let elabora_risposta () =
     let uscito = if giorni_passati <= 14 then true else false in
     let giorni_fa = Utils.distanza giorni_passati in
     let data_italiano = Utils.string_of_date last_episode_data.date in
-    let fretta = if giorni_passati >= 10 && giorni_passati <= 14 then true else false in
     let msg_risposta_no =
       match giorni_passati with
       | _n when (not uscito) && (mese_corrente = 8 || mese_corrente = 9) ->
@@ -78,8 +76,8 @@ let elabora_risposta () =
       | n when (not uscito) && n > 20 -> Some "Mi duole ammetterlo ma è giunto il momento di protestare!"
       | _ -> None
     in
-    (uscito, fretta, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, msg_risposta_no)
-  | None -> (false, false, "", "", 1999, "", None)
+    (uscito, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, msg_risposta_no)
+  | None -> (false, "", "", 1999, "", None)
 
 let rec monitor () =
   log.debug (fun l -> l "Scarico info ultima puntata...");

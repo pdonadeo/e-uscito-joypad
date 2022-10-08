@@ -32,7 +32,6 @@ _opam/
 *.code-workspace
 .envrc
 
-assets/
 data/
 .DS_Store
 compose_env_prod

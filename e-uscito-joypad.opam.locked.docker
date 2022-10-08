@@ -50,6 +50,7 @@ depends: [
   "core" {= "v0.15.0"}
   "core_kernel" {= "v0.15.0"}
   "cppo" {= "1.6.9"}
+  "crunch" {= "3.3.1"}
   "csexp" {= "1.5.1"}
   "cstruct" {= "6.1.1"}
   "ctypes" {= "0.20.1"}

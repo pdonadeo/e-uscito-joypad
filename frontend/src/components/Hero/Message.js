@@ -6,7 +6,7 @@ const Message = (props) => {
   if (uscito) {
     return (
       <div className={classes.wrapper}>
-        <p className={classes.message}>
+        <p id="for-prerender" className={classes.message}>
           <span className={classes.bold}>Sì!</span> <br /> È uscito {giorni_fa} l'episodio
           <br /> <span className={classes.bold}>numero {ep_num}</span> <br />
           di Joypad, dal titolo <br />
@@ -17,7 +17,7 @@ const Message = (props) => {
   } else
     return (
       <div className={classes.wrapper}>
-        <p className={classes.message}>
+        <p id="for-prerender" className={classes.message}>
           <span className={classes.bold}>No.</span> <br /> L'ultimo episodio è uscito {giorni_fa},
           <br /> <span className={classes.date}> {data_italiano}.</span> <br />
           {msg_risposta_no ? (

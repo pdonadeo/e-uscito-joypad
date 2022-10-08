@@ -1,7 +1,7 @@
 (executable
  (name e_uscito_joypad)
  (public_name e_uscito_joypad)
- (modules e_uscito_joypad views joypad_monitor react middlewares)
+ (modules e_uscito_joypad views joypad_monitor middlewares assets)
  (preprocess
   (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
  (libraries
@@ -33,12 +33,21 @@
  (libraries dream batteries malloc timedesc))
 
 (rule
- (targets index.html)
+ (target assets.ml)
+ (deps
+  (glob_files_rec %{project_root}/frontend/build/*)
+  (glob_files_rec %{project_root}/frontend/public/*)
+  (file %{project_root}/euscitojoypad_db/prerendered_index.html))
  (action
-  (copy ../frontend/build/index.html index.html)))
-
-(rule
- (targets react.ml)
- (deps index.html)
- (action
-  (run ./tyxml_of_react.sh react.ml --workspace %{workspace_root})))
+  (progn
+   (bash "rm -Rf %{project_root}/assets && mkdir %{project_root}/assets")
+   (bash "cp -a %{project_root}/frontend/public/* %{project_root}/assets/")
+   (bash "mkdir %{project_root}/assets/js %{project_root}/assets/css")
+   (bash "cp -a %{project_root}/frontend/build/static/js/* %{project_root}/assets/js/")
+   (bash "cp -a %{project_root}/frontend/build/static/css/* %{project_root}/assets/css/")
+   (bash "cp -fa %{project_root}/frontend/build/index.html %{project_root}/assets/index.html")
+   (bash "cp %{project_root}/euscitojoypad_db/prerendered_index.html %{project_root}/assets/")
+   (with-stdout-to %{target} (run ocaml-crunch -m plain %{project_root}/assets))
+  )
+ )
+)

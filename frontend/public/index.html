@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="it">
-    <head>
-        <title>È uscito Joypad?</title>
-        <meta charset="UTF-8" />
-        <meta name="google-site-verification" content="RVQl_YUzLnpzfD8LfW0RND3EgYD_grzfjKCwshqJ1Xg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <meta
-            name="description"
-            content="Semplice pagina di informazione per sapere se e quando è uscito Joypad, il podcast a tema videoludico di Matteo Bordone (Corri!), Francesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)."
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&amp;display=swap"
-        />
 
-        <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" sizes="180x180" />
-        <link rel="icon" href="%PUBLIC_URL%/favicon-32x32.png" type="image/png" sizes="32x32" />
-        <link rel="icon" href="%PUBLIC_URL%/favicon-16x16.png" type="image/png" sizes="16x16" />
-        <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
-        <link rel="stylesheet" href="%PUBLIC_URL%/e-uscito-joypad.css" media="print" onload="this.media='all'" />
-    </head>
+<head>
+  <title>È uscito Joypad?</title>
+  <meta charset="UTF-8" />
+  <meta name="google-site-verification" content="RVQl_YUzLnpzfD8LfW0RND3EgYD_grzfjKCwshqJ1Xg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="description"
+    content="Semplice pagina di informazione per sapere se e quando è uscito Joypad, il podcast a tema videoludico di Matteo Bordone (Corri!), Francesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)." />
+  <style>
+    body:not(.loaded) {
+      display: none;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&amp;display=swap" />
+  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png" sizes="180x180" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="%PUBLIC_URL%/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
+  <link rel="stylesheet" href="%PUBLIC_URL%/e-uscito-joypad.css" media="print" onload="this.media='all'" />
+</head>
 
-    <body>
-        <main id="root"></main>
-        <div id="modal"></div>
+<!-- Add a class to flag when the page is fully loaded
+     https://stackoverflow.com/a/7411591/263638 -->
+<body onload="document.body.classList.add('loaded')">
+  <main id="root"></main>
 
-        <footer>
-            <p>
-                Copyright © 2022 Paolo Donadeo.<br />Rilasciato sotto licenza MIT, vedi
-                <a href="https://github.com/pdonadeo/e-uscito-joypad/blob/main/LICENSE">LICENSE.md</a>
-            </p>
-        </footer>
-    </body>
+  <div id="modal"></div>
+
+  <footer>
+    <p>
+      Copyright © 2022 Paolo Donadeo.<br />Rilasciato sotto licenza MIT, vedi
+      <a href="https://github.com/pdonadeo/e-uscito-joypad/blob/main/LICENSE">LICENSE.md</a>
+    </p>
+  </footer>
+</body>
+
 </html>

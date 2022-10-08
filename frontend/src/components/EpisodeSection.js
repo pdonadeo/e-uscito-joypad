@@ -39,7 +39,7 @@ const EpisodeSection = () => {
   }, [searchInput, sortOrder]);
 
   return (
-    <div className={classes.container}>
+    <div id="episode-section" className={classes.container}>
       <SearchBar />
       {searchInput.trim() === "" ? (
         <p className={classes.title}>Gli ultimi {MAX_NUMBER_OF_EPISODES} episodi…</p>

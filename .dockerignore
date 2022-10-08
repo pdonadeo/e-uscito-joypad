@@ -4,6 +4,5 @@
 _build
 _opam/
 data/
-euscitojoypad_db/
 frontend/node_modules
 docker-compose.yml

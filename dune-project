@@ -2,6 +2,8 @@
 
 (name e-uscito-joypad)
 
+(using directory-targets 0.1)
+
 (version 8)
 
 (generate_opam_files true)
@@ -36,6 +38,7 @@
   (caqti-driver-postgresql (= 1.8.0))
   (ppx_rapper_lwt (= 3.1.0))
   (decimal (= 0.3.0))
+  (crunch (= 3.3.1))
   (dune (and :dev (= 3.4.1)))
   (utop (and :dev (= 2.10.0)))
   (merlin (and :dev (= 4.6-414)))
