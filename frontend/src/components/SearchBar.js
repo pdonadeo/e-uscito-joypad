@@ -32,7 +32,6 @@ const SearchBar = () => {
       <DebounceInput
         initial-scale="1"
         maximum-scale="1"
-        // onFocus={focusHandler}
         type="text"
         placeholder={"| Cerca un gioco…"}
         className={classes.input}
