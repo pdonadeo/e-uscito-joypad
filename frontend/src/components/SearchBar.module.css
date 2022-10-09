@@ -49,27 +49,28 @@
 }
 
 .sortModal {
-    background-color: red;
-    width: 100vw;
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: absolute;
+    top:100%;
+    right: 0;
+    z-index: 10;
+    width: 33rem;
     height: 16.3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1.6rem;
-    border-radius: 16px 16px 0px 0px;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(20px);
-    transform: translateY(100%);
-    transition: transform 0.5s;
+	border-radius: 0px 0px 8px 8px;
+	background: rgba(255, 255, 255, 0.5);
+	backdrop-filter: blur(20px);display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1.6rem;
+	visibility: hidden;
+	opacity: 0;
+	transition: all .5s ease-out;
 }
 
 .show {
-    transform: translateY(0);
-    transition: transform 0.5s;
+	/* animation: fadeIn .5s ease-out forwards; */
+	opacity: 1;
+	visibility: visible;
 }
 
 .sortText {
@@ -77,16 +78,36 @@
     font-size: 1.2rem;
 }
 
+.sortContainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap:1rem;
+}
+
 .sortControl {
+	padding-left:2rem;
     font-weight: 600;
     font-size: 1.2rem;
+	cursor: pointer;
 }
+
 .sortButton {
     background-color: transparent;
     border: none;
     font-family: inherit;
     font-weight: 800;
     color: #55aadd;
+	cursor: pointer;
+}
+
+.checkIcon {
+	height: 2rem;
+	visibility: hidden;
+}
+
+.showCheckIcon .checkIcon{
+	visibility:visible;
 }
 
 @media screen and (max-width: 800px) {
@@ -100,4 +121,39 @@
         left: 0;
         margin: 0;
     }
+
+    .sortModal {
+        width: 100vw;
+        position: fixed;
+        top: unset;
+        bottom: 0;
+        right: 0;
+        height: 16.3rem;
+        transform: translateY(100%);
+        transition: transform 0.5s;
+		visibility: visible;
+		border-radius: 16px 16px 0px 0px;
+    }
+
+    .show {
+        transform: translateY(0);
+        transition: transform 0.5s;
+		visibility: unset;
+    }
 }
+
+@keyframes fadeIn {
+	0% {
+	   opacity: 0;
+	   visibility: hidden;
+	}
+	50% {
+	   visibility: visible;
+	   opacity: 0.6;
+	}
+	100% {
+	   opacity: 1;
+	   visibility: visible;
+	}
+ }
+ 
