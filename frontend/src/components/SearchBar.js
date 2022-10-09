@@ -22,10 +22,6 @@ const SearchBar = () => {
     toggleShowModal();
   };
 
-  // const focusHandler = () => {
-  //     window.scrollTo({ top: 605, behavior: "smooth" });
-  // };
-
   return (
     <div className={classes.searchBar}>
       <DebounceInput
