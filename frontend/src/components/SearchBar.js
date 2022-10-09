@@ -11,16 +11,21 @@ import classes from "./SearchBar.module.css";
 const SearchBar = () => {
   const searchCtx = useContext(SearchContext);
   const [showModal, setShowModal] = useState(false);
+  const [sorting, setSorting] = useState('ascending');
 
   const toggleShowModal = () => {
     setShowModal((oldState) => !oldState);
   };
 
   const reverseHandler = (order) => {
-    if (order === "ascending") searchCtx.setSortOrder("ascending");
-    if (order === "descending") searchCtx.setSortOrder("descending");
+    searchCtx.setSortOrder(order);
+    setSorting(order);
     toggleShowModal();
   };
+
+  const checkIcon = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`${classes.checkIcon}`}>
+  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>;
 
   return (
     <div className={classes.searchBar}>
@@ -44,12 +49,14 @@ const SearchBar = () => {
       </div>
       <div className={`${classes.sortModal} ${showModal && classes.show}`}>
         <p className={classes.sortText}>ORDINA PER</p>
-        <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>
-          Più recenti
-        </p>
-        <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>
-          Meno recenti
-        </p>
+        <div className={classes.sortContainer}>
+          <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>Più recenti</p>
+          <div className={sorting === 'ascending' && classes.showCheckIcon}>{checkIcon}</div>
+        </div>
+        <div className={classes.sortContainer}>
+          <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>Meno recenti</p>
+          <div className={sorting === 'descending' && classes.showCheckIcon}>{checkIcon}</div>
+        </div>
         <button className={classes.sortButton} onClick={toggleShowModal}>
           Chiudi
         </button>
