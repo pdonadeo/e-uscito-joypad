@@ -44,6 +44,9 @@ const EpisodeContent = (props) => {
    return (
       <div className={classes.containerAnimation}>
          <ul className={classes.controls}>
+            <li onClick={sectionHandler.bind(this, "descrizione")}>
+               <p className={`${classes.control} ${section === "descrizione" && classes.tagActive}`}>DESCRIZIONE</p>
+            </li>
             {recensioni.length !== 0 && (
                <li onClick={sectionHandler.bind(this, "recensioni")}>
                   <p className={`${classes.control} ${section === "recensioni" && classes.tagActive}`}>
@@ -65,9 +68,6 @@ const EpisodeContent = (props) => {
                   </p>
                </li>
             )}
-            <li onClick={sectionHandler.bind(this, "descrizione")}>
-               <p className={`${classes.control} ${section === "descrizione" && classes.tagActive}`}>DESCRIZIONE</p>
-            </li>
          </ul>
          <div className={classes.contentContainer}>{sectionContent}</div>
       </div>

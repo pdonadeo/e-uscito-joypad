@@ -10,7 +10,6 @@ import EpisodeNumber from "./UI/EpisodeNumber";
 import PlayButton from "./UI/PlayButton";
 
 const EpisodeItem = (props) => {
-   const [section, setSection] = useState("recensioni");
    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
 
    const y = 605 + props.index * 138;
@@ -29,35 +28,9 @@ const EpisodeItem = (props) => {
       // }, 500);
    };
 
-   /* Commentato perché inutilizzato */
-   // const checkEvenIndex = (index) => {
-   //    return index % 2 === 0;
-   // };
-
-   // let activation = props.cardState;
-   // if (props.active) {
-   //   activation = true;
-   // } else {
-   //   activation = props.cardState;
-   // }
-
-   // useEffect(() => {
-   //   console.log("rendering");
-   //   console.log(activation);
-   // }, [activation]);
-
    const recensioni = props.giochi.filter((gioco) => gioco.tipologia === "Recensione");
    const chiacchiere = props.giochi.filter((gioco) => gioco.tipologia === "Chiacchiera libera");
    const consigli = props.giochi.filter((gioco) => gioco.tipologia === "Consiglio");
-
-   useEffect(() => {
-      const groupsArr = [recensioni, consigli, chiacchiere];
-      const firstActive = groupsArr.findIndex((group) => group.length !== 0);
-      if (firstActive === -1) setSection("descrizione");
-      if (firstActive === 0) setSection("recensioni");
-      if (firstActive === 1) setSection("consigli");
-      if (firstActive === 2) setSection("chiacchiere");
-   }, [recensioni, consigli, chiacchiere]);
 
    return (
       <>
@@ -91,7 +64,7 @@ const EpisodeItem = (props) => {
                style={!isMobile ? { gridRowStart: `${Math.floor(props.index / 2 + 2)}` } : {}}
             >
                <EpisodeContent
-                  section={section}
+                  section='descrizione'
                   recensioni={recensioni}
                   consigli={consigli}
                   chiacchiere={chiacchiere}
