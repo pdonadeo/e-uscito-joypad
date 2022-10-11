@@ -46,15 +46,15 @@ const SearchBar = () => {
       <div className={classes.sortIcon} onClick={toggleShowModal}>
         <SortIcon />
       </div>
-      <div className={`${classes.sortModal} ${showModal && classes.show}`}>
+      <div className={`${classes.sortModal} ${showModal ? classes.show : ''}`}>
         <p className={classes.sortText}>ORDINA PER</p>
         <div className={classes.sortContainer}>
           <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>Più recenti</p>
-          <div className={sorting === 'ascending' && classes.showCheckIcon}>{checkIcon}</div>
+          <div className={sorting === 'ascending' ? classes.showCheckIcon : '' }>{checkIcon}</div>
         </div>
         <div className={classes.sortContainer}>
           <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>Meno recenti</p>
-          <div className={sorting === 'descending' && classes.showCheckIcon}>{checkIcon}</div>
+          <div className={sorting === 'descending' ? classes.showCheckIcon : '' }>{checkIcon}</div>
         </div>
         <button className={classes.sortButton} onClick={toggleShowModal}>
           Chiudi
