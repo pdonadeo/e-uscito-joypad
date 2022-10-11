@@ -12,7 +12,7 @@ import PlayButton from "./UI/PlayButton";
 const EpisodeItem = (props) => {
    const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
 
-   const y = 605 + props.index * 138;
+   const y = 649 + props.index * 138;
 
    // const yBox = cardRef.current?.offsetTop;
    // yBox ? console.log(props.numero, yBox) : console.log(null);

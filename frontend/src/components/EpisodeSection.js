@@ -11,6 +11,8 @@ const EpisodeSection = (props) => {
   const { searchInput, sortOrder } = useContext(SearchContext);
   const [ episodeList, setEpisodeList ] = useState([]);
 
+  const maxNumbersOfEpisodes = 8;
+
   useEffect(() => {
     const fetchEpisode = async () => {
       try {
@@ -18,7 +20,7 @@ const EpisodeSection = (props) => {
         if (searchInput.trim() !== "") {
           response = await fetch(`/api/search-game/${searchInput}`);
         } else {
-          response = await fetch(`/api/last-episodes/${props.maxNumberOfEpisode}`);
+          response = await fetch(`/api/last-episodes/${maxNumbersOfEpisodes}`);
         }
 
         if (!response.ok) {
@@ -35,13 +37,14 @@ const EpisodeSection = (props) => {
     };
 
     fetchEpisode();
-  }, [searchInput, sortOrder, props.maxNumberOfEpisode]);
+  }, [searchInput, sortOrder]);
 
   return (
     <div id="episode-section" className={classes.container}>
       <SearchBar />
+      <p style={{fontSize: "1.8rem", textAlign: "center", marginBottom:"2rem"}}>{searchInput.trim() === "" ? `Ecco gli ultimi ${maxNumbersOfEpisodes} episodi!`: 'Se ne è parlato qui:'}</p>
       <EpisodeListing
-        listLength={props.maxNumberOfEpisode}
+        listLength={maxNumbersOfEpisodes}
         episodeList={episodeList}
       />
     </div>
