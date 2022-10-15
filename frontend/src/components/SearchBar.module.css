@@ -21,6 +21,7 @@
 }
 
 .searchIcon,
+.closeIcon,
 .sortIcon {
     height: 4rem;
     min-width: 4rem;
@@ -43,7 +44,8 @@
     right: -0.8rem;
 }
 
-.sortIcon {
+.sortIcon,
+.closeIcon {
     margin-right: 0.8rem;
     cursor: pointer;
 }
@@ -156,4 +158,3 @@
 	   visibility: visible;
 	}
  }
- 
