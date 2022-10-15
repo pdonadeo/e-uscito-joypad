@@ -162,7 +162,7 @@ let search_episodes_by_game_title db ~search_input () =
                       JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
                     WHERE unaccent(game.titolo) ILIKE unaccent(%string{search_input})
                   ) t
-                ORDER BY similarity DESC, pri ASC
+                ORDER BY similarity DESC, pri ASC, data_uscita DESC
               |sql}]
       in
       (search_input, q)
@@ -219,7 +219,7 @@ let search_episodes_by_game_title db ~search_input () =
                       JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
                     WHERE word_similarity(unaccent(%string{search_input}), unaccent(game.titolo)) > 0.25
                   ) t
-                ORDER BY similarity DESC, pri ASC
+                ORDER BY similarity DESC, pri ASC, data_uscita DESC
               |sql}]
       in
       (search_input, q)
