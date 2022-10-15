@@ -1,7 +1,7 @@
 name: Build Docker and push to registry (Django)
 on:
-  push:
-    branches: [ main ]
+  #push:
+  #  branches: [ main ]
   release:
     types: [published, created, edited]
 jobs:
