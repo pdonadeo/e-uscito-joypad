@@ -23,7 +23,8 @@ let%html risposta_si ep_num giorni_fa titolo =
   |}
 
 let%html risposta_no giorni_fa data_italiano msg_risposta_no =
-  {| <span> No. L'ultimo episodio è uscito |}
+  {| <p id="for-prerender">
+       <span>No. L'ultimo episodio è uscito |}
     [txt giorni_fa]
     {|, |}
     [txt data_italiano]
@@ -34,7 +35,7 @@ let%html risposta_no giorni_fa data_italiano msg_risposta_no =
         | Some m -> m
         | None -> "");
     ]
-    {|</span> |}
+    {|</span></p> |}
 
 let replace_txt p selector new_text =
   let open Soup in
