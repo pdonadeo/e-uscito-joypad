@@ -59,6 +59,7 @@ let get_last_episods db ?n () =
               @string?{descrizione_html},
               @string?{descrizione_txt}
           FROM backoffice_episodio ep
+          WHERE ep.pubblicato = TRUE
           ORDER BY data_uscita DESC
           LIMIT %int{n}
         |sql}]
@@ -161,6 +162,7 @@ let search_episodes_by_game_title db ~search_input () =
                       JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
                       JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
                     WHERE unaccent(game.titolo) ILIKE unaccent(%string{search_input})
+                      AND ep.pubblicato = TRUE
                   ) t
                 ORDER BY similarity DESC, pri ASC, data_uscita DESC
               |sql}]
@@ -218,6 +220,7 @@ let search_episodes_by_game_title db ~search_input () =
                       JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
                       JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
                     WHERE word_similarity(unaccent(%string{search_input}), unaccent(game.titolo)) > 0.25
+                      AND ep.pubblicato = TRUE
                   ) t
                 ORDER BY similarity DESC, pri ASC, data_uscita DESC
               |sql}]
@@ -307,6 +310,7 @@ let search_episodes_by_game_id db ~game_id () =
                         JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
                         JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
                     WHERE game.id = %int64{game_id}
+                      AND ep.pubblicato = TRUE
                 ) t
             ORDER BY data_uscita DESC
           |sql}]

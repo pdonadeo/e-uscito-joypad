@@ -28,7 +28,6 @@ class Videogame(models.Model):
             )
         ]
 
-
     ts_created = models.DateTimeField(auto_now_add=True)
     ts = models.DateTimeField(auto_now=True)
     titolo = models.CharField(
@@ -138,6 +137,8 @@ class Episodio(models.Model):
         help_text="Titoli di cui si è parlato nell'episodio.",
         through="AssociazioneEpisodioVideogame",
     )
+
+    pubblicato = models.BooleanField(verbose_name="Pubblicato", default=False)
 
     def __str__(self):
         return f"Ep. {self.episodio_numero}, {self.titolo}"
