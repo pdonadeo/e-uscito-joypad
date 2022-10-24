@@ -113,7 +113,6 @@
    display: flex;
    justify-content: center;
    align-items: center;
-   overflow: scroll;
    grid-column-start: 1;
    grid-column-end: -1;
 }

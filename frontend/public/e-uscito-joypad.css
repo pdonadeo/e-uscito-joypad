@@ -16,13 +16,13 @@ html {
 }
 
 body {
-  min-height: calc(100vh - 20px);
-  display: flex;
-  flex-direction: column;
-  font-family: "Montserrat", sans-serif;
-  text-align: left;
-  background-color: #f7f7f8;
-  width: 100vw;
+    min-height: calc(100vh - 20px);
+    display: flex;
+    flex-direction: column;
+    font-family: "Montserrat", sans-serif;
+    text-align: left;
+    background-color: #f7f7f8;
+    width: 100%;
 }
 
 /* header {
