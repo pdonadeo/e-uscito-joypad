@@ -1,55 +1,17 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { useMediaQuery } from "react-responsive";
+import React from "react";
 import EpisodeSection from "./components/EpisodeSection";
-import Message from "./components/Hero/Message";
-import HeroLinks from "./components/Hero/HeroLinks";
-import Logo from "./components/Hero/Logo";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 const App = () => {
-  const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
-  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
-
-  useEffect(() => {
-    fetch("/api/ultima-puntata")
-      .then((response) => response.json())
-      .then((data) => {
-        setDatiUltimaPuntata(data);
-      });
-  }, []);
-
-  const style = isMobile
-    ? {
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        height: "605px",
-      }
-    : {};
-
   return (
-    <Fragment>
-      <header style={style}>
-        <Logo />
-        <div
-          style={
-            !isMobile
-              ? {
-                  display: "flex",
-                  flexDirection: "row",
-                  margin: "0 auto",
-                  width: "91.9rem",
-                  justifyContent: "space-between",
-                }
-              : {}
-          }
-        >
-          <Message dati={datiUltimaPuntata} />
-          <HeroLinks />
-        </div>
-      </header>
-      <EpisodeSection/>
-    </Fragment>
+    <>
+      <Header />
+      <EpisodeSection />
+      <Footer />
+    </>
   );
 };
 
 export default App;
+
