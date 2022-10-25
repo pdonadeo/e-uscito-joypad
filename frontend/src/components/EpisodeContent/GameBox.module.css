@@ -94,6 +94,7 @@ p.speaker {
       align-items: center;
       justify-content: center;
       background-color: transparent;
+      overflow-y: auto;
    }
 
    .closeButton {
@@ -107,6 +108,7 @@ p.speaker {
       top:0;
       left: 0;
       z-index: 1;
+      background-color: none;
       animation: fadeIn 5s forwards ease-out;
    }
 
@@ -124,7 +126,7 @@ p.speaker {
 @keyframes fadeIn {
    0% {
       backdrop-filter: blur(0px);
-      background-color: transparent;
+      background-color: none;
    }
    50% {
       
