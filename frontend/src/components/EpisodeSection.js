@@ -7,9 +7,9 @@ import SearchBar from "./SearchBar";
 import classes from "./EpisodeSection.module.css";
 
 
-const EpisodeSection = (props) => {
+const EpisodeSection = () => {
   const { searchInput, sortOrder } = useContext(SearchContext);
-  const [ episodeList, setEpisodeList ] = useState([]);
+  const [episodeList, setEpisodeList] = useState([]);
 
   const maxNumbersOfEpisodes = 8;
 
@@ -42,7 +42,7 @@ const EpisodeSection = (props) => {
   return (
     <div id="episode-section" className={classes.container}>
       <SearchBar />
-      <p style={{fontSize: "1.8rem", textAlign: "center", marginBottom:"2rem"}}>{searchInput.trim() === "" ? `Ecco gli ultimi ${maxNumbersOfEpisodes} episodi!`: 'Se ne è parlato qui:'}</p>
+      <p style={{ fontSize: "1.8rem", textAlign: "center", marginBottom: "2rem" }}>{searchInput.trim() === "" ? `Ecco gli ultimi ${maxNumbersOfEpisodes} episodi!` : 'Se ne è parlato qui:'}</p>
       <EpisodeListing
         listLength={maxNumbersOfEpisodes}
         episodeList={episodeList}

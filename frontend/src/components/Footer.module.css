@@ -1,0 +1,21 @@
+footer {
+  height: 30px;
+  margin-top: 5rem;
+  margin-bottom: 8rem;
+  font-size: 10px;
+  line-height: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+footer a {
+  margin-left: .5em;
+}
+
+.bottomIcon {
+  margin-top: 1rem;
+  margin-right: 0.5rem;
+  height: 2em;
+}

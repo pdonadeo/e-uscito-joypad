@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-
 import ListTransition from "../CustomHooks/ListTransition";
 import classes from "./EpisodeItem.module.css";
 import { useMediaQuery } from "react-responsive";
