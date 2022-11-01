@@ -35,9 +35,12 @@ echo "Docker entrypoint | Django App --> START migrate"
 /venv/bin/python manage.py migrate
 echo "Docker entrypoint | Django App -->   END migrate"
 
-echo "Docker entrypoint | Django App --> START load fixtures"
-/venv/bin/python manage.py loaddata ./backoffice/fixtures/euscitojoypad_db.json
-echo "Docker entrypoint | Django App -->   END load fixtures"
+if [ "$DEBUG" == "True" ]
+then
+    echo "Docker entrypoint | Django App --> START load fixtures (DEBUG == True ONLY!)"
+    /venv/bin/python manage.py loaddata ./backoffice/fixtures/euscitojoypad_db.json
+    echo "Docker entrypoint | Django App -->   END load fixtures (DEBUG == True ONLY!)"
+fi
 
 echo "Docker entrypoint | Django App --> START collectstatic"
 /venv/bin/python manage.py collectstatic --no-input
