@@ -22,7 +22,7 @@ services:
     container_name: "euj-postgresql"
     networks:
       - euj
-    env_file: ./compose_env_devel
+    env_file: ./compose_env
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./infra/db/:/docker-entrypoint-initdb.d/
@@ -42,7 +42,7 @@ services:
     environment:
       PGHOST: "postgresql"
       PGPORT: "5432"
-    env_file: ./compose_env_devel
+    env_file: ./compose_env
 
   # Backoffice (Django)
   backoffice:
@@ -56,7 +56,7 @@ services:
     environment:
       PGHOST: "postgresql"
       PGPORT: "5432"
-    env_file: ./compose_env_devel
+    env_file: ./compose_env
     volumes:
       - ./euscitojoypad_db/backoffice:/app/backoffice
       - ./euscitojoypad_db/euscitojoypad_db:/app/euscitojoypad_db
