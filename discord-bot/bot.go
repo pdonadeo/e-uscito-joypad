@@ -21,21 +21,58 @@ type Result struct {
 	DescrizioneTxt string
 }
 
-// Variables used for command line parameters
 var (
-	token string
+	applicationId string
+	token         string
 
 	pgHost string
 	pgPort string
 	pgUser string
 	pgPass string
 	pgDb   string
-	db     *gorm.DB
+
+	db *gorm.DB
+
+	commands = []*discordgo.ApplicationCommand{
+		{
+			Name: "consiglio",
+			Type: discordgo.MessageApplicationCommand,
+		},
+	}
+
+	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+		"consiglio": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+			if i.Type == 2 {
+				messages := i.ApplicationCommandData().Resolved.Messages
+
+				var lastContent string
+				for messageId, m := range messages {
+					lastContent = m.Content
+					log.Debugf("messageId = %s", messageId)
+					log.Debugf("message = %v", lastContent)
+
+					err := s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
+					if err != nil {
+						log.Error(err)
+					}
+				}
+
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "Grazie per il consiglio! :heart:",
+						Flags:   discordgo.MessageFlagsEphemeral,
+					},
+				})
+			}
+		},
+	}
 )
 
 func init() {
 	var err error
 
+	applicationId = os.Getenv("DISCORD_APPLICATION_ID")
 	token = os.Getenv("DISCORD_BOT_TOKEN")
 
 	pgHost = os.Getenv("PGHOST")
@@ -69,11 +106,8 @@ func init() {
 }
 
 func main() {
-	// Client ID:  1038209194089795605
-	// Invite URL: Leggi messaggi: 	https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=1024&scope=bot
-	// Invite URL: Invio messaggi: 	https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=2048&scope=bot
-	// Invite URL: Admin: 			https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=8&scope=bot
-	// Invite URL: NIENTE: 			https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=0&scope=bot
+	// Invite URL: https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=2147484736&scope=bot
+	// Invite URL: https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=8&scope=bot
 
 	var result Result
 	db.Raw("SELECT id, descrizione_txt FROM backoffice_episodio WHERE id = ?", 12).Scan(&result)
@@ -81,20 +115,36 @@ func main() {
 	log.Debug(result.DescrizioneTxt)
 
 	// Create a new Discord session using the provided bot token.
-	dg, err := discordgo.New("Bot " + token)
+	s, err := discordgo.New("Bot " + token)
 	if err != nil {
 		log.Fatalf("error creating Discord session: %s", err)
 	}
 
+	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+			h(s, i)
+		}
+	})
+
+	log.Infof("Adding commands...")
+	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
+	for i, v := range commands {
+		cmd, err := s.ApplicationCommandCreate(applicationId, "", v)
+		if err != nil {
+			log.Fatalf("Cannot create '%v' command: %v", v.Name, err)
+		}
+		registeredCommands[i] = cmd
+	}
+
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(messageCreate)
+	s.AddHandler(messageCreate)
 
 	// In this example, we only care about receiving message events.
-	dg.Identify.Intents = discordgo.IntentsGuildMessages
-	dg.Identify.Intents |= discordgo.IntentMessageContent
+	s.Identify.Intents = discordgo.IntentsGuildMessages
+	s.Identify.Intents |= discordgo.IntentMessageContent
 
 	// Open a websocket connection to Discord and begin listening.
-	err = dg.Open()
+	err = s.Open()
 	if err != nil {
 		log.Fatalf("error opening connection: %s", err)
 	}
@@ -106,7 +156,7 @@ func main() {
 	<-sc
 
 	// Cleanly close down the Discord session.
-	dg.Close()
+	s.Close()
 }
 
 // This function will be called (due to AddHandler above) every time a new
@@ -118,6 +168,22 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// This isn't required in this specific example but it's a good practice.
 	if m.Author.ID == s.State.User.ID {
 		return
+	}
+
+	log.Debug("==================================================================")
+	log.Debugf("ID = %s", m.ID)
+	log.Debugf("m.Timestamp = %s", m.Timestamp)
+	log.Debugf("m.Author.AvatarURL(\"256\") = %s", m.Author.AvatarURL("256"))
+	log.Debugf("m.Author.Username = %s", m.Author.Username)
+	log.Debugf("m.Content = %s", m.Content)
+	log.Debug("------------------------------------------------------------------")
+
+	if strings.HasPrefix(m.Content, "!consiglio") {
+		log.Debug("Ho ricevuto un comando di consiglio")
+		err := s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
+		if err != nil {
+			log.Error(err)
+		}
 	}
 
 	/* // If the message is "ping" reply with "Pong!"
