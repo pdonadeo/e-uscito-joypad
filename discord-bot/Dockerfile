@@ -10,7 +10,12 @@ COPY --from=build-stage /app/discord-bot /usr/local/bin/discord-bot
 
 ENV DISCORD_APPLICATION_ID=CHANGE_ME_IN_PRODUCTION
 ENV DISCORD_BOT_TOKEN=CHANGE_ME_IN_PRODUCTION
-ENV DEBUG=TRUE
+ENV PGHOST=postgresql
+ENV PGPORT=5432
+ENV PGUSER=django_db_user
+ENV PGPASSWORD=admin
+ENV PGDATABASE=euj
+ENV DEBUG=True
 
 WORKDIR /
 ENTRYPOINT ["/usr/local/bin/discord-bot"]
