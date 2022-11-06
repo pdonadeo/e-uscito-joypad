@@ -198,3 +198,19 @@ class AssociazioneEpisodioVideogame(models.Model):
 
     def __str__(self):
         return f"Associazione ep. {self.episodio.episodio_numero} con «{self.videogame.titolo}»"
+
+
+class DiscordMessage(models.Model):
+    class Meta:
+        verbose_name = "messaggio Discord"
+        verbose_name_plural = "messaggi Discord"
+
+    id = models.CharField(verbose_name="ID", max_length=32, primary_key=True)
+    ts = models.DateTimeField(verbose_name="Timestamp del messaggio", null=False, blank=False)
+    author_avatar = models.URLField(verbose_name="URL avatar autore", max_length=256, null=False, blank=False)
+    author_name = models.CharField(verbose_name="Nome autore", max_length=256, null=False, blank=False)
+    content = models.TextField(verbose_name="Contenuto", null=False, blank=False)
+    consiglio = models.BooleanField(verbose_name="È un consiglio", default=False)
+
+    def __str__(self):
+        return f"#{self.ts} - {self.author_name}: {self.content[0:32]}"

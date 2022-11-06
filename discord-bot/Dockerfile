@@ -1,0 +1,16 @@
+FROM golang:1.19-alpine3.16 AS build-stage
+
+USER root
+ADD  ./go.mod ./go.sum ./bot.go /app/
+RUN cd /app && go build .
+
+FROM alpine:3.16
+
+COPY --from=build-stage /app/discord-bot /usr/local/bin/discord-bot
+
+ENV DISCORD_APPLICATION_ID=CHANGE_ME_IN_PRODUCTION
+ENV DISCORD_BOT_TOKEN=CHANGE_ME_IN_PRODUCTION
+ENV DEBUG=TRUE
+
+WORKDIR /
+ENTRYPOINT ["/usr/local/bin/discord-bot"]

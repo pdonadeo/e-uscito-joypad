@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -16,9 +17,17 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-type Result struct {
-	ID             uint
-	DescrizioneTxt string
+type DiscordMessage struct {
+	ID           string `gorm:"primaryKey"`
+	Ts           *time.Time
+	AuthorAvatar string
+	AuthorName   string
+	Content      string
+	Consiglio    bool
+}
+
+func (DiscordMessage) TableName() string {
+	return "backoffice_discordmessage"
 }
 
 var (
@@ -46,7 +55,9 @@ var (
 				messages := i.ApplicationCommandData().Resolved.Messages
 
 				var lastContent string
+				var lastMessageId string
 				for messageId, m := range messages {
+					lastMessageId = messageId
 					lastContent = m.Content
 					log.Debugf("messageId = %s", messageId)
 					log.Debugf("message = %v", lastContent)
@@ -54,6 +65,18 @@ var (
 					err := s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
 					if err != nil {
 						log.Error(err)
+					}
+				}
+
+				var dbMessage DiscordMessage
+				result := db.First(&dbMessage, lastMessageId)
+				if result.Error != nil {
+					log.Error(result.Error)
+				} else {
+					dbMessage.Consiglio = true
+					result = db.Save(&dbMessage)
+					if result.Error != nil {
+						log.Error(result.Error)
 					}
 				}
 
@@ -108,11 +131,6 @@ func init() {
 func main() {
 	// Invite URL: https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=2147484736&scope=bot
 	// Invite URL: https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=8&scope=bot
-
-	var result Result
-	db.Raw("SELECT id, descrizione_txt FROM backoffice_episodio WHERE id = ?", 12).Scan(&result)
-	log.Debug(result.ID)
-	log.Debug(result.DescrizioneTxt)
 
 	// Create a new Discord session using the provided bot token.
 	s, err := discordgo.New("Bot " + token)
@@ -170,6 +188,20 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	message := DiscordMessage{
+		ID:           m.ID,
+		Ts:           &m.Timestamp,
+		AuthorAvatar: m.Author.AvatarURL("256"),
+		AuthorName:   m.Author.Username,
+		Content:      m.Content,
+		Consiglio:    false,
+	}
+	result := db.Create(&message)
+
+	if result.Error != nil {
+		log.Error(result.Error)
+	}
+
 	log.Debug("==================================================================")
 	log.Debugf("ID = %s", m.ID)
 	log.Debugf("m.Timestamp = %s", m.Timestamp)
@@ -185,14 +217,4 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			log.Error(err)
 		}
 	}
-
-	/* // If the message is "ping" reply with "Pong!"
-	if m.Content == "ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
-	}
-
-	// If the message is "pong" reply with "Ping!"
-	if m.Content == "pong" {
-		s.ChannelMessageSend(m.ChannelID, "Ping!")
-	} */
 }
