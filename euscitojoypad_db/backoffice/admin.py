@@ -2,10 +2,12 @@ from django import forms
 from django.contrib import admin
 from django.db import models
 
+from django.utils.html import format_html
+
 from django_json_widget.widgets import JSONEditorWidget
 
 
-from .models import Episodio, Videogame, AssociazioneEpisodioVideogame
+from .models import Episodio, Videogame, AssociazioneEpisodioVideogame, DiscordMessage
 
 
 class EpisodioAdminForm(forms.ModelForm):
@@ -89,3 +91,18 @@ class VideogameAdmin(admin.ModelAdmin):
     }
 
     inlines = [AssociazioneEpisodioVideogameInline]
+
+
+@admin.register(DiscordMessage)
+class DiscordMessageAdmin(admin.ModelAdmin):
+    list_display = ("ts", "guild_id", "channel_id", "message_id", "author_name", "consiglio", "url_messaggio")
+    search_fields = ("author_name", "content")
+    list_filter = ("consiglio",)
+    date_hierarchy = "ts"
+
+    def url_messaggio(self, instance):
+        url = f"https://discord.com/channels/{instance.guild_id}/{instance.channel_id}/{instance.message_id}"
+        return format_html(f'<a target="_blank" href="{url}">Apri in Discord</a>')
+
+    url_messaggio.boolean = False
+    url_messaggio.short_description = "URL"

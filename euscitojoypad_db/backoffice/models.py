@@ -1,6 +1,4 @@
-from curses.ascii import SP
 import datetime
-from http.client import ImproperConnectionState
 import json
 import urllib.request
 
@@ -204,8 +202,15 @@ class DiscordMessage(models.Model):
     class Meta:
         verbose_name = "messaggio Discord"
         verbose_name_plural = "messaggi Discord"
+        constraints = [
+            models.UniqueConstraint(fields=["guild_id", "channel_id", "message_id"], name="unique_discord_message"),
+        ]
+        ordering = ["-ts"]
 
-    id = models.CharField(verbose_name="ID", max_length=32, primary_key=True)
+    guild_id = models.CharField(verbose_name="ID del server Discord", max_length=32, null=False, blank=False)
+    channel_id = models.CharField(verbose_name="ID del canale", max_length=32, null=False, blank=False)
+    message_id = models.CharField(verbose_name="ID del messaggio", max_length=32, null=False, blank=False)
+
     ts = models.DateTimeField(verbose_name="Timestamp del messaggio", null=False, blank=False)
     author_avatar = models.URLField(verbose_name="URL avatar autore", max_length=256, null=False, blank=False)
     author_name = models.CharField(verbose_name="Nome autore", max_length=256, null=False, blank=False)

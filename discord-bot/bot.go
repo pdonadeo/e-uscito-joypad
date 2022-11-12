@@ -18,7 +18,10 @@ import (
 )
 
 type DiscordMessage struct {
-	ID           string `gorm:"primaryKey"`
+	ID           uint `gorm:"primaryKey"`
+	GuildID      string
+	ChannelID    string
+	MessageID    string
 	Ts           *time.Time
 	AuthorAvatar string
 	AuthorName   string
@@ -44,22 +47,28 @@ var (
 
 	commands = []*discordgo.ApplicationCommand{
 		{
-			Name: "consiglio",
+			Name: "Consiglia questo messaggio",
 			Type: discordgo.MessageApplicationCommand,
 		},
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"consiglio": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		"Consiglia questo messaggio": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			if i.Type == 2 {
 				messages := i.ApplicationCommandData().Resolved.Messages
 
-				var lastContent string
+				var lastGuildID string
+				var lastChannelID string
 				var lastMessageId string
+				var lastContent string
+
 				for messageId, m := range messages {
+					lastGuildID = i.GuildID
+					lastChannelID = m.ChannelID
 					lastMessageId = messageId
 					lastContent = m.Content
-					log.Debugf("messageId = %s", messageId)
+
+					log.Debugf("messageId = (%s, %s, %s)", lastGuildID, lastChannelID, lastMessageId)
 					log.Debugf("message = %v", lastContent)
 
 					err := s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
@@ -69,7 +78,10 @@ var (
 				}
 
 				var dbMessage DiscordMessage
-				result := db.First(&dbMessage, lastMessageId)
+
+				result := db.Where("guild_id = ? AND channel_id = ? AND message_id = ?", lastGuildID, lastChannelID, lastMessageId).First(&dbMessage)
+
+				//result := db.First(&dbMessage, lastMessageId)
 				if result.Error != nil {
 					log.Error(result.Error)
 				} else {
@@ -129,7 +141,6 @@ func init() {
 }
 
 func main() {
-	// Invite URL: https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=2147484736&scope=bot
 	// Invite URL: https://discord.com/api/oauth2/authorize?client_id=1038209194089795605&permissions=8&scope=bot
 
 	// Create a new Discord session using the provided bot token.
@@ -189,7 +200,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	message := DiscordMessage{
-		ID:           m.ID,
+		GuildID:      m.GuildID,
+		ChannelID:    m.ChannelID,
+		MessageID:    m.ID,
 		Ts:           &m.Timestamp,
 		AuthorAvatar: m.Author.AvatarURL("256"),
 		AuthorName:   m.Author.Username,
@@ -204,17 +217,11 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	log.Debug("==================================================================")
 	log.Debugf("ID = %s", m.ID)
+	log.Debugf("ChannelID = %s", m.ChannelID)
+	log.Debugf("GuildID = %s", m.GuildID)
 	log.Debugf("m.Timestamp = %s", m.Timestamp)
 	log.Debugf("m.Author.AvatarURL(\"256\") = %s", m.Author.AvatarURL("256"))
 	log.Debugf("m.Author.Username = %s", m.Author.Username)
 	log.Debugf("m.Content = %s", m.Content)
 	log.Debug("------------------------------------------------------------------")
-
-	if strings.HasPrefix(m.Content, "!consiglio") {
-		log.Debug("Ho ricevuto un comando di consiglio")
-		err := s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
-		if err != nil {
-			log.Error(err)
-		}
-	}
 }

@@ -1,3 +1,4 @@
-.envrc
 *.code-workspace
+.envrc
 discord-bot
+vendor
