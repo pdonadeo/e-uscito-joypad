@@ -1,6 +1,4 @@
-from curses.ascii import SP
 import datetime
-from http.client import ImproperConnectionState
 import json
 import urllib.request
 
@@ -198,3 +196,26 @@ class AssociazioneEpisodioVideogame(models.Model):
 
     def __str__(self):
         return f"Associazione ep. {self.episodio.episodio_numero} con «{self.videogame.titolo}»"
+
+
+class DiscordMessage(models.Model):
+    class Meta:
+        verbose_name = "messaggio Discord"
+        verbose_name_plural = "messaggi Discord"
+        constraints = [
+            models.UniqueConstraint(fields=["guild_id", "channel_id", "message_id"], name="unique_discord_message"),
+        ]
+        ordering = ["-ts"]
+
+    guild_id = models.CharField(verbose_name="ID del server Discord", max_length=32, null=False, blank=False)
+    channel_id = models.CharField(verbose_name="ID del canale", max_length=32, null=False, blank=False)
+    message_id = models.CharField(verbose_name="ID del messaggio", max_length=32, null=False, blank=False)
+
+    ts = models.DateTimeField(verbose_name="Timestamp del messaggio", null=False, blank=False)
+    author_avatar = models.URLField(verbose_name="URL avatar autore", max_length=256, null=False, blank=False)
+    author_name = models.CharField(verbose_name="Nome autore", max_length=256, null=False, blank=False)
+    content = models.TextField(verbose_name="Contenuto", null=False, blank=False)
+    consiglio = models.BooleanField(verbose_name="È un consiglio", default=False)
+
+    def __str__(self):
+        return f"#{self.ts} - {self.author_name}: {self.content[0:32]}"

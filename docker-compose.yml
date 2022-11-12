@@ -63,6 +63,20 @@ services:
       - ./euscitojoypad_db/MEDIA:/app/MEDIA
       - ./euscitojoypad_db/STATIC:/app/STATIC
 
+  # Discord bot (Go)
+  bot:
+    image: ghcr.io/pdonadeo/e-uscito-joypad-bot:latest
+    depends_on:
+      - "postgresql"
+    container_name: "euj-bot"
+    build: ./discord-bot/
+    networks:
+      - euj
+    environment:
+      PGHOST: "postgresql"
+      PGPORT: "5432"
+    env_file: ./compose_env
+
 volumes:
   postgres-data:
     driver: local
