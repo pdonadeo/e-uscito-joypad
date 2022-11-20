@@ -100,6 +100,14 @@ class DiscordMessageAdmin(admin.ModelAdmin):
     list_filter = ("consiglio",)
     date_hierarchy = "ts"
 
+    formfield_overrides = {
+        models.JSONField: {
+            "widget": JSONEditorWidget(
+                width="75%", height="400px", options={"mode": "view", "modes": ["view", "tree", "code"]}
+            )
+        },
+    }
+
     def url_messaggio(self, instance):
         url = f"https://discord.com/channels/{instance.guild_id}/{instance.channel_id}/{instance.message_id}"
         return format_html(f'<a target="_blank" href="{url}">Apri in Discord</a>')

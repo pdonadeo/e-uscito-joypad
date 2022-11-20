@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/signal"
@@ -8,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgtype"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
@@ -25,7 +27,7 @@ type DiscordMessage struct {
 	Ts           *time.Time
 	AuthorAvatar string
 	AuthorName   string
-	Content      string
+	Content      pgtype.JSONB `gorm:"type:jsonb;default:'{}';not null"`
 	Consiglio    bool
 }
 
@@ -199,6 +201,12 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	JsonMessage, err := json.Marshal(m)
+	if err != nil {
+		log.Errorf("Errore convertendo un messaggio Discord in JSON: %s", err)
+		return
+	}
+
 	message := DiscordMessage{
 		GuildID:      m.GuildID,
 		ChannelID:    m.ChannelID,
@@ -206,7 +214,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		Ts:           &m.Timestamp,
 		AuthorAvatar: m.Author.AvatarURL("256"),
 		AuthorName:   m.Author.Username,
-		Content:      m.Content,
+		Content:      pgtype.JSONB{Bytes: JsonMessage, Status: pgtype.Present},
 		Consiglio:    false,
 	}
 	result := db.Create(&message)
@@ -215,13 +223,5 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		log.Error(result.Error)
 	}
 
-	log.Debug("==================================================================")
-	log.Debugf("ID = %s", m.ID)
-	log.Debugf("ChannelID = %s", m.ChannelID)
-	log.Debugf("GuildID = %s", m.GuildID)
-	log.Debugf("m.Timestamp = %s", m.Timestamp)
-	log.Debugf("m.Author.AvatarURL(\"256\") = %s", m.Author.AvatarURL("256"))
-	log.Debugf("m.Author.Username = %s", m.Author.Username)
-	log.Debugf("m.Content = %s", m.Content)
-	log.Debug("------------------------------------------------------------------")
+	log.Debugf("Messaggio JSON: %s", string(JsonMessage))
 }

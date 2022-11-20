@@ -214,8 +214,11 @@ class DiscordMessage(models.Model):
     ts = models.DateTimeField(verbose_name="Timestamp del messaggio", null=False, blank=False)
     author_avatar = models.URLField(verbose_name="URL avatar autore", max_length=256, null=False, blank=False)
     author_name = models.CharField(verbose_name="Nome autore", max_length=256, null=False, blank=False)
-    content = models.TextField(verbose_name="Contenuto", null=False, blank=False)
+    content = models.JSONField(null=False, blank=False, default=dict, verbose_name="Discord message raw content")
     consiglio = models.BooleanField(verbose_name="È un consiglio", default=False)
 
     def __str__(self):
-        return f"#{self.ts} - {self.author_name}: {self.content[0:32]}"
+        if "content" in self.content:
+            return f"#{self.ts} - {self.author_name}: {self.content['content']}"
+        else:
+            return f"#{self.ts} - {self.author_name}"
