@@ -12,27 +12,27 @@ license: "ISC"
 homepage: "https://github.com/pdonadeo/e-uscito-joypad"
 bug-reports: "https://github.com/pdonadeo/e-uscito-joypad/issues"
 depends: [
-  "ocaml" {= "4.14.0"}
-  "batteries" {= "3.5.1"}
-  "timedesc" {= "0.9.0"}
+  "ocaml" {= "4.14.1"}
+  "batteries" {= "3.6.0"}
+  "timedesc" {= "0.9.1"}
   "cohttp-lwt-unix" {= "5.0.0"}
   "lambdasoup" {= "0.7.3"}
   "re2" {= "v0.15.0"}
   "dream" {= "1.0.0~alpha4"}
   "tyxml-ppx" {= "4.5.0"}
   "ppx_deriving_yojson" {= "3.7.0"}
-  "caqti-driver-postgresql" {= "1.8.0"}
+  "caqti-driver-postgresql" {= "1.9.1"}
   "ppx_rapper_lwt" {= "3.1.0"}
   "decimal" {= "0.3.0"}
   "crunch" {= "3.3.1"}
-  "dune" {>= "3.0" & dev & = "3.4.1"}
+  "dune" {>= "3.6" & dev & = "3.6.1"}
   "utop" {dev & = "2.10.0"}
-  "merlin" {dev & = "4.6-414"}
+  "merlin" {dev & = "4.7-414"}
   "ocp-indent" {dev & = "1.8.1"}
-  "ocp-index" {dev & = "1.3.3"}
-  "ocamlformat" {dev & = "0.23.0"}
-  "ocaml-lsp-server" {dev & = "1.13.1"}
-  "odoc" {dev & = "2.1.1"}
+  "ocp-index" {dev & = "1.3.4"}
+  "ocamlformat" {dev & = "0.24.1"}
+  "ocaml-lsp-server" {dev & = "1.14.2"}
+  "odoc" {dev & = "2.2.0"}
   "odig" {dev & = "0.0.8"}
   "odoc" {with-doc}
 ]

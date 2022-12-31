@@ -1,7 +1,7 @@
 #################
 # BUILD PHASE 1 #
 #################
-FROM node:16-alpine3.11 AS build-stage-1
+FROM node:18-alpine3.17 AS build-stage-1
 WORKDIR /app
 COPY ./frontend/package.json ./frontend/yarn.lock ./
 RUN yarn
@@ -25,7 +25,7 @@ RUN apk add upx
 
 USER opam
 WORKDIR /app
-ENV PATH /home/opam/.opam/4.14/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH /home/opam/_opam/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN dune build @install
 RUN chmod +w /app/_build/default/src/e_uscito_joypad.exe && \
@@ -38,7 +38,7 @@ RUN chown root:root /usr/local/bin/e_uscito_joypad
 ################
 # DEPLOY PHASE #
 ################
-FROM alpine:latest
+FROM alpine:3.17.0
 COPY --from=build-stage-2 /usr/local/bin/e_uscito_joypad /usr/local/bin/
 RUN apk update
 RUN apk add --no-cache                                  \

@@ -1,10 +1,10 @@
-FROM golang:1.19-alpine3.16 AS build-stage
+FROM golang:1.19-alpine3.17 AS build-stage
 
 USER root
 ADD  ./go.mod ./go.sum ./bot.go /app/
 RUN cd /app && go build .
 
-FROM alpine:3.16
+FROM alpine:3.17
 
 COPY --from=build-stage /app/discord-bot /usr/local/bin/discord-bot
 

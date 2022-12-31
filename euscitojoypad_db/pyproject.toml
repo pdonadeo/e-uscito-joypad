@@ -6,7 +6,7 @@ authors = ["Paolo Donadeo <paolo@donadeo.net>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 Django = "^4.1"
 django-extensions = "=3.2.0"
 gunicorn = "=20.1.0"

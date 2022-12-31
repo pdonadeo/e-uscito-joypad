@@ -9,16 +9,17 @@
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "framer-motion": "^6.5.1",
-    "minimatch": "^5.1.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "framer-motion": "^8.0.2",
+    "json5": "2.2.2",
+    "minimatch": "^5.1.2",
     "react": "^18.2.0",
     "react-debounce-input": "^3.3.0",
     "react-dom": "^18.2.0",
-    "react-responsive": "^9.0.0-beta.10",
+    "react-responsive": "^9.0.2",
     "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^3.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
