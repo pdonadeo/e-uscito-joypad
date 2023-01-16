@@ -1,7 +1,7 @@
 open Cohttp_lwt_unix
 
 type data = {
-  ep_num : int;
+  ep_num : string option;
   title : string;
   date : Timedesc.Date.t;
 }
@@ -10,7 +10,7 @@ type dati_ultima_puntata = {
   uscito : bool;
   giorni_fa : string;
   data_italiano : string;
-  ep_num : int;
+  ep_num : string option;
   titolo : string;
   msg_risposta_no : string option;
 }
@@ -34,13 +34,13 @@ let extract_date desc =
   let year = matches.(3) |> Utils.option_value |> int_of_string in
   Timedesc.Date.of_iso8601_exn (Utils.spf "%04d-%02d-%02d" year month day)
 
-let title_reg = Re2.create_exn "Ep\\. +(\\d+) +(?:–|—) +(.*)"
+let title_reg = Re2.create_exn "(Ep\\. +)?(\\w+) +(?:–|—) +(.*)"
 
 let extract_ep_num_and_title data_title =
   (* "Ep. 47 – Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo" *)
   let m = Re2.find_submatches_exn title_reg data_title in
-  let ep_num = m.(1) |> Utils.option_value |> int_of_string in
-  let title = m.(2) |> Utils.option_value in
+  let ep_num = m.(2) |> Option.map (fun s -> s |> String.trim) in
+  let title = m.(3) |> Utils.option_value in
   (ep_num, title)
 
 let extract_data_from_page () =
@@ -77,7 +77,7 @@ let elabora_risposta () =
       | _ -> None
     in
     (uscito, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, msg_risposta_no)
-  | None -> (false, "", "", 1999, "", None)
+  | None -> (false, "", "", Some "1999", "", None)
 
 let rec monitor () =
   log.debug (fun l -> l "Scarico info ultima puntata...");

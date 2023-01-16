@@ -11,7 +11,7 @@ let%html risposta_si ep_num giorni_fa titolo =
     {| l'episodio
       <br />
       <span>numero |}
-    [txt (string_of_int ep_num)]
+    [txt ep_num]
     {|</span>
       <br />
       di Joypad, dal titolo
@@ -59,6 +59,7 @@ let index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no : string 
       react_build_index_s
     end
   in
+  let ep_num = Option.value ep_num ~default:"" in
 
   let message_p_ty =
     if uscito then risposta_si ep_num giorni_fa titolo else risposta_no giorni_fa data_italiano msg_risposta_no
