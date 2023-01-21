@@ -1,7 +1,13 @@
 open Cohttp_lwt_unix
 
+type ep_num =
+  | Intero of int
+  | Stringa of string
+  | NonSpecificato
+[@@deriving yojson]
+
 type data = {
-  ep_num : string option;
+  ep_num : ep_num;
   title : string;
   date : Timedesc.Date.t;
 }
@@ -10,7 +16,7 @@ type dati_ultima_puntata = {
   uscito : bool;
   giorni_fa : string;
   data_italiano : string;
-  ep_num : string option;
+  ep_num : ep_num;
   titolo : string;
   msg_risposta_no : string option;
 }
@@ -40,6 +46,11 @@ let extract_ep_num_and_title data_title =
   (* "Ep. 47 – Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo" *)
   let m = Re2.find_submatches_exn title_reg data_title in
   let ep_num = m.(2) |> Option.map (fun s -> s |> String.trim) in
+  let ep_num =
+    match ep_num with
+    | None -> NonSpecificato
+    | Some s -> ( try Intero (int_of_string s) with _ -> Stringa s)
+  in
   let title = m.(3) |> Utils.option_value in
   (ep_num, title)
 
@@ -77,7 +88,7 @@ let elabora_risposta () =
       | _ -> None
     in
     (uscito, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, msg_risposta_no)
-  | None -> (false, "", "", Some "1999", "", None)
+  | None -> (false, "", "", NonSpecificato, "", None)
 
 let rec monitor () =
   log.debug (fun l -> l "Scarico info ultima puntata...");
