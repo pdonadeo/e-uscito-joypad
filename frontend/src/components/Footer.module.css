@@ -19,3 +19,16 @@ footer a {
   margin-right: 0.5rem;
   height: 2em;
 }
+
+.note {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0 auto 1.6rem;
+  letter-spacing: -0.03em;
+}
+
+.note a {
+  color: #29abe2;
+  font-weight: 700;
+}
