@@ -13,6 +13,7 @@ const SearchBar = () => {
   const searchCtx = useContext(SearchContext);
   const [showModal, setShowModal] = useState(false);
   const [sorting, setSorting] = useState('ascending');
+  const [resultList, setResultList] = useState([]);
 
   const toggleShowModal = () => {
     setShowModal((oldState) => !oldState);
@@ -23,6 +24,17 @@ const SearchBar = () => {
     setSorting(order);
     toggleShowModal();
   };
+
+  const getSearchResults = async (searchWords) => {
+    if(searchWords.length  === 0) {setResultList([]); return;}
+
+    const response = await fetch(`http://localhost:5000/api/search-game-title/${searchWords}`);
+    const data = await response.json();
+    console.log(data.result);
+
+    const listNames = data.result.map(({titolo, id}) => ({titolo, id}));
+    setResultList(listNames);
+  }
 
   const checkIcon = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`${classes.checkIcon}`}>
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -36,12 +48,26 @@ const SearchBar = () => {
         type="text"
         placeholder={"| Cerca un gioco…"}
         className={classes.input}
-
         minLength={4}
         debounceTimeout={300}
-        onChange={(ev) => { searchCtx.setSearchInput(ev.target.value) }}
+        onChange={(ev) => { 
+          // searchCtx.setSearchInput(ev.target.value);
+          getSearchResults(ev.target.value) 
+          console.log(ev.target.value);
+        }}
         value={searchCtx.searchInput}
       />
+      {resultList.length > 0 && 
+      <div className={classes.searchSuggestions}>
+        {resultList.map(result=> 
+        <div 
+          className={classes.suggestion} 
+          key={result.id} 
+          onClick={()=> {searchCtx.setSearchInput(result.titolo); setResultList([])}}>
+            <p >{result.titolo}</p>
+          </div>
+        )}
+        </div>}
       <div className={classes.searchIcon}>
         <SearchIcon />
       </div>
@@ -67,7 +93,12 @@ const SearchBar = () => {
         </>
       ) :
         <>
-          <div className={classes.closeIcon} onClick={(ev) => { searchCtx.setSearchInput("") }}>
+          <div 
+            className={classes.closeIcon} 
+            onClick={(ev) => { 
+              searchCtx.setSearchInput(""); 
+              setResultList([]); 
+          }}>
             <CloseIcon />
           </div>
         </>

@@ -18,7 +18,39 @@
     padding-left: 2rem;
     height: 4rem;
     font-size: 1.6rem;
+    position:relative;
 }
+
+/*
+* Suggestion dropdown
+*/
+
+.searchSuggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 15;
+    width: 100%;
+    background-color: #fff;
+}
+
+.suggestion {
+    padding: .5rem 2rem .5rem 2rem;
+    cursor: pointer;
+}
+
+.suggestion:hover {
+    background-color: #f7f7f8;
+}
+
+.suggestion p {
+    font-size: 1.8rem;
+}
+
+
+/*
+* Search Icons
+*/
 
 .searchIcon,
 .closeIcon,
