@@ -31,20 +31,24 @@
     left: 0;
     z-index: 15;
     width: 100%;
-    background-color: #fff;
+	background: rgba(255, 255, 255, 0.5);
+	backdrop-filter: blur(30px);
 }
 
 .suggestion {
     padding: .5rem 2rem .5rem 2rem;
     cursor: pointer;
+    font-size: 1.6rem;
+    height: 4.4rem;
+    display: flex;
+    align-items: center;
 }
 
-.suggestion:hover {
-    background-color: #f7f7f8;
+.suggestion:hover, .keyActive {
+    background-color: rgba(41, 171, 226, 0.3);
 }
 
 .suggestion p {
-    font-size: 1.8rem;
 }
 
 
