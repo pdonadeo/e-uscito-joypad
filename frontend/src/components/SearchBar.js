@@ -77,6 +77,7 @@ const SearchBar = () => {
   </svg>;
 
   return (
+  <>
     <div className={classes.searchBar}>
       <DebounceInput
         initial-scale="1"
@@ -142,6 +143,8 @@ const SearchBar = () => {
         </>
       }
     </div >
+    <div className={classes.overlayMobile}></div>
+  </>
   );
 };
 

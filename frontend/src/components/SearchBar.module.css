@@ -48,9 +48,6 @@
     background-color: rgba(41, 171, 226, 0.3);
 }
 
-.suggestion p {
-}
-
 
 /*
 * Search Icons
@@ -152,13 +149,35 @@
     .searchBar {
         width: 100vw;
         position: fixed;
-        background-color: #fff;
         z-index: 10;
         box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
         bottom: 0;
         left: 0;
         margin: 0;
+        transition: all 500ms;
     }
+
+
+    .searchBar:focus-within {
+        transform: translateY(calc(-100vh + 100%));
+        transition: all 500ms;
+    }
+
+    .overlayMobile {
+        position:absolute;
+        top:0;
+        left: 0;
+        background-color: rgba(0,0,0,0.4);
+        height:100vh;
+        width:100vw;
+        z-index: 2;
+        display:none;
+    }
+
+    .searchBar:focus-within + .overlayMobile{
+        display: block;
+    }
+
 
     .sortModal {
         width: 100vw;
