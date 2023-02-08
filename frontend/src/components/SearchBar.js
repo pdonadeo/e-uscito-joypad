@@ -92,6 +92,12 @@ const SearchBar = () => {
           // searchCtx.setSearchInput(ev.target.value);
           getSearchResults(ev.target.value) 
         }}
+        onFocus={()=> window.scrollTo({
+          top: 0,
+          left:0,
+          behavior: 'smooth'
+        })
+        }
         value={searchCtx.searchInput}
         onKeyDown={onKeyDown}
       />
