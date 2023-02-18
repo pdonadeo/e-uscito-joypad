@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import classes from "./GameBox.module.css";
+import {createPortal} from 'react-dom';
 
 import { ReactComponent as IconClose } from "../../icons/ICN_Close.svg";
 import ListTransition from "../../CustomHooks/ListTransition";
@@ -12,13 +13,6 @@ const GameBox = (props) => {
 
     const minutes = Math.floor(istante / 60);
     const seconds = istante - minutes * 60;
-
-    // const backdrop = ReactDOM.createPortal(
-    //   <div className={`${classes.modal} ${showGame ? classes.showModalGame : ""} `}>
-    //     <p>{descrizione}</p>
-    //   </div>,
-    //   document.getElementById("modal")
-    // );
 
     const createDescription = (description) => {
         return { __html: description };
@@ -44,7 +38,8 @@ const GameBox = (props) => {
                     </p>
                 </div>
             </div>
-            <ListTransition>
+            {createPortal(
+                <ListTransition>
                 {isMobile? 
                 <div className={`${classes.modal} ${showGame ? classes.showModalGame : ""} `}>
                     <div className={classes.firstRow} onClick={showGameHandler}>
@@ -57,7 +52,7 @@ const GameBox = (props) => {
                     <p className={classes.gameDescription} dangerouslySetInnerHTML={createDescription(descrizione)}></p>
                 </div>
                 : 
-                    <div className={`${classes.modal} ${showGame ? classes.showModalGame : ""}`}>
+                <div className={`${classes.modal} ${showGame ? classes.showModalGame : ""}`}>
                         <div className={classes.backdrop} onClick={showGameHandler}></div>
                         <div className={classes.modalContent}>
                         <div className={classes.firstRow}>
@@ -71,7 +66,7 @@ const GameBox = (props) => {
                         </div>
                 </div>
             }
-            </ListTransition>
+        </ListTransition>, document.body)}
         </Fragment>
     );
 };
