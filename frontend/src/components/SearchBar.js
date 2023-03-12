@@ -89,7 +89,6 @@ const SearchBar = () => {
         minLength={4}
         debounceTimeout={300}
         onChange={(ev) => { 
-          // searchCtx.setSearchInput(ev.target.value);
           getSearchResults(ev.target.value) 
         }}
         onFocus={()=> window.scrollTo({
@@ -105,7 +104,6 @@ const SearchBar = () => {
       <div className={classes.searchSuggestions}>
         {resultList.map((result, i)=> 
         <div 
-          // style={ i === focus ? {backgroundColor: '#f7f7f8'} : {}}
           className={`${classes.suggestion} ${i === focus? classes.keyActive : ''}`} 
           key={result.id} 
           onClick={()=> {searchCtx.setSearchInput(result.titolo); setResultList([])}}>
@@ -140,7 +138,7 @@ const SearchBar = () => {
         <>
           <div 
             className={classes.closeIcon} 
-            onClick={(ev) => { 
+            onClick={(_ev) => { 
               searchCtx.setSearchInput(""); 
               setResultList([]); 
           }}>
