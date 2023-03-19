@@ -305,14 +305,22 @@ let search_episodes_by_game_id db ~game_id () =
                         ep.url_post,
                         ep.note,
                         ep.descrizione_html,
-                        ep.descrizione_txt
+                        ep.descrizione_txt,
+                        (
+                          CASE
+                            WHEN ass.tipologia = 'RECE' THEN 1
+                            WHEN ass.tipologia = 'CONS' THEN 2
+                            WHEN ass.tipologia = 'FREE' THEN 3
+                            ELSE 4
+                          END
+                        ) AS pri
                     FROM backoffice_episodio ep
                         JOIN backoffice_associazioneepisodiovideogame ass ON (ep.id = ass.episodio_id)
                         JOIN backoffice_videogame game ON (game.id = ass.videogame_id)
                     WHERE game.id = %int64{game_id}
                       AND ep.pubblicato = TRUE
                 ) t
-            ORDER BY data_uscita DESC
+            ORDER BY pri ASC, data_uscita DESC
           |sql}]
   in
   let* records = q db ~game_id in

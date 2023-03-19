@@ -28,45 +28,46 @@ const SearchBar = () => {
   };
 
   const getSearchResults = async (searchWords) => {
-    if(searchWords.length  === 0) {setResultList([]); return;}
+    if (searchWords.length === 0) { setResultList([]); return; }
 
     setSearchWords(searchWords);
     const response = await fetch(`/api/search-game-title/${searchWords}`);
     const data = await response.json();
-    
-    const listNames = data.result.map(({titolo, id}) => ({titolo, id}));
+
+    const listNames = data.result.map(({ titolo, id }) => ({ titolo, id }));
     setResultList(listNames);
   }
 
-  const boldName = (name, search) =>{
-    
-    const isMatch = name.toLowerCase().match(search.toLowerCase());
-    if(isMatch) {
-    const index = isMatch.index;
+  const boldName = (name, search) => {
 
-    if (index !== 0) {
+    const isMatch = name.toLowerCase().match(search.toLowerCase());
+    if (isMatch) {
+      const index = isMatch.index;
+
+      if (index !== 0) {
         return <>
-          {name.substr(0, index)}<strong>{name.substr(index, search.length)}</strong>{name.substr((index+search.length), name.length)}
+          {name.substr(0, index)}<strong>{name.substr(index, search.length)}</strong>{name.substr((index + search.length), name.length)}
         </>
       }
     }
-    if(name.substr(0,search.length).toLowerCase() ===search.toLowerCase() ){ 
+    if (name.substr(0, search.length).toLowerCase() === search.toLowerCase()) {
       return <>
-    <strong>{name.substr(0, search.length)}</strong>{name.substr(search.length)};
-    </>
+        <strong>{name.substr(0, search.length)}</strong>{name.substr(search.length)};
+      </>
     }
     return name;
   }
 
-  const onKeyDown = (event) =>{
-    if(event.key === 'ArrowDown'){
-       setFocus(()=> focus + 1);
+  const onKeyDown = (event) => {
+    if (event.key === 'ArrowDown') {
+      setFocus(() => focus + 1);
     }
-    if(event.key === 'ArrowUp'){
-       setFocus(()=> focus - 1);
+    if (event.key === 'ArrowUp') {
+      setFocus(() => focus - 1);
     }
-    if(event.key === 'Enter') {
+    if (event.key === 'Enter') {
       searchCtx.setSearchInput(resultList[focus].titolo);
+      searchCtx.setSelectedGameId(resultList[focus].id);
       setResultList([]);
       setFocus(0);
     }
@@ -77,78 +78,83 @@ const SearchBar = () => {
   </svg>;
 
   return (
-  <>
-    <div className={classes.searchBar}>
-      <DebounceInput
-        initial-scale="1"
-        maximum-scale="1"
-        type="text"
-        placeholder={"| Cerca un gioco…"}
-        className={classes.input}
-        id="search-bar"
-        minLength={4}
-        debounceTimeout={300}
-        onChange={(ev) => { 
-          getSearchResults(ev.target.value) 
-        }}
-        onFocus={()=> window.scrollTo({
-          top: 0,
-          left:0,
-          behavior: 'smooth'
-        })
+    <>
+      <div className={classes.searchBar}>
+        <DebounceInput
+          initial-scale="1"
+          maximum-scale="1"
+          type="text"
+          placeholder={"| Cerca un gioco…"}
+          className={classes.input}
+          id="search-bar"
+          minLength={3}
+          debounceTimeout={300}
+          onChange={(ev) => {
+            getSearchResults(ev.target.value)
+          }}
+          onFocus={() => window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          })
+          }
+          value={searchCtx.searchInput}
+          onKeyDown={onKeyDown}
+        />
+        {resultList.length > 0 &&
+          <div className={classes.searchSuggestions}>
+            {resultList.map((result, i) =>
+              <div
+                className={`${classes.suggestion} ${i === focus ? classes.keyActive : ''}`}
+                key={result.id}
+                onClick={() => {
+                  searchCtx.setSearchInput(result.titolo);
+                  searchCtx.setSelectedGameId(result.id);
+                  setResultList([]);
+                }}>
+                <p >{boldName(result.titolo, searchWords)}</p>
+              </div>
+            )}
+          </div>}
+        <div className={classes.searchIcon}>
+          <SearchIcon />
+        </div>
+        {searchCtx.searchInput.trim() === "" ? (
+          <>
+            <div className={classes.sortIcon} onClick={toggleShowModal}>
+              <SortIcon />
+            </div>
+            <div className={`${classes.sortModal} ${showModal ? classes.show : ''}`}>
+              <p className={classes.sortText}>ORDINA PER</p>
+              <div className={classes.sortContainer}>
+                <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>Più recenti</p>
+                <div className={sorting === 'ascending' ? classes.showCheckIcon : ''}>{checkIcon}</div>
+              </div>
+              <div className={classes.sortContainer}>
+                <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>Meno recenti</p>
+                <div className={sorting === 'descending' ? classes.showCheckIcon : ''}>{checkIcon}</div>
+              </div>
+              <button className={classes.sortButton} onClick={toggleShowModal}>
+                Chiudi
+              </button>
+            </div>
+          </>
+        ) :
+          <>
+            <div
+              className={classes.closeIcon}
+              onClick={(_ev) => {
+                searchCtx.setSearchInput("");
+                searchCtx.setSelectedGameId(null);
+                setResultList([]);
+              }}>
+              <CloseIcon />
+            </div>
+          </>
         }
-        value={searchCtx.searchInput}
-        onKeyDown={onKeyDown}
-      />
-      {resultList.length > 0 && 
-      <div className={classes.searchSuggestions}>
-        {resultList.map((result, i)=> 
-        <div 
-          className={`${classes.suggestion} ${i === focus? classes.keyActive : ''}`} 
-          key={result.id} 
-          onClick={()=> {searchCtx.setSearchInput(result.titolo); setResultList([])}}>
-            <p >{boldName(result.titolo, searchWords)}</p>
-          </div>
-        )}
-        </div>}
-      <div className={classes.searchIcon}>
-        <SearchIcon />
-      </div>
-      {searchCtx.searchInput.trim() === "" ? (
-        <>
-          <div className={classes.sortIcon} onClick={toggleShowModal}>
-            <SortIcon />
-          </div>
-          <div className={`${classes.sortModal} ${showModal ? classes.show : ''}`}>
-            <p className={classes.sortText}>ORDINA PER</p>
-            <div className={classes.sortContainer}>
-              <p className={classes.sortControl} onClick={reverseHandler.bind(this, "ascending")}>Più recenti</p>
-              <div className={sorting === 'ascending' ? classes.showCheckIcon : ''}>{checkIcon}</div>
-            </div>
-            <div className={classes.sortContainer}>
-              <p className={classes.sortControl} onClick={reverseHandler.bind(this, "descending")}>Meno recenti</p>
-              <div className={sorting === 'descending' ? classes.showCheckIcon : ''}>{checkIcon}</div>
-            </div>
-            <button className={classes.sortButton} onClick={toggleShowModal}>
-              Chiudi
-            </button>
-          </div>
-        </>
-      ) :
-        <>
-          <div 
-            className={classes.closeIcon} 
-            onClick={(_ev) => { 
-              searchCtx.setSearchInput(""); 
-              setResultList([]); 
-          }}>
-            <CloseIcon />
-          </div>
-        </>
-      }
-    </div >
-    <div className={classes.overlayMobile}></div>
-  </>
+      </div >
+      <div className={classes.overlayMobile}></div>
+    </>
   );
 };
 

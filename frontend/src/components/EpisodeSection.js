@@ -8,7 +8,7 @@ import classes from "./EpisodeSection.module.css";
 
 
 const EpisodeSection = () => {
-  const { searchInput, sortOrder } = useContext(SearchContext);
+  const { searchInput, sortOrder, selectedGameId } = useContext(SearchContext);
   const [episodeList, setEpisodeList] = useState([]);
 
   const maxNumbersOfEpisodes = 8;
@@ -18,7 +18,7 @@ const EpisodeSection = () => {
       try {
         let response = null;
         if (searchInput.trim() !== "") {
-          response = await fetch(`/api/search-game/${searchInput}`);
+          response = await fetch(`/api/episodes-by-game-id/${selectedGameId}`);
         } else {
           response = await fetch(`/api/last-episodes/${maxNumbersOfEpisodes}`);
         }
@@ -37,7 +37,7 @@ const EpisodeSection = () => {
     };
 
     fetchEpisode();
-  }, [searchInput, sortOrder]);
+  }, [searchInput, sortOrder, selectedGameId]);
 
   return (
     <div id="episode-section" className={classes.container}>
