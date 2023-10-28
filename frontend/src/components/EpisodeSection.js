@@ -1,52 +1,125 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useReducer } from "react";
 
 import SearchContext from "../store/search-context";
 import EpisodeListing from "./EpisodeListing";
 import SearchBar from "./SearchBar";
+import ShowMoreButton from "./UI/ShowMoreButton";
 
 import classes from "./EpisodeSection.module.css";
 
 
+const limit = 8;
+
 const EpisodeSection = () => {
   const { searchInput, sortOrder, selectedGameId } = useContext(SearchContext);
   const [episodeList, setEpisodeList] = useState([]);
+  const [offset, setOffset] = useState(0);
 
-  const maxNumbersOfEpisodes = 8;
+  const reducer = (state, action) => {
+    if (state === undefined) return;
 
-  useEffect(() => {
-    const fetchEpisode = async () => {
-      try {
-        let response = null;
-        if (searchInput.trim() !== "") {
-          response = await fetch(`/api/episodes-by-game-id/${selectedGameId}`);
-        } else {
-          response = await fetch(`/api/last-episodes/${maxNumbersOfEpisodes}`);
+    let url = null;
+    let makeNewEpisodeList = null;
+    let new_state = state;
+
+    switch (action) {
+      case "game_selected":
+        switch (state) {
+          case "episode_list":
+            url = `/api/episodes-by-game-id/${selectedGameId}`;
+            makeNewEpisodeList = (data) => (prevEpisodeList) => data.result;
+            new_state = "game";
+            break;
+          case "game":
+            url = `/api/episodes-by-game-id/${selectedGameId}`;
+            makeNewEpisodeList = (data) => (prevEpisodeList) => data.result;
+            new_state = "game";
+            break;
+          default:
+            break;
         }
+        break;
+      case "episode_list_selected":
+        switch (state) {
+          case "episode_list":
+            url = `/api/last-episodes/${limit}/${offset}`;
+            makeNewEpisodeList = (data) => (prevEpisodeList) => data.result;
+            new_state = "episode_list";
+            break;
+          case "game":
+            url = `/api/last-episodes/${limit}/0`;
+            makeNewEpisodeList = (data) => (prevEpisodeList) => data.result;
+            new_state = "episode_list";
+            break;
+          default:
+            break;
+        }
+        break;
+      case "show_more":
+        switch (state) {
+          case "episode_list":
+            setOffset((prevOffset) => prevOffset + limit);
+            url = `/api/last-episodes/${limit}/${offset + limit}`;
+            makeNewEpisodeList = (data) => (prevEpisodeList) => [...new Map([...prevEpisodeList, ...data.result].map(item => [item['episodio_numero'], item])).values()];
+            new_state = "episode_list";
+            break;
+          default:
+            break;
+        }
+        break;
+      default:
+        break;
+    }
 
+    fetch(url).then(
+      (response) => {
         if (!response.ok) {
           throw new Error("Something went wrong!");
         }
-        const data = await response.json();
+        return response.json();
+      }
+    ).then(
+      (data) => {
         if (sortOrder === "descending") {
           data.result = data.result.reverse();
         }
-        setEpisodeList(data.result);
-      } catch (error) {
+        setEpisodeList(makeNewEpisodeList(data));
+      }
+    ).catch(
+      (error) => {
         console.error(error.message);
       }
-    };
+    );
+    return new_state;
+  };
 
-    fetchEpisode();
+  const [state, dispatch] = useReducer(reducer, "episode_list");
+
+  useEffect(() => {
+    if (searchInput.trim() !== "") {
+      dispatch("game_selected");
+    } else {
+      dispatch("episode_list_selected");
+    }
   }, [searchInput, sortOrder, selectedGameId]);
 
   return (
     <div id="episode-section" className={classes.container}>
       <SearchBar />
-      <p style={{ fontSize: "1.8rem", textAlign: "center", marginBottom: "2rem" }}>{searchInput.trim() === "" ? `Ecco gli ultimi ${maxNumbersOfEpisodes} episodi!` : 'Se ne è parlato qui:'}</p>
+      <p style={{ fontSize: "1.8rem", textAlign: "center", marginBottom: "2rem" }}>
+        {searchInput.trim() === "" ? `Ecco gli ultimi ${limit} episodi!` : "Se ne è parlato qui:"}
+      </p>
       <EpisodeListing
-        listLength={maxNumbersOfEpisodes}
+        listLength={limit}
         episodeList={episodeList}
       />
+
+      {state === "episode_list" &&
+        <ShowMoreButton
+          onClick={() => { dispatch("show_more"); }}
+          limit={limit}
+        />
+      }
     </div>
   );
 };

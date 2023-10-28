@@ -157,9 +157,10 @@ let episodes_adapter db episodi_db =
 module Last_episodes = struct
   let view (request : Dream.request) (db : Caqti_lwt.connection) =
     let open Lwt_result.Syntax in
+    let%lwt offset = try%lwt Dream.param request "offset" |> int_of_string |> Lwt.return with _ -> Lwt.return 0 in
     let num = Dream.param request "num" |> int_of_string in
 
-    let* episodi_db = Db.Django.Episodio.get_last_episods db ~n:num () in
+    let* episodi_db = Db.Django.Episodio.get_last_episods db ~offset ~n:num () in
     episodes_adapter db episodi_db
 end
 

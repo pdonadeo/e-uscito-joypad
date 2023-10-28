@@ -36,8 +36,7 @@ let default () =
     descrizione_txt = None;
   }
 
-let get_last_episods db ?n () =
-  let n = Option.value ~default:10 n in
+let get_last_episods db ?(n=10) ~offset  () =
   let open Lwt_result.Syntax in
   let q =
     [%rapper
@@ -62,9 +61,10 @@ let get_last_episods db ?n () =
           WHERE ep.pubblicato = TRUE
           ORDER BY data_uscita DESC
           LIMIT %int{n}
+          OFFSET %int{offset}
         |sql}]
   in
-  let* records = q db ~n in
+  let* records = q db ~n ~offset in
   let records =
     ListLabels.map records ~f:(fun r ->
         let ( id,

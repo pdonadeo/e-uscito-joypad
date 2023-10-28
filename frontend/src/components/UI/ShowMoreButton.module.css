@@ -1,0 +1,27 @@
+.wrapper {
+    background: linear-gradient(258.12deg, #55aadd 0%, #4aa35a 32.81%, #f1b456 61.98%, #ca4649 100%);
+    padding: 0.2rem;
+    border-radius: 4px;
+}
+
+.button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    height: 2.5rem;
+    background-color: #fff;
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.button p {
+    font-family: "Rokkitt", serif;
+    font-size: 2.1rem;
+    color: #000;
+}
+
+.button svg {
+    width: 1.2rem;
+}
