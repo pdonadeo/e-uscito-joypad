@@ -107,7 +107,10 @@ const EpisodeSection = () => {
     <div id="episode-section" className={classes.container}>
       <SearchBar />
       <p style={{ fontSize: "1.8rem", textAlign: "center", marginBottom: "2rem" }}>
-        {searchInput.trim() === "" ? `Ecco gli ultimi ${limit} episodi!` : "Se ne è parlato qui:"}
+        {state === "episode_list" ?
+          `Ecco gli ultimi ${limit + offset} episodi!`
+          : "Se ne è parlato qui:"
+        }
       </p>
       <EpisodeListing
         listLength={limit}
