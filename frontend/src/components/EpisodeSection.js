@@ -1,5 +1,7 @@
 import { useState, useEffect, useContext, useReducer } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import SearchContext from "../store/search-context";
 import EpisodeListing from "./EpisodeListing";
 import SearchBar from "./SearchBar";
@@ -14,6 +16,7 @@ const EpisodeSection = () => {
   const { searchInput, sortOrder, selectedGameId } = useContext(SearchContext);
   const [episodeList, setEpisodeList] = useState([]);
   const [offset, setOffset] = useState(0);
+  const navigate = useNavigate();
 
   const reducer = (state, action) => {
     if (state === undefined) return;
@@ -93,15 +96,17 @@ const EpisodeSection = () => {
     return new_state;
   };
 
-  const [state, dispatch] = useReducer(reducer, "episode_list");
+  const [state, dispatch] = useReducer(reducer, selectedGameId ? "game" : "episode_list");
 
   useEffect(() => {
     if (searchInput.trim() !== "") {
       dispatch("game_selected");
+      navigate(`/se-ne-parla-qui/${selectedGameId}/${encodeURIComponent(searchInput)}`);
     } else {
       dispatch("episode_list_selected");
+      navigate("/");
     }
-  }, [searchInput, sortOrder, selectedGameId]);
+  }, [searchInput, sortOrder, selectedGameId, navigate]);
 
   return (
     <div id="episode-section" className={classes.container}>

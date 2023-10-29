@@ -29,6 +29,10 @@ let loader root path _request =
   | None -> Dream.empty `Not_Found
   | Some asset -> Dream.respond asset
 
+let default_handler _req =
+  let uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.elabora_risposta () in
+  Dream.html (Views.index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no)
+
 let server =
   Lwt.async Joypad_monitor.monitor (* TODO ELIMINARE Lwt.async *);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec) (* TODO ELIMINARE Lwt.async *);
@@ -59,11 +63,8 @@ let server =
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
          get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
          get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
-         get "/" (fun _req ->
-             let uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no =
-               Joypad_monitor.elabora_risposta ()
-             in
-             Dream.html (Views.index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no));
+         get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" default_handler;
+         get "/" default_handler;
        ]
 
 let () = Lwt_main.run server

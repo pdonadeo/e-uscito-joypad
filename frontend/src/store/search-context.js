@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 
 const SearchContext = React.createContext({
   searchInput: "",
@@ -10,8 +11,9 @@ const SearchContext = React.createContext({
 });
 
 export const SearchContextProvider = (props) => {
-  const [searchInput, setSearchInput] = useState("");
-  const [selectedGameId, setSelectedGameId] = useState(null);
+  const { selectedGameIdUrl, searchInputUrl } = useParams();
+  const [searchInput, setSearchInput] = useState(searchInputUrl || "");
+  const [selectedGameId, setSelectedGameId] = useState(selectedGameIdUrl || null);
   const [sortOrder, setSortOrder] = useState("ascending");
 
   return (
