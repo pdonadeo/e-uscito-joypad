@@ -1,7 +1,7 @@
 import classes from "./Message.module.css";
 
-const Message = (props) => {
-  const { ep_num, giorni_fa, titolo, uscito, data_italiano, msg_risposta_no } = props.dati;
+const Message = ({dati}) => {
+  const { ep_num, giorni_fa, titolo, uscito, data_italiano, msg_risposta_no } = dati;
 
   let ep_num_decoded = null;
   if (ep_num) {
@@ -19,7 +19,7 @@ const Message = (props) => {
   if (uscito) {
     return (
       <div className={classes.wrapper}>
-        <p id="for-prerender" className={classes.message}>
+        <p tabIndex={0} id="for-prerender" className={classes.message}>
           <span className={classes.bold}>Sì!</span> <br /> È uscito {giorni_fa} l'episodio
           <br /> <span className={classes.bold}>{ep_num_decoded}</span> <br />
           di Joypad, dal titolo <br />
@@ -30,7 +30,7 @@ const Message = (props) => {
   } else
     return (
       <div className={classes.wrapper}>
-        <p id="for-prerender" className={classes.message}>
+        <p tabIndex={0} id="for-prerender" className={classes.message}>
           <span className={classes.bold}>No.</span> <br /> L'ultimo episodio è uscito {giorni_fa},
           <br /> <span className={classes.date}> {data_italiano}.</span> <br />
           {msg_risposta_no ? (
