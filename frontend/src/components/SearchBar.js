@@ -66,11 +66,20 @@ const SearchBar = () => {
       setFocus(() => focus - 1);
     }
     if (event.key === 'Enter') {
+      if(!resultList[focus]) return;
       searchCtx.setSearchInput(resultList[focus].titolo);
       searchCtx.setSelectedGameId(resultList[focus].id);
       setResultList([]);
       setFocus(0);
+      document.querySelector('#focus-search-list').focus();
     }
+  }
+
+  const resetSearch = () => {
+    searchCtx.setSearchInput("");
+    setSearchWords('');
+    searchCtx.setSelectedGameId(null);
+    setResultList([]);
   }
 
   const checkIcon = <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`${classes.checkIcon}`}>
@@ -88,6 +97,7 @@ const SearchBar = () => {
           className={classes.input}
           id="search-bar"
           minLength={3}
+          aria-label="Cerca un gioco!"
           debounceTimeout={300}
           onChange={(ev) => {
             getSearchResults(ev.target.value)
@@ -112,18 +122,18 @@ const SearchBar = () => {
                   searchCtx.setSelectedGameId(result.id);
                   setResultList([]);
                 }}>
-                <p >{boldName(result.titolo, searchWords)}</p>
+                <p>{boldName(result.titolo, searchWords)}</p>
               </div>
             )}
           </div>}
-        <div className={classes.searchIcon}>
+        <div className={classes.searchIcon} tabIndex={0}>
           <SearchIcon />
         </div>
-        {searchCtx.searchInput.trim() === "" ? (
+        {searchCtx.searchInput.trim() === "" && searchWords === '' ? (
           <>
-            <div className={classes.sortIcon} onClick={toggleShowModal}>
+            <button className={classes.sortIcon} onClick={toggleShowModal} tabIndex={0}>
               <SortIcon />
-            </div>
+            </button>
             <div className={`${classes.sortModal} ${showModal ? classes.show : ''}`}>
               <p className={classes.sortText}>ORDINA PER</p>
               <div className={classes.sortContainer}>
@@ -143,10 +153,11 @@ const SearchBar = () => {
           <>
             <div
               className={classes.closeIcon}
-              onClick={(_ev) => {
-                searchCtx.setSearchInput("");
-                searchCtx.setSelectedGameId(null);
-                setResultList([]);
+              tabIndex={0}
+              onKeyDown={(ev)=> 
+              {if(ev.key === 'Enter') resetSearch()}}
+              onClick={() => {
+                resetSearch()
               }}>
               <CloseIcon />
             </div>
