@@ -111,7 +111,7 @@ const EpisodeSection = () => {
   return (
     <div id="episode-section" className={classes.container}>
       <SearchBar />
-      <p style={{ fontSize: "1.8rem", textAlign: "center", marginBottom: "2rem" }}>
+      <p id="focus-search-list" tabIndex={0} style={{ fontSize: "1.8rem", textAlign: "center", marginBottom: "2rem" }}>
         {state === "episode_list" ?
           `Ecco gli ultimi ${limit + offset} episodi!`
           : "Se ne è parlato qui:"
