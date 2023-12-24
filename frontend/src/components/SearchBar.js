@@ -39,7 +39,6 @@ const SearchBar = () => {
   }
 
   const boldName = (name, search) => {
-
     const isMatch = name.toLowerCase().match(search.toLowerCase());
     if (isMatch) {
       const index = isMatch.index;
@@ -52,7 +51,7 @@ const SearchBar = () => {
     }
     if (name.substr(0, search.length).toLowerCase() === search.toLowerCase()) {
       return <>
-        <strong>{name.substr(0, search.length)}</strong>{name.substr(search.length)};
+        <strong>{name.substr(0, search.length)}</strong>{name.substr(search.length)}
       </>
     }
     return name;
@@ -112,7 +111,7 @@ const SearchBar = () => {
                   searchCtx.setSelectedGameId(result.id);
                   setResultList([]);
                 }}>
-                <p >{boldName(result.titolo, searchWords)}</p>
+                <p>{boldName(result.titolo, searchWords)}</p>
               </div>
             )}
           </div>}
