@@ -21,6 +21,7 @@ class EpisodioAdminForm(forms.ModelForm):
 
 class AssociazioneEpisodioVideogameInline(admin.TabularInline):
     model = AssociazioneEpisodioVideogame
+    raw_id_fields = ["videogame"]
     extra = 3
     ordering = ["episodio__data_uscita", "istante"]
 
