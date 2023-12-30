@@ -1,9 +1,9 @@
 (executable
  (name e_uscito_joypad)
  (public_name e_uscito_joypad)
- (modules e_uscito_joypad views joypad_monitor middlewares assets)
+ (modules e_uscito_joypad views joypad_monitor middlewares assets sitemap)
  (preprocess
-  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
+  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson ppx_rapper))
  (libraries
   dream
   db

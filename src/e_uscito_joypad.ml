@@ -64,6 +64,7 @@ let server =
          get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
          get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
          get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" default_handler;
+         get "/sitemap.xml" (fun r -> Dream.sql r (Sitemap.view r));
          get "/" default_handler;
        ]
 
