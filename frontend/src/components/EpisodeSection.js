@@ -101,9 +101,11 @@ const EpisodeSection = () => {
   useEffect(() => {
     if (searchInput.trim() !== "") {
       dispatch("game_selected");
+      document.title = `In questi episodi si parla di "${searchInput}" — È uscito Joypad?`;
       navigate(`/se-ne-parla-qui/${selectedGameId}/${encodeURIComponent(searchInput)}`);
     } else {
       dispatch("episode_list_selected");
+      document.title = `È uscito Joypad?`;
       navigate("/");
     }
   }, [searchInput, sortOrder, selectedGameId, navigate]);
