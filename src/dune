@@ -30,7 +30,7 @@
  (modules utils)
  (preprocess
   (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
- (libraries dream batteries malloc timedesc))
+ (libraries dream batteries malloc timedesc re2))
 
 (rule
  (target assets.ml)

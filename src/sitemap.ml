@@ -34,7 +34,7 @@ let view (_request : Dream.request) (db : Caqti_lwt.connection) =
         let%lwt () =
           Lwt_list.iter_s
             (fun (url, last_mod) ->
-              let url = Uri.of_string url |> Uri.to_string in
+              let url = Utils.escape_url url in
               let url_xml =
                 Printf.sprintf
                   "  <url>\n\

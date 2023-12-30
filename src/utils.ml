@@ -154,3 +154,22 @@ module Lwt_result = struct
       Lwt.return (combine_errors _results)
   end
 end
+
+let quot_regexp = Re2.create_exn "\""
+let apos_regexp = Re2.create_exn "'"
+let lt_regexp = Re2.create_exn "<"
+let gt_regexp = Re2.create_exn ">"
+let amp_regexp = Re2.create_exn "&"
+let xml_amp_regexp = Re2.create_exn "&amp;"
+
+let escape_url s =
+  s
+  |> Re2.rewrite_exn amp_regexp ~template:"%26"
+  |> Uri.of_string
+  |> Uri.to_string
+  |> Re2.rewrite_exn amp_regexp ~template:"&amp;"
+  |> Re2.rewrite_exn quot_regexp ~template:"&quot;"
+  |> Re2.rewrite_exn apos_regexp ~template:"&apos;"
+  |> Re2.rewrite_exn lt_regexp ~template:"&lt;"
+  |> Re2.rewrite_exn gt_regexp ~template:"&gt;"
+  |> Re2.rewrite_exn xml_amp_regexp ~template:"%26"
