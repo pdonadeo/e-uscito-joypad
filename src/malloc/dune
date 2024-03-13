@@ -1,4 +1,6 @@
 (library
  (name malloc)
  (modules malloc)
- (foreign_stubs (language c) (names malloc_stubs)))
+ (foreign_stubs
+  (language c)
+  (names malloc_stubs)))

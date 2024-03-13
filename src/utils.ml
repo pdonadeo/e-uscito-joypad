@@ -55,7 +55,7 @@ let rec gc_loop every () =
   log.debug (fun m -> m "BEFORE GC: heap_words = %d; live_words = %d" stat'.heap_words stat'.live_words);
   log.debug (fun m -> m "           VmRSS = %d" (BatMap.String.find "VmRSS" memstats));
   compact ();
-  Malloc.malloc_trim 0;
+  let _unused_bool = Malloc.malloc_trim 0 in
   let stat' = stat () in
   let%lwt memstats = get_meminfo ~path () in
   log.debug (fun m -> m "AFTER  GC: heap_words = %d; live_words = %d" stat'.heap_words stat'.live_words);

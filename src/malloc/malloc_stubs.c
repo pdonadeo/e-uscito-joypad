@@ -5,8 +5,7 @@ CAMLprim value malloc_trim_stub(value v_n)
 {
 #ifdef __GLIBC__
   int ret = malloc_trim(Int_val(v_n));
-  if (ret != 1)
-    caml_failwith("malloc_trim");
+  return Val_bool(ret);
 #endif
-  return Val_unit;
+  return Val_bool(1);
 }
