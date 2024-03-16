@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import JoycordChannels from "./JoycordChannels";
 import reportWebVitals from "./reportWebVitals";
 
 import {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl",
     element: <SearchContextProvider><App /></SearchContextProvider>,
+  },
+  {
+    path: "/joycord/channels",
+    element: <JoycordChannels />,
   },
 ]);
 

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"net/http"
 	"os"
 	"os/signal"
 	"sort"
@@ -43,6 +45,7 @@ func (s nodeType) MarshalJSON() ([]byte, error) {
 }
 
 type TreeNode struct {
+	GuildID      string      `json:"guildId"`
 	ID           string      `json:"id"`
 	Name         string      `json:"name"`
 	Position     int         `json:"position"`
@@ -55,15 +58,15 @@ type TreeNode struct {
 type Tree []TreeNode
 
 var (
-	//applicationId string
-	token   string
-	guildID string
+	token            string
+	guildID          string
+	dreamAppHostname string
 )
 
 func init() {
-	//applicationId = os.Getenv("DISCORD_APPLICATION_ID")
 	token = os.Getenv("DISCORD_BOT_TOKEN")
 	guildID = os.Getenv("DISCORD_GUILD_ID")
+	dreamAppHostname = os.Getenv("DREAM_APP_HOSTNAME")
 
 	debug := strings.ToLower(os.Getenv("DEBUG"))
 
@@ -127,6 +130,7 @@ func printChannel(channel *DiscordChannel, thisNode *TreeNode) {
 
 		thisNode.Children = append(thisNode.Children, &TreeNode{
 			ID:           thread.channel.ID,
+			GuildID:      guildID,
 			Name:         thread.channel.Name,
 			Position:     thread.channel.Position,
 			MessageCount: thread.channel.MessageCount,
@@ -211,6 +215,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 				log.Debugf("Nome della categoria = \"%s\" (posizione %d)", c.channel.Name, c.channel.Position)
 				node := TreeNode{
 					ID:       c.ID,
+					GuildID:  guildID,
 					Name:     c.channel.Name,
 					Position: c.channel.Position,
 					NodeType: categoryType,
@@ -229,6 +234,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 				for _, channel := range secondLevel {
 					channelNode := TreeNode{
 						ID:       channel.ID,
+						GuildID:  guildID,
 						Name:     channel.channel.Name,
 						Position: channel.channel.Position,
 						NodeType: channelType,
@@ -243,6 +249,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 			} else {
 				node := TreeNode{
 					ID:       c.ID,
+					GuildID:  guildID,
 					Name:     c.channel.Name,
 					Position: c.channel.Position,
 					NodeType: channelType,
@@ -256,6 +263,12 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 
 		jsonTree, _ := json.MarshalIndent(tree, "", "  ")
 		log.Debugf("\n\n%s\n\n", jsonTree)
+		bodyReader := bytes.NewReader(jsonTree)
+		url := "http://" + dreamAppHostname + "/api/joycord/channels"
+		req, _ := http.NewRequest(http.MethodPost, url, bodyReader)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Accept", "application/json, */*;q=0.5")
+		http.DefaultClient.Do(req)
 	} else {
 		return
 	}

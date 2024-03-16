@@ -33,6 +33,18 @@ let default_handler _req =
   let uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.elabora_risposta () in
   Dream.html (Views.index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no)
 
+let joycord_json_tree : string option ref = ref None
+
+let store_joycord_json_tree req =
+  let%lwt json = Dream.body req in
+  joycord_json_tree := Some json;
+  Dream.json "{ \"status\": \"ok\" }"
+
+let get_joycord_json_tree _req =
+  match !joycord_json_tree with
+  | None -> Dream.json "[]"
+  | Some json -> Dream.json json
+
 let server =
   Lwt.async Joypad_monitor.monitor (* TODO ELIMINARE Lwt.async *);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec) (* TODO ELIMINARE Lwt.async *);
@@ -63,7 +75,10 @@ let server =
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
          get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
          get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
+         post "/api/joycord/channels" store_joycord_json_tree;
+         get "/api/joycord/channels" get_joycord_json_tree;
          get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" default_handler;
+         get "/joycord/channels" default_handler;
          get "/sitemap.xml" (fun r -> Dream.sql r (Sitemap.view r));
          get "/" default_handler;
        ]
