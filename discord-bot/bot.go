@@ -2,121 +2,68 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 	"syscall"
-	"time"
 
-	"github.com/jackc/pgtype"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/bwmarrin/discordgo"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-type DiscordMessage struct {
-	ID           uint `gorm:"primaryKey"`
-	GuildID      string
-	ChannelID    string
-	MessageID    string
-	Ts           *time.Time
-	AuthorAvatar string
-	AuthorName   string
-	Content      pgtype.JSONB `gorm:"type:jsonb;default:'{}';not null"`
-	Consiglio    bool
+type DiscordChannel struct {
+	ID       string
+	channel  *discordgo.Channel
+	children map[string]*DiscordChannel
 }
 
-func (DiscordMessage) TableName() string {
-	return "backoffice_discordmessage"
+type nodeType int
+
+const (
+	categoryType nodeType = iota
+	channelType
+	threadType
+)
+
+func (s nodeType) String() string {
+	if s == categoryType {
+		return "categoryType"
+	} else if s == channelType {
+		return "channelType"
+	} else if s == threadType {
+		return "threadType"
+	}
+	return "unknown"
 }
+
+func (s nodeType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.String())
+}
+
+type TreeNode struct {
+	ID           string      `json:"id"`
+	Name         string      `json:"name"`
+	Position     int         `json:"position"`
+	MessageCount int         `json:"messageCount"`
+	NodeType     nodeType    `json:"nodeType"`
+	IsRoot       bool        `json:"isRoot"`
+	Children     []*TreeNode `json:"children"`
+}
+
+type Tree []TreeNode
 
 var (
-	applicationId string
-	token         string
-
-	pgHost string
-	pgPort string
-	pgUser string
-	pgPass string
-	pgDb   string
-
-	db *gorm.DB
-
-	commands = []*discordgo.ApplicationCommand{
-		{
-			Name: "Consiglia questo messaggio",
-			Type: discordgo.MessageApplicationCommand,
-		},
-	}
-
-	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"Consiglia questo messaggio": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			if i.Type == 2 {
-				messages := i.ApplicationCommandData().Resolved.Messages
-
-				var lastGuildID string
-				var lastChannelID string
-				var lastMessageId string
-				var lastContent string
-
-				for messageId, m := range messages {
-					lastGuildID = i.GuildID
-					lastChannelID = m.ChannelID
-					lastMessageId = messageId
-					lastContent = m.Content
-
-					log.Debugf("messageId = (%s, %s, %s)", lastGuildID, lastChannelID, lastMessageId)
-					log.Debugf("message = %v", lastContent)
-
-					err := s.MessageReactionAdd(m.ChannelID, m.ID, "👍")
-					if err != nil {
-						log.Error(err)
-					}
-				}
-
-				var dbMessage DiscordMessage
-
-				result := db.Where("guild_id = ? AND channel_id = ? AND message_id = ?", lastGuildID, lastChannelID, lastMessageId).First(&dbMessage)
-
-				//result := db.First(&dbMessage, lastMessageId)
-				if result.Error != nil {
-					log.Error(result.Error)
-				} else {
-					dbMessage.Consiglio = true
-					result = db.Save(&dbMessage)
-					if result.Error != nil {
-						log.Error(result.Error)
-					}
-				}
-
-				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Content: "Grazie per il consiglio! :heart:",
-						Flags:   discordgo.MessageFlagsEphemeral,
-					},
-				})
-			}
-		},
-	}
+	//applicationId string
+	token   string
+	guildID string
 )
 
 func init() {
-	var err error
-
-	applicationId = os.Getenv("DISCORD_APPLICATION_ID")
+	//applicationId = os.Getenv("DISCORD_APPLICATION_ID")
 	token = os.Getenv("DISCORD_BOT_TOKEN")
-
-	pgHost = os.Getenv("PGHOST")
-	pgPort = os.Getenv("PGPORT")
-	pgUser = os.Getenv("PGUSER")
-	pgPass = os.Getenv("PGPASSWORD")
-	pgDb = os.Getenv("PGDATABASE")
+	guildID = os.Getenv("DISCORD_GUILD_ID")
 
 	debug := strings.ToLower(os.Getenv("DEBUG"))
 
@@ -132,14 +79,6 @@ func init() {
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
-
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", pgHost, pgPort, pgUser, pgPass, pgDb)
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to PostgreSQL: ", err)
-	}
 }
 
 func main() {
@@ -151,28 +90,11 @@ func main() {
 		log.Fatalf("error creating Discord session: %s", err)
 	}
 
-	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
-		}
-	})
+	s.AddHandler(guildCreateHandler)
 
-	log.Infof("Adding commands...")
-	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
-	for i, v := range commands {
-		cmd, err := s.ApplicationCommandCreate(applicationId, "", v)
-		if err != nil {
-			log.Fatalf("Cannot create '%v' command: %v", v.Name, err)
-		}
-		registeredCommands[i] = cmd
-	}
-
-	// Register the messageCreate func as a callback for MessageCreate events.
-	s.AddHandler(messageCreate)
-
-	// In this example, we only care about receiving message events.
 	s.Identify.Intents = discordgo.IntentsGuildMessages
 	s.Identify.Intents |= discordgo.IntentMessageContent
+	s.Identify.Intents |= discordgo.IntentGuilds
 
 	// Open a websocket connection to Discord and begin listening.
 	err = s.Open()
@@ -190,38 +112,151 @@ func main() {
 	s.Close()
 }
 
-// This function will be called (due to AddHandler above) every time a new
-// message is created on any channel that the authenticated bot has access to.
-func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	log.Debugf("Ho ricevuto un messaggio da \"%s\": |||%s|||\n", m.Author.AvatarURL("256"), m.Content)
+func printChannel(channel *DiscordChannel, thisNode *TreeNode) {
+	log.Debugf("    Nome del canale = \"%s\": https://discord.com/channels/%s/%s",
+		channel.channel.Name, guildID, channel.channel.ID)
 
-	// Ignore all messages created by the bot itself
-	// This isn't required in this specific example but it's a good practice.
-	if m.Author.ID == s.State.User.ID {
+	thirdLevel := make([]*DiscordChannel, 0)
+	for _, thread := range channel.children {
+		thirdLevel = append(thirdLevel, thread)
+	}
+
+	for _, thread := range thirdLevel {
+		log.Debugf("        Thread: \"%s\" (%d messaggi): https://discord.com/channels/%s/%s",
+			thread.channel.Name, thread.channel.MessageCount, guildID, thread.channel.ID)
+
+		thisNode.Children = append(thisNode.Children, &TreeNode{
+			ID:           thread.channel.ID,
+			Name:         thread.channel.Name,
+			Position:     thread.channel.Position,
+			MessageCount: thread.channel.MessageCount,
+			NodeType:     threadType,
+			IsRoot:       false,
+			Children:     make([]*TreeNode, 0),
+		})
+	}
+}
+
+func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
+	log.Debugf("Connesso al server: \"%s\", con ID = %s\n", event.Name, event.ID)
+
+	if event.ID == guildID {
+		categories_and_root_channels := make(map[string]*DiscordChannel)
+		channels := make(map[string]*DiscordChannel)
+
+		// Prima le categorie
+		for _, category_or_root_channel := range event.Guild.Channels {
+			if category_or_root_channel.Type == discordgo.ChannelTypeGuildCategory {
+				categories_and_root_channels[category_or_root_channel.ID] = &DiscordChannel{
+					ID:       category_or_root_channel.ID,
+					channel:  category_or_root_channel,
+					children: make(map[string]*DiscordChannel, 0),
+				}
+			} else if category_or_root_channel.ParentID == "" {
+				my_channel := DiscordChannel{
+					ID:       category_or_root_channel.ID,
+					channel:  category_or_root_channel,
+					children: make(map[string]*DiscordChannel, 0),
+				}
+				channels[category_or_root_channel.ID] = &my_channel
+				categories_and_root_channels[category_or_root_channel.ID] = &my_channel
+			}
+		}
+
+		// Poi i channels veri e propri
+		for _, category_or_root_channel := range event.Guild.Channels {
+			if (category_or_root_channel.Type == discordgo.ChannelTypeGuildText ||
+				category_or_root_channel.Type == discordgo.ChannelTypeGuildVoice ||
+				category_or_root_channel.Type == discordgo.ChannelTypeGuildNews ||
+				category_or_root_channel.Type == discordgo.ChannelTypeGuildPublicThread ||
+				category_or_root_channel.Type == discordgo.ChannelTypeGuildForum) &&
+				category_or_root_channel.ParentID != "" {
+				// Sono i normali channel, e non quello root
+				my_channel := DiscordChannel{
+					ID:       category_or_root_channel.ID,
+					channel:  category_or_root_channel,
+					children: make(map[string]*DiscordChannel, 0),
+				}
+				channels[category_or_root_channel.ID] = &my_channel
+				category := categories_and_root_channels[category_or_root_channel.ParentID]
+				category.children[category_or_root_channel.ID] = &my_channel
+			}
+		}
+
+		// Poi i thread
+		for _, thread := range event.Guild.Threads {
+			if thread.Type == discordgo.ChannelTypeGuildPublicThread {
+				// Sono i thread pubblici
+				parentId := thread.ParentID
+				channel := channels[parentId]
+				channel.children[thread.ID] = &DiscordChannel{
+					ID:       thread.ID,
+					channel:  thread,
+					children: make(map[string]*DiscordChannel, 0),
+				}
+			}
+		}
+
+		firstLevel := make([]*DiscordChannel, 0)
+		for _, c := range categories_and_root_channels {
+			firstLevel = append(firstLevel, c)
+		}
+		sort.Slice(firstLevel, func(i, j int) bool {
+			return firstLevel[i].channel.Position < firstLevel[j].channel.Position
+		})
+
+		tree := make(Tree, 0)
+		for _, c := range firstLevel {
+			if c.channel.Type == discordgo.ChannelTypeGuildCategory {
+				log.Debugf("Nome della categoria = \"%s\" (posizione %d)", c.channel.Name, c.channel.Position)
+				node := TreeNode{
+					ID:       c.ID,
+					Name:     c.channel.Name,
+					Position: c.channel.Position,
+					NodeType: categoryType,
+					IsRoot:   true,
+					Children: make([]*TreeNode, 0),
+				}
+
+				secondLevel := make([]*DiscordChannel, 0)
+				for _, channel := range c.children {
+					secondLevel = append(secondLevel, channel)
+				}
+				sort.Slice(secondLevel, func(i, j int) bool {
+					return secondLevel[i].channel.Position < secondLevel[j].channel.Position
+				})
+
+				for _, channel := range secondLevel {
+					channelNode := TreeNode{
+						ID:       channel.ID,
+						Name:     channel.channel.Name,
+						Position: channel.channel.Position,
+						NodeType: channelType,
+						IsRoot:   false,
+						Children: make([]*TreeNode, 0),
+					}
+
+					node.Children = append(node.Children, &channelNode)
+					printChannel(channel, &channelNode)
+				}
+				tree = append(tree, node)
+			} else {
+				node := TreeNode{
+					ID:       c.ID,
+					Name:     c.channel.Name,
+					Position: c.channel.Position,
+					NodeType: channelType,
+					IsRoot:   true,
+					Children: make([]*TreeNode, 0),
+				}
+				printChannel(c, &node)
+				tree = append(tree, node)
+			}
+		}
+
+		jsonTree, _ := json.MarshalIndent(tree, "", "  ")
+		log.Debugf("\n\n%s\n\n", jsonTree)
+	} else {
 		return
 	}
-
-	JsonMessage, err := json.Marshal(m)
-	if err != nil {
-		log.Errorf("Errore convertendo un messaggio Discord in JSON: %s", err)
-		return
-	}
-
-	message := DiscordMessage{
-		GuildID:      m.GuildID,
-		ChannelID:    m.ChannelID,
-		MessageID:    m.ID,
-		Ts:           &m.Timestamp,
-		AuthorAvatar: m.Author.AvatarURL("256"),
-		AuthorName:   m.Author.Username,
-		Content:      pgtype.JSONB{Bytes: JsonMessage, Status: pgtype.Present},
-		Consiglio:    false,
-	}
-	result := db.Create(&message)
-
-	if result.Error != nil {
-		log.Error(result.Error)
-	}
-
-	log.Debugf("Messaggio JSON: %s", string(JsonMessage))
 }
