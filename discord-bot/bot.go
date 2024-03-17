@@ -268,6 +268,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 		req, _ := http.NewRequest(http.MethodPost, url, bodyReader)
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Accept", "application/json, */*;q=0.5")
+		req.Header.Set("Origin", "http://"+dreamAppHostname)
 		http.DefaultClient.Do(req)
 	} else {
 		return
