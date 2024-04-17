@@ -9,7 +9,7 @@ license = "MIT"
 python = "^3.11"
 django = "4.2.11"
 django-extensions = "3.2.3"
-gunicorn = "21.2.0"
+gunicorn = "22.0.0"
 uvicorn = {version = "0.29.0", extras = ["standard"]}
 whitenoise = "6.6.0"
 pillow = "10.3.0"
