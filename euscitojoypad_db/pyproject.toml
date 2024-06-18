@@ -16,7 +16,7 @@ pillow = "10.3.0"
 django-json-widget = "2.0.1"
 beautifulsoup4 = "4.12.3"
 psycopg2-binary = "2.9.9"
-urllib3 = "1.26.18"
+urllib3 = "1.26.19"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
