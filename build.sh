@@ -1,9 +1,8 @@
 #!/bin/bash
 
-
-pushd frontend
+pushd frontend || exit
 rm -Rf build
 yarn build
-popd
+popd || exit
 
 dune clean && dune build @install
