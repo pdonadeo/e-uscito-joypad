@@ -58,15 +58,27 @@ let extract_data_from_page () =
   let open Soup in
   let%lwt body = body () in
   let soup = parse body in
-  let maybe_a = soup $$ "div.ilpostPodcastList div a.play" |> first in
-  match maybe_a with
-  | Some a ->
-    let data_title = attribute "data-title" a |> Option.value ~default:"" in
-    let data_desc = attribute "data-desc" a |> Option.value ~default:"" in
-    log.debug (fun l -> l "data_title = %s" data_title);
-    log.debug (fun l -> l "data_desc = %s" data_desc);
-    Lwt.return (data_title, data_desc)
-  | None -> failwith "TODO: MANCANO I DATI"
+
+  let first_div = soup $$ "main div" |> R.first in
+  let title_link = first_div $$ "h3 a" |> R.first in
+  let data_title = try trimmed_texts title_link |> List.hd with Failure _ -> failwith "non c'è un titolo" in
+
+  let data_desc =
+    with_stop (fun stop ->
+        first_div
+        |> children
+        |> elements
+        |> iter (fun el ->
+               if has_attribute "class" el
+               then begin
+                 let class_text = classes el |> List.hd in
+                 if Str.string_match (Str.regexp ".*_details_.*") class_text 0 then stop.throw el
+               end);
+        failwith "Non trovo la data di pubblicazione")
+    |> trimmed_texts
+    |> String.concat " "
+  in
+  Lwt.return (data_title, data_desc)
 
 let elabora_risposta () =
   match !last_episode_data with
