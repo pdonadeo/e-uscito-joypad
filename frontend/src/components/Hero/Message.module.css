@@ -42,7 +42,7 @@ border: 3px solid;
 border-image-source: linear-gradient(258.12deg, #55AADD 0%, #4AA35A 32.81%, #F1B456 61.98%, #CA4649 100%);
  */
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 920px) {
   .wrapper {
     margin: 0;
     width: 44.7rem;

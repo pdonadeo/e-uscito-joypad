@@ -81,7 +81,7 @@ p.speaker {
    margin-bottom: 8rem;
 }
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 921px) {
    .container {
       padding: 0 1rem 0 1.6rem;
       cursor: pointer;

@@ -7,7 +7,7 @@ import classes from "./EpisodeListing.module.css";
 
 
 const EpisodeListing = ({ /* listLength, */ episodeList }) => {
-   const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+   const isMobile = useMediaQuery({ query: "(max-width: 920px)" });
    const [interestedIndex, setInterestedIndex] = useState();
    const [activeCard, setActiveCard] = useState("");
 

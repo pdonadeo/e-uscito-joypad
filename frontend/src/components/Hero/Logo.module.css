@@ -11,7 +11,7 @@
     width: 70%;
 }
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 921px) {
     .logoImage {
         width: 25.7rem;
     }

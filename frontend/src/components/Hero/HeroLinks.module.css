@@ -49,7 +49,7 @@ p.service {
   letter-spacing: -0.03em;
 }
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 921px) {
   .container {
     width: 44.7rem;
   }

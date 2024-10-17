@@ -6,7 +6,7 @@ import Logo from "./Hero/Logo";
 
 const Header = () => {
   const [datiUltimaPuntata, setDatiUltimaPuntata] = useState({});
-  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 920px)" });
 
   useEffect(() => {
     fetch("/api/ultima-puntata")

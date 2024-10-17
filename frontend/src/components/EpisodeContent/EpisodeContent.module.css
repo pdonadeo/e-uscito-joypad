@@ -74,7 +74,7 @@
    max-width: 44.4rem;
 }
 
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 921px) {
    .containerAnimation {
       width: 55rem;
    }

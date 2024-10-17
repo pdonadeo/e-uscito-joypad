@@ -8,7 +8,7 @@ import ListTransition from "../../CustomHooks/ListTransition";
 
 const GameBox = (props) => {
     const [showGame, setShowGame] = useState(false);
-  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 920px)" });
     const { titolo, speaker, istante, descrizione, cover } = props;
 
     const minutes = Math.floor(istante / 60);

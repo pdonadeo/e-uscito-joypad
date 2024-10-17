@@ -146,7 +146,7 @@
 	visibility:visible;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 920px) {
     .searchBar {
         width: 100vw;
         position: fixed;

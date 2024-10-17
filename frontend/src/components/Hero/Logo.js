@@ -4,7 +4,7 @@ import classes from "./Logo.module.css";
 
 const Logo = () => {
   
-  const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+  const isMobile = useMediaQuery({ query: "(max-width: 920px)" });
 
   return (
     <div className={classes.logoContainer}>

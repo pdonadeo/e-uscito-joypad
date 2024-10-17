@@ -8,7 +8,7 @@ import EpisodeNumber from "./UI/EpisodeNumber";
 import PlayButton from "./UI/PlayButton";
 
 const EpisodeItem = (props) => {
-   const isMobile = useMediaQuery({ query: "(max-width: 800px)" });
+   const isMobile = useMediaQuery({ query: "(max-width: 920px)" });
 
    const y = 649 + props.index * 138;
 
