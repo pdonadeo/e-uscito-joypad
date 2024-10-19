@@ -30,7 +30,7 @@ let body () =
   let%lwt body = Cohttp_lwt.Body.to_string body in
   Lwt.return body
 
-let date_reg = Re2.create_exn "(\\d\\d) +(...) +(\\d\\d\\d\\d) +(?:-|—) +(\\d+) +min"
+let date_reg = Re2.create_exn "(\\d\\d?) +(...) +(\\d\\d\\d\\d) +(?:-|—) +(\\d+) +min"
 
 let extract_date desc =
   (* Esempio di data.desc: "09 Apr 2022 - 42 min" *)
