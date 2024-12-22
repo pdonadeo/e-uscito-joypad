@@ -1,9 +1,12 @@
 .logoContainer {
     width: 100%;
+    margin-bottom: 1.6rem;
+}
+
+.logoContainer a {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.6rem;
 }
 
 .logoImage {
