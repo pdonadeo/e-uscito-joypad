@@ -77,6 +77,7 @@ let server =
          get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
          post "/api/joycord/channels" store_joycord_json_tree;
          get "/api/joycord/channels" get_joycord_json_tree;
+         get "/api/joycord/games-for-score.tsv" (fun r -> Dream.sql r (Rest.Games_for_score.view r));
          get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" default_handler;
          get "/joycord/channels" default_handler;
          get "/sitemap.xml" (fun r -> Dream.sql r (Sitemap.view r));

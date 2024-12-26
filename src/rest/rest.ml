@@ -213,3 +213,49 @@ module Episodes_by_game_id = struct
     let* episodi_db = Db.Django.Episodio.search_episodes_by_game_id db ~game_id () in
     episodes_adapter db episodi_db
 end
+
+module Games_for_score = struct
+  let view (_request : Dream.request) (db : Caqti_lwt.connection) =
+    let q =
+      [%rapper
+        get_many
+          {sql|
+            SELECT g.id AS @int64{"ID"},
+                g.titolo AS @string{"TITOLO"},
+                g.rawg_json->'rating' AS @string{"RAWG_RATING"}
+            FROM backoffice_videogame g
+            ORDER BY g.id DESC
+          |sql}]
+    in
+    let%lwt records_or_error = q () db in
+    match records_or_error with
+    | Ok records -> begin
+      Dream.stream
+        ~status:`OK
+        ~headers:[("content-type", "text/tab-separated-values; charset=UTF-8")]
+        (fun stream ->
+          let%lwt () = Dream.write stream "ID\tTITOLO\tRAWG_RATING\n" in
+          Lwt_list.iter_s
+            (fun r ->
+              let id, titolo, rating = r in
+              let rating = Str.global_replace (Str.regexp "\\.") "," rating in
+              let row = Printf.sprintf "%Ld\t%s\t%s\n" id titolo rating in
+              Dream.write stream row)
+            records)
+    end
+    | Error e -> begin
+      let msg = Caqti_error.show e |> Str.global_replace (Str.regexp "\\\\n") "\n" in
+
+      log.error (fun m -> m "Caqti Error!\n%s" msg);
+
+      let msg =
+        msg
+        |> String.split_on_char '\n'
+        |> List.filter (fun l -> if String.trim l = "" then false else true)
+        |> List.map (fun l -> `String l)
+      in
+
+      let json = `Assoc [("status", `String "error"); ("message", `List msg)] in
+      Dream.json ~status:`Internal_Server_Error (Yojson.Safe.to_string json)
+    end
+end
