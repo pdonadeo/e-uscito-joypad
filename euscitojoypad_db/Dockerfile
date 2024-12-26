@@ -1,7 +1,7 @@
 #######################
 # STEP 1: BUILD IMAGE #
 #######################
-FROM python:3.11.1-alpine3.17 AS build-image
+FROM python:3.13.1-alpine3.21 AS build-image
 
 RUN apk update \
  && apk add --no-cache \
@@ -49,7 +49,7 @@ RUN python3 -m venv $VIRTUAL_ENV            \
 ########################
 # STEP 2: DEPLOY IMAGE #
 ########################
-FROM python:3.11.1-alpine3.17 AS deploy-image
+FROM python:3.13.1-alpine3.21 AS deploy-image
 
 ENV USER=joypad
 ENV UID=1000

@@ -1,13 +1,10 @@
 from django import forms
 from django.contrib import admin
 from django.db import models
-
 from django.utils.html import format_html
-
 from django_json_widget.widgets import JSONEditorWidget
 
-
-from .models import Episodio, Videogame, AssociazioneEpisodioVideogame, DiscordMessage
+from .models import AssociazioneEpisodioVideogame, DiscordMessage, Episodio, Videogame
 
 
 class EpisodioAdminForm(forms.ModelForm):
@@ -39,7 +36,6 @@ class EpisodioAdmin(admin.ModelAdmin):
         "url_post_ok",
         "url_video_ok",
     )
-    filter_horizontal = ("giochi",)
     ordering = ("-data_uscita",)
     search_fields = ("episodio_numero", "titolo")
     list_per_page = 20
@@ -47,25 +43,25 @@ class EpisodioAdmin(admin.ModelAdmin):
     inlines = [AssociazioneEpisodioVideogameInline]
 
     def cover_presente(self, instance):
-        return instance.cover != None and instance.cover != ""
+        return instance.cover is not None and instance.cover != ""
 
     cover_presente.boolean = True
     cover_presente.short_description = "Cover"
 
     def url_audio(self, instance):
-        return instance.url != None and instance.url != ""
+        return instance.url is not None and instance.url != ""
 
     url_audio.boolean = True
     url_audio.short_description = "URL audio"
 
     def url_post_ok(self, instance):
-        return instance.url_post != None and instance.url_post != ""
+        return instance.url_post is not None and instance.url_post != ""
 
     url_post_ok.boolean = True
     url_post_ok.short_description = "URL Post"
 
     def url_video_ok(self, instance):
-        return instance.url_video != None and instance.url_video != ""
+        return instance.url_video is not None and instance.url_video != ""
 
     url_video_ok.boolean = True
     url_video_ok.short_description = "URL video"
