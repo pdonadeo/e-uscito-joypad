@@ -2,6 +2,7 @@
     background: linear-gradient(258.12deg, #55aadd 0%, #4aa35a 32.81%, #f1b456 61.98%, #ca4649 100%);
     padding: 0.2rem;
     border-radius: 4px;
+    margin-top: 2.4rem;
 }
 
 .button {
@@ -14,9 +15,10 @@
     background-color: #fff;
     padding: 1rem;
     cursor: pointer;
+    border: none;
 }
 
-.button p {
+.button span {
     font-family: "Rokkitt", serif;
     font-size: 2.1rem;
     color: #000;

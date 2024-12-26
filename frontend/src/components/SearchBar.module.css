@@ -18,7 +18,7 @@
     padding-left: 2rem;
     height: 4rem;
     font-size: 1.6rem;
-    position:relative;
+    position: relative;
 }
 
 /*
@@ -31,12 +31,12 @@
     left: 0;
     z-index: 15;
     width: 100%;
-	background: rgba(255, 255, 255, 0.5);
-	backdrop-filter: blur(30px);
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(30px);
 }
 
 .suggestion {
-    padding: .5rem 2rem .5rem 2rem;
+    padding: 0.5rem 2rem 0.5rem 2rem;
     cursor: pointer;
     font-size: 1.6rem;
     height: 4.4rem;
@@ -44,10 +44,10 @@
     align-items: center;
 }
 
-.suggestion:hover, .keyActive {
+.suggestion:hover,
+.keyActive {
     background-color: rgba(41, 171, 226, 0.3);
 }
-
 
 /*
 * Search Icons
@@ -61,6 +61,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: transparent;
+    border: none;
 }
 
 .searchIcon {
@@ -85,28 +87,28 @@
 
 .sortModal {
     position: absolute;
-    top:100%;
+    top: 100%;
     right: 0;
     z-index: 10;
     width: 33rem;
     height: 16.3rem;
-	border-radius: 0px 0px 8px 8px;
-	background: rgba(255, 255, 255, 0.5);
-	backdrop-filter: blur(20px);
+    border-radius: 0px 0px 8px 8px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(20px);
     display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 1.6rem;
-	visibility: hidden;
-	opacity: 0;
-	transition: all .5s ease-out;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.6rem;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.5s ease-out;
 }
 
 .show {
-	/* animation: fadeIn .5s ease-out forwards; */
-	opacity: 1;
-	visibility: visible;
+    /* animation: fadeIn .5s ease-out forwards; */
+    opacity: 1;
+    visibility: visible;
 }
 
 .sortText {
@@ -115,17 +117,17 @@
 }
 
 .sortContainer {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap:1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .sortControl {
-	padding-left:2rem;
+    padding-left: 2rem;
     font-weight: 600;
     font-size: 1.2rem;
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .sortButton {
@@ -134,16 +136,16 @@
     font-family: inherit;
     font-weight: 800;
     color: #55aadd;
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .checkIcon {
-	height: 2rem;
-	visibility: hidden;
+    height: 2rem;
+    visibility: hidden;
 }
 
-.showCheckIcon .checkIcon{
-	visibility:visible;
+.showCheckIcon .checkIcon {
+    visibility: visible;
 }
 
 @media screen and (max-width: 920px) {
@@ -158,29 +160,27 @@
         transition: all 500ms;
     }
 
-
     .searchBar:focus-within {
-        bottom:100%;
+        bottom: 100%;
         transform: translateY(100%);
         transition: all 500ms;
     }
 
     .overlayMobile {
-        position:fixed;
-        top:0;
+        position: fixed;
+        top: 0;
         left: 0;
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(20px);
-        height:100vh;
-        width:100vw;
+        height: 100vh;
+        width: 100vw;
         z-index: 5;
-        display:none;
+        display: none;
     }
 
-    .searchBar:focus-within + .overlayMobile{
+    .searchBar:focus-within + .overlayMobile {
         display: block;
     }
-
 
     .sortModal {
         width: 100vw;
@@ -191,28 +191,28 @@
         height: 16.3rem;
         transform: translateY(100%);
         transition: transform 0.5s;
-		visibility: visible;
-		border-radius: 16px 16px 0px 0px;
+        visibility: visible;
+        border-radius: 16px 16px 0px 0px;
     }
 
     .show {
         transform: translateY(0);
         transition: transform 0.5s;
-		visibility: unset;
+        visibility: unset;
     }
 }
 
 @keyframes fadeIn {
-	0% {
-	   opacity: 0;
-	   visibility: hidden;
-	}
-	50% {
-	   visibility: visible;
-	   opacity: 0.6;
-	}
-	100% {
-	   opacity: 1;
-	   visibility: visible;
-	}
- }
+    0% {
+        opacity: 0;
+        visibility: hidden;
+    }
+    50% {
+        visibility: visible;
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+        visibility: visible;
+    }
+}
