@@ -1,7 +1,7 @@
 #################
 # BUILD PHASE 1 #
 #################
-FROM node:18-alpine3.17 AS build-stage-1
+FROM node:22.12-alpine3.21 AS build-stage-1
 WORKDIR /app
 COPY ./frontend/package.json ./frontend/yarn.lock ./
 RUN yarn

@@ -10,8 +10,8 @@ let%html risposta_si ep_num giorni_fa titolo =
     [txt giorni_fa]
     {| l'episodio
       <br /> |}
-      [ep_num]
-      {| <br />
+    [ep_num]
+    {| <br />
       di Joypad, dal titolo
       <br />
       &#171;|}
@@ -49,8 +49,8 @@ let index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no : string 
     match !react_build_index_s_cache with
     | Some s -> s
     | None -> begin
-      let react_build_index_s = Assets.read "index.html" |> Utils.option_value |> parse in
-      let prerendered_index_s = Assets.read "prerendered_index.html" |> Utils.option_value |> parse in
+      let react_build_index_s = Static_filesystem.read "index.html" |> Utils.option_value |> parse in
+      let prerendered_index_s = Static_filesystem.read "prerendered_index.html" |> Utils.option_value |> parse in
       replace (react_build_index_s $ "main#root") (prerendered_index_s $ "main#root");
       delete (react_build_index_s $ "div#episode-section");
       react_build_index_s_cache := Some react_build_index_s;

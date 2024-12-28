@@ -26,7 +26,7 @@ Se tutto quello che vi interessa è far partire il progetto seguite le istruzion
 
 ### Prima shell: database + API backend + backoffice + frontend (Docker Compose)
 
-1. *(su OSX è indispensabile installare l'ultima versione di Docker e abilitare le ottimizzazioni)*
+1. _(su OSX è indispensabile installare l'ultima versione di Docker e abilitare le ottimizzazioni)_
 
 2. fai fork del progetto da GitHub: https://github.com/pdonadeo/e-uscito-joypad
 
@@ -38,9 +38,9 @@ Se tutto quello che vi interessa è far partire il progetto seguite le istruzion
 
 4. esegui il backend: `docker-compose up --build -d`
 
-   *(la prima volta potrebbe richiedere una decina di minuti)*
+   _(la prima volta potrebbe richiedere una decina di minuti)_
 
-   *(su OSX il comando si chiama `docker compose` senza trattino)*
+   _(su OSX il comando si chiama `docker compose` senza trattino)_
 
 Questo farà partire un servizio sulla porta 5000. Per verificare che stia funzionando apri il browser su http://localhost:5000/
 
@@ -56,7 +56,7 @@ Qui do per scontato che si conosca lo sviluppo in ambiente Javascript e siano gi
 
 2. solo la prima volta: `yarn install` per installare tutte le dipendenze
 
-3. `yarn start` per far partire il server di sviluppo. Per verificare che stia funzionando vai col browser su http://localhost:3000/ .
+3. `yarn dev` per far partire il server di sviluppo. Per verificare che stia funzionando vai col browser su http://localhost:3000/ .
 
 A questo punto è possibile procedere col normale sviluppo del frontend, testando sulla porta 3000: il client React è configurato con un proxy che inoltra le chiamate API che arrivano sulla porta 3000 al backend che gira sulla 5000.
 
@@ -70,7 +70,7 @@ Il database utilizzato è [PostgreSQL](https://www.postgresql.org/).
 
 ### Backoffice
 
-Per il *data entry* di episodi e giochi occorre un [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) di accesso al database. È stato realizzato con [Django](https://www.djangoproject.com/) e, una volta fatto partire il progetto con `docker-compose`, è accessibile a questo indirizzo: http://localhost:5000/bo/
+Per il _data entry_ di episodi e giochi occorre un [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) di accesso al database. È stato realizzato con [Django](https://www.djangoproject.com/) e, una volta fatto partire il progetto con `docker-compose`, è accessibile a questo indirizzo: http://localhost:5000/bo/
 
 ### Variabili d'ambiente per la configurazione del progetto
 

@@ -1,54 +1,41 @@
 {
   "name": "e-uscito-joypad",
-  "version": "1.0.0",
+  "version": "31",
   "description": "Frontend per https://www.euscitojoypad.it/",
   "main": "index.js",
   "repository": "https://github.com/pdonadeo/e-uscito-joypad",
   "author": "Paolo Donadeo",
   "license": "MIT",
   "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^14.2.2",
-    "@testing-library/user-event": "^14.5.2",
-    "framer-motion": "^11.0.24",
-    "json5": "^2.2.3",
-    "minimatch": "^9.0.4",
-    "react": "^18.2.0",
-    "react-debounce-input": "^3.3.0",
-    "react-dom": "^18.2.0",
-    "react-responsive": "^10.0.0",
-    "react-router-dom": "^6.22.3",
-    "react-scripts": "^5.0.1",
-    "web-vitals": "^3.5.2"
-  },
+  "type": "module",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "dependencies": {
+    "framer-motion": "^11.15.0",
+    "react": "^18.3.1",
+    "react-debounce-input": "^3.3.0",
+    "react-dom": "^18.3.1",
+    "react-responsive": "^10.0.0",
+    "react-router-dom": "^7.1.1",
+    "web-vitals": "^4.2.4"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "homepage": "/static/",
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@eslint/js": "^9.17.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "rollup-plugin-visualizer": "^5.13.1",
+    "vite": "^6.0.5",
+    "vite-plugin-svgr": "^4.3.0"
   },
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
