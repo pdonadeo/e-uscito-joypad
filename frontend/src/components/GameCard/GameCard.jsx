@@ -3,7 +3,7 @@
 //   document.getElementById("backdrop")
 // );
 
-const GameCard = (props) => {
+const GameCard = () => {
   return <div></div>;
 };
 

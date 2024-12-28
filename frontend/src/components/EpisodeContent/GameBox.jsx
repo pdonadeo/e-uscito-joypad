@@ -35,7 +35,7 @@ const GameBox = (props) => {
         </div>
         <div className={classes.timeStamp}>
           <p>
-            {minutes}' {seconds}''
+            {minutes}&apos; {seconds}&apos;&apos;
           </p>
         </div>
       </div>

@@ -17,7 +17,7 @@ const EpisodeItem = (props) => {
 
   // const [active, setActive] = useState(false);
 
-  const activeHandler = (event) => {
+  const activeHandler = () => {
     // window.scrollTo({ top: y, behavior: "smooth" });
     // setActive(!active);
     // setTimeout(() => {

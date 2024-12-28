@@ -18,11 +18,11 @@ const Header = () => {
 
   const style = isMobile
     ? {
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      height: "605px",
-    }
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        height: "605px",
+      }
     : {};
 
   return (
@@ -32,12 +32,12 @@ const Header = () => {
         style={
           !isMobile
             ? {
-              display: "flex",
-              flexDirection: "row",
-              margin: "0 auto",
-              width: "91.9rem",
-              justifyContent: "space-between",
-            }
+                display: "flex",
+                flexDirection: "row",
+                margin: "0 auto",
+                width: "91.9rem",
+                justifyContent: "space-between",
+              }
             : {}
         }
       >

@@ -3,17 +3,19 @@ import { useParams } from "react-router-dom";
 
 const SearchContext = React.createContext({
   searchInput: "",
-  setSearchInput: () => { },
+  setSearchInput: () => {},
   selectedGameId: null,
-  setSelectedGameId: () => { },
+  setSelectedGameId: () => {},
   sortOrder: "",
-  setSortOrder: () => { }
+  setSortOrder: () => {},
 });
 
 export const SearchContextProvider = (props) => {
   const { selectedGameIdUrl, searchInputUrl } = useParams();
   const [searchInput, setSearchInput] = useState(searchInputUrl || "");
-  const [selectedGameId, setSelectedGameId] = useState(selectedGameIdUrl || null);
+  const [selectedGameId, setSelectedGameId] = useState(
+    selectedGameIdUrl || null,
+  );
   const [sortOrder, setSortOrder] = useState("ascending");
 
   return (
@@ -24,7 +26,7 @@ export const SearchContextProvider = (props) => {
         selectedGameId: selectedGameId,
         setSelectedGameId: setSelectedGameId,
         sortOrder: sortOrder,
-        setSortOrder: setSortOrder
+        setSortOrder: setSortOrder,
       }}
     >
       {props.children}
