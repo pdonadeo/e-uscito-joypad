@@ -44,7 +44,7 @@ RUN python3 -m venv $VIRTUAL_ENV            \
  && source $VIRTUAL_ENV/bin/activate        \
  && pip install --upgrade pip               \
  && poetry config virtualenvs.create false  \
- && poetry install --no-interaction --no-dev --no-root
+ && poetry install --no-interaction --no-root --without dev
 
 ########################
 # STEP 2: DEPLOY IMAGE #
