@@ -69,19 +69,21 @@ let distanza giorni =
   | 2 -> "l'altro ieri"
   | _ -> spf "%d giorni fa" giorni
 
-let int_of_italian_month = function
-  | "Gen" -> 1
-  | "Feb" -> 2
-  | "Mar" -> 3
-  | "Apr" -> 4
-  | "Mag" -> 5
-  | "Giu" -> 6
-  | "Lug" -> 7
-  | "Ago" -> 8
-  | "Set" -> 9
-  | "Ott" -> 10
-  | "Nov" -> 11
-  | "Dic" -> 12
+let int_of_italian_month s =
+  let s = String.lowercase_ascii s in
+  match s with
+  | "gen" -> 1
+  | "feb" -> 2
+  | "mar" -> 3
+  | "apr" -> 4
+  | "mag" -> 5
+  | "giu" -> 6
+  | "lug" -> 7
+  | "ago" -> 8
+  | "set" -> 9
+  | "ott" -> 10
+  | "nov" -> 11
+  | "dic" -> 12
   | m -> failwith (spf "int_of_italian_month: unknown month %s" m)
 
 let string_of_date date =
