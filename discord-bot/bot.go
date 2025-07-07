@@ -30,14 +30,16 @@ const (
 )
 
 func (s nodeType) String() string {
-	if s == categoryType {
+	switch s {
+	case categoryType:
 		return "categoryType"
-	} else if s == channelType {
+	case channelType:
 		return "channelType"
-	} else if s == threadType {
+	case threadType:
 		return "threadType"
+	default:
+		return "unknown"
 	}
-	return "unknown"
 }
 
 func (s nodeType) MarshalJSON() ([]byte, error) {
@@ -112,7 +114,7 @@ func main() {
 	<-sc
 
 	// Cleanly close down the Discord session.
-	s.Close()
+	_ = s.Close()
 }
 
 func printChannel(channel *DiscordChannel, thisNode *TreeNode) {
@@ -149,7 +151,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 		channels := make(map[string]*DiscordChannel)
 
 		// Prima le categorie
-		for _, category_or_root_channel := range event.Guild.Channels {
+		for _, category_or_root_channel := range event.Channels {
 			if category_or_root_channel.Type == discordgo.ChannelTypeGuildCategory {
 				categories_and_root_channels[category_or_root_channel.ID] = &DiscordChannel{
 					ID:       category_or_root_channel.ID,
@@ -168,7 +170,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 		}
 
 		// Poi i channels veri e propri
-		for _, category_or_root_channel := range event.Guild.Channels {
+		for _, category_or_root_channel := range event.Channels {
 			if (category_or_root_channel.Type == discordgo.ChannelTypeGuildText ||
 				category_or_root_channel.Type == discordgo.ChannelTypeGuildVoice ||
 				category_or_root_channel.Type == discordgo.ChannelTypeGuildNews ||
@@ -188,7 +190,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 		}
 
 		// Poi i thread
-		for _, thread := range event.Guild.Threads {
+		for _, thread := range event.Threads {
 			if thread.Type == discordgo.ChannelTypeGuildPublicThread {
 				// Sono i thread pubblici
 				parentId := thread.ParentID
@@ -269,7 +271,7 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("Accept", "application/json, */*;q=0.5")
 		req.Header.Set("Origin", "http://"+dreamAppHostname)
-		http.DefaultClient.Do(req)
+		_, _ = http.DefaultClient.Do(req)
 	} else {
 		return
 	}
