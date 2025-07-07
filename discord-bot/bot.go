@@ -60,15 +60,17 @@ type TreeNode struct {
 type Tree []TreeNode
 
 var (
-	token            string
-	guildID          string
-	dreamAppHostname string
+	token                 string
+	guildID               string
+	dreamAppHostname      string
+	announcementChannelID string
 )
 
 func init() {
 	token = os.Getenv("DISCORD_BOT_TOKEN")
 	guildID = os.Getenv("DISCORD_GUILD_ID")
 	dreamAppHostname = os.Getenv("DREAM_APP_HOSTNAME")
+	announcementChannelID = os.Getenv("DISCORD_ANNOUNCEMENT_CHANNEL_ID")
 
 	debug := strings.ToLower(os.Getenv("DEBUG"))
 
@@ -100,6 +102,12 @@ func main() {
 	s.Identify.Intents = discordgo.IntentsGuildMessages
 	s.Identify.Intents |= discordgo.IntentMessageContent
 	s.Identify.Intents |= discordgo.IntentGuilds
+
+	s.AddHandler(threadCreateHandler)
+	s.Identify.Intents = discordgo.IntentsGuilds |
+		discordgo.IntentGuildMessages |
+		discordgo.IntentGuildMembers |
+		discordgo.IntentMessageContent
 
 	// Open a websocket connection to Discord and begin listening.
 	err = s.Open()
@@ -274,5 +282,43 @@ func guildCreateHandler(s *discordgo.Session, event *discordgo.GuildCreate) {
 		_, _ = http.DefaultClient.Do(req)
 	} else {
 		return
+	}
+}
+
+func threadCreateHandler(s *discordgo.Session, t *discordgo.ThreadCreate) {
+	thread := t.Channel
+
+	// Ignora i thread archiviati o privati
+	if thread == nil || thread.ThreadMetadata == nil || thread.ThreadMetadata.Archived || thread.Type != discordgo.ChannelTypeGuildPublicThread {
+		return
+	}
+
+	// Recupera il canale padre
+	parentChannel, err := s.Channel(thread.ParentID)
+	if err != nil {
+		log.Warnf("Impossibile ottenere il canale padre del thread: %v", err)
+		return
+	}
+
+	// Recupera chi ha creato il thread
+	var authorName string
+	if thread.OwnerID != "" {
+		user, err := s.User(thread.OwnerID)
+		if err == nil {
+			authorName = user.Username
+		}
+	}
+	if authorName == "" {
+		authorName = "Qualcuno"
+	}
+
+	// Costruisci il messaggio di annuncio
+	message := ":loudspeaker: **" + authorName + "** ha creato un nuovo thread: **" + thread.Name + "** nel canale #" + parentChannel.Name + "\n" +
+		"https://discord.com/channels/" + thread.GuildID + "/" + thread.ID
+
+	// Invia il messaggio nel canale annunci (sostituisci con l'ID reale)
+	_, err = s.ChannelMessageSend(announcementChannelID, message)
+	if err != nil {
+		log.Warnf("Errore nell'invio del messaggio di annuncio: %v", err)
 	}
 }
