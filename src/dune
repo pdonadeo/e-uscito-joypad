@@ -1,9 +1,15 @@
 (executable
  (name e_uscito_joypad)
  (public_name e_uscito_joypad)
- (modules e_uscito_joypad views joypad_monitor middlewares static_filesystem sitemap)
+ (modules
+  e_uscito_joypad
+  views
+  joypad_monitor
+  middlewares
+  static_filesystem
+  sitemap)
  (preprocess
-  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson ppx_rapper))
+  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
  (libraries
   dream
   db
@@ -39,22 +45,30 @@
   (file %{project_root}/euscitojoypad_db/prerendered_index.html))
  (action
   (progn
-   (bash "rm -Rf %{project_root}/static_filesystem && mkdir %{project_root}/static_filesystem")
+   (bash
+    "rm -Rf %{project_root}/static_filesystem && mkdir %{project_root}/static_filesystem")
    (bash "mkdir %{project_root}/static_filesystem/assets")
    (bash "mkdir %{project_root}/static_filesystem/static")
-
-   (bash "cp -a %{project_root}/frontend/build/apple-touch-icon.png %{project_root}/static_filesystem/static")
-   (bash "cp -a %{project_root}/frontend/build/assets/* %{project_root}/static_filesystem/assets")
-   (bash "cp -a %{project_root}/frontend/build/e-uscito-joypad.css %{project_root}/static_filesystem/")
-   (bash "cp -a %{project_root}/frontend/build/favicon-16x16.png %{project_root}/static_filesystem/")
-   (bash "cp -a %{project_root}/frontend/build/favicon-32x32.png %{project_root}/static_filesystem/")
-   (bash "cp -a %{project_root}/frontend/build/favicon.ico %{project_root}/static_filesystem/")
-   (bash "cp -a %{project_root}/frontend/build/index.html %{project_root}/static_filesystem/")
-   (bash "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/")
-   (bash "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/static/")
-
-   (bash "cp %{project_root}/euscitojoypad_db/prerendered_index.html %{project_root}/static_filesystem/")
-   (with-stdout-to %{target} (run ocaml-crunch -m plain %{project_root}/static_filesystem))
-  )
- )
-)
+   (bash
+    "cp -a %{project_root}/frontend/build/apple-touch-icon.png %{project_root}/static_filesystem/static")
+   (bash
+    "cp -a %{project_root}/frontend/build/assets/* %{project_root}/static_filesystem/assets")
+   (bash
+    "cp -a %{project_root}/frontend/build/e-uscito-joypad.css %{project_root}/static_filesystem/")
+   (bash
+    "cp -a %{project_root}/frontend/build/favicon-16x16.png %{project_root}/static_filesystem/")
+   (bash
+    "cp -a %{project_root}/frontend/build/favicon-32x32.png %{project_root}/static_filesystem/")
+   (bash
+    "cp -a %{project_root}/frontend/build/favicon.ico %{project_root}/static_filesystem/")
+   (bash
+    "cp -a %{project_root}/frontend/build/index.html %{project_root}/static_filesystem/")
+   (bash
+    "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/")
+   (bash
+    "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/static/")
+   (bash
+    "cp %{project_root}/euscitojoypad_db/prerendered_index.html %{project_root}/static_filesystem/")
+   (with-stdout-to
+    %{target}
+    (run ocaml-crunch -m plain %{project_root}/static_filesystem)))))

@@ -2,19 +2,21 @@ let log = Dream.sub_log "SMAP"
 
 let dati_sitemap db =
   let q =
-    [%rapper
-      get_many
-        {sql|
-          SELECT 'https://www.euscitojoypad.it/se-ne-parla-qui/'|| game.id ||'/'||game.titolo as @string{loc},
-                 max(ep.data_uscita) AS @string{ultima_citazione}
-          FROM backoffice_videogame game
-          JOIN backoffice_associazioneepisodiovideogame ass ON (ass.videogame_id = game.id)
-          JOIN backoffice_episodio ep ON (ass.episodio_id = ep.id)
-          GROUP BY game.id, game.titolo
-          ORDER BY ultima_citazione DESC
-        |sql}]
+    let open Caqti_request.Infix in
+    let open Caqti_type in
+    (unit ->* t2 string string)
+      {|
+        SELECT 'https://www.euscitojoypad.it/se-ne-parla-qui/'|| game.id ||'/'||game.titolo as loc,
+                max(ep.data_uscita) AS ultima_citazione
+        FROM backoffice_videogame game
+        JOIN backoffice_associazioneepisodiovideogame ass ON (ass.videogame_id = game.id)
+        JOIN backoffice_episodio ep ON (ass.episodio_id = ep.id)
+        GROUP BY game.id, game.titolo
+        ORDER BY ultima_citazione DESC
+      |}
   in
-  q () db
+  let module DB = (val db : Caqti_lwt.CONNECTION) in
+  DB.collect_list q ()
 
 let view (_request : Dream.request) (db : Caqti_lwt.connection) =
   match%lwt dati_sitemap db with

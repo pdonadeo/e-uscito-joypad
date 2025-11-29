@@ -7,6 +7,5 @@
    ppx_deriving_yojson
    ppx_deriving.show
    ppx_sexp_conv
-   ppx_enumerate
-   ppx_rapper))
- (libraries decimal timedesc dream db settings ppx_rapper_lwt caqti-lwt))
+   ppx_enumerate))
+ (libraries decimal timedesc dream db settings caqti-lwt))

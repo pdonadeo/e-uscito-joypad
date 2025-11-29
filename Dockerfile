@@ -1,7 +1,7 @@
 #################
 # BUILD PHASE 1 #
 #################
-FROM node:22.12-alpine3.21 AS build-stage-1
+FROM node:22.21-alpine3.22 AS build-stage-1
 WORKDIR /app
 COPY ./frontend/package.json ./frontend/yarn.lock ./
 RUN yarn
@@ -25,11 +25,11 @@ RUN apk add upx
 
 USER opam
 WORKDIR /app
-ENV PATH /home/opam/_opam/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/home/opam/_opam/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 RUN dune build @install
 RUN chmod +w /app/_build/default/src/e_uscito_joypad.exe && \
-    upx /app/_build/default/src/e_uscito_joypad.exe
+  upx /app/_build/default/src/e_uscito_joypad.exe
 
 USER root
 RUN mv /app/_build/default/src/e_uscito_joypad.exe /usr/local/bin/e_uscito_joypad
@@ -38,12 +38,12 @@ RUN chown root:root /usr/local/bin/e_uscito_joypad
 ################
 # DEPLOY PHASE #
 ################
-FROM alpine:3.17.0
+FROM alpine:3.22
 COPY --from=build-stage-2 /usr/local/bin/e_uscito_joypad /usr/local/bin/
 RUN apk update
 RUN apk add --no-cache                                  \
-    gmp libev ca-certificates ca-certificates-bundle    \
-    libstdc++ libpq libffi tzdata
+  gmp libev ca-certificates ca-certificates-bundle    \
+  libstdc++ libpq libffi tzdata
 ENV TZ=Europe/Rome
 
 ENV REST_LISTEN_ADDRESS=0.0.0.0
