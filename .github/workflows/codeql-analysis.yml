@@ -19,6 +19,7 @@ on:
     branches: [ main ]
   schedule:
     - cron: '29 7 * * 6'
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -38,7 +39,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
