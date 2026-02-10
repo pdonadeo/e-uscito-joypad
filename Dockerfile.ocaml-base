@@ -1,4 +1,4 @@
-FROM ocaml/opam:alpine-ocaml-4.14
+FROM ocaml/opam:alpine-ocaml-5.3
 
 USER root
 RUN apk update && apk upgrade
@@ -16,9 +16,9 @@ USER opam
 WORKDIR /home/opam
 RUN opam repo set-url default https://opam.ocaml.org
 RUN opam update -y && opam upgrade -y
-ADD ./e-uscito-joypad.opam.locked /home/opam/e-uscito-joypad.opam.locked
-RUN opam switch create ./ 4.14.1 --no-install
+RUN opam switch create ./ 5.3.0 --no-install
 RUN opam env >> .profile
+ADD ./e-uscito-joypad.opam.locked /home/opam/e-uscito-joypad.opam.locked
 RUN opam install ./e-uscito-joypad.opam.locked --deps-only
 
 CMD [ "/bin/bash" ]

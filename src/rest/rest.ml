@@ -89,24 +89,26 @@ let decorator request view =
 let get_games_by_episode db ~episodio_id =
   let open Lwt_result.Syntax in
   let q =
-    [%rapper
-      get_many
-        {sql|
-            SELECT
-                @string{game.titolo},
-                @string{game.descrizione_raw},
-                @string{game.descrizione_html},
-                @string?{game.cover},
-                @string{ass.istante},
-                @string{ass.speaker},
-                @string{ass.tipologi}a
-            FROM backoffice_videogame game
-                JOIN backoffice_associazioneepisodiovideogame ass ON (game.id = ass.videogame_id)
-            WHERE ass.episodio_id = %int64{episodio_id}
-            ORDER BY ass.istante
-          |sql}]
+    let open Caqti_request.Infix in
+    let open Caqti_type in
+    (int64 ->* t7 string string string (option string) string string string)
+      {|
+        SELECT
+            game.titolo,
+            game.descrizione_raw,
+            game.descrizione_html,
+            game.cover,
+            ass.istante,
+            ass.speaker,
+            ass.tipologia
+        FROM backoffice_videogame game
+            JOIN backoffice_associazioneepisodiovideogame ass ON (game.id = ass.videogame_id)
+        WHERE ass.episodio_id = ?
+        ORDER BY ass.istante
+      |}
   in
-  let* records = q db ~episodio_id in
+  let module DB = (val db : Caqti_lwt.CONNECTION) in
+  let* records = DB.collect_list q episodio_id in
   let records =
     ListLabels.map records ~f:(fun r ->
         let titolo, descrizione_txt, descrizione_html, cover, istante, speaker, tipologia = r in
@@ -181,19 +183,21 @@ module Search_game_title = struct
     let open Lwt_result.Syntax in
     let search_input = String.trim search_input in
     let q =
-      [%rapper
-        get_many
-          {sql|
-              SELECT
-                  @int64{id},
-                  game.titolo AS @string{titolo},
-                  word_similarity(unaccent(%string{search_input}), unaccent(game.titolo)) AS @float{sim}
-              FROM backoffice_videogame game
-              WHERE word_similarity(unaccent(%string{search_input}), unaccent(game.titolo)) > 0.25
-              ORDER BY sim DESC
-          |sql}]
+      let open Caqti_request.Infix in
+      let open Caqti_type in
+      (t2 string string ->* t3 int64 string float)
+        {|
+            SELECT
+              id,
+              game.titolo AS titolo,
+              word_similarity(unaccent(?), unaccent(game.titolo)) AS sim
+            FROM backoffice_videogame game
+            WHERE word_similarity(unaccent(?), unaccent(game.titolo)) > 0.25
+            ORDER BY sim DESC
+          |}
     in
-    let* records = q db ~search_input in
+    let module DB = (val db : Caqti_lwt.CONNECTION) in
+    let* records = DB.collect_list q (search_input, search_input) in
     let records =
       ListLabels.map records ~f:(fun r ->
           let id, titolo, similarity = r in
@@ -217,17 +221,19 @@ end
 module Games_for_score = struct
   let view (_request : Dream.request) (db : Caqti_lwt.connection) =
     let q =
-      [%rapper
-        get_many
-          {sql|
-            SELECT g.id AS @int64{"ID"},
-                g.titolo AS @string{"TITOLO"},
-                g.rawg_json->'rating' AS @string{"RAWG_RATING"}
-            FROM backoffice_videogame g
-            ORDER BY g.id DESC
-          |sql}]
+      let open Caqti_request.Infix in
+      let open Caqti_type in
+      (unit ->* t3 int64 string string)
+        {|
+          SELECT g.id AS \"ID\",
+            g.titolo AS \"TITOLO\",
+            g.rawg_json->'rating' AS \"RAWG_RATING\"
+          FROM backoffice_videogame g
+          ORDER BY g.id DESC
+        |}
     in
-    let%lwt records_or_error = q () db in
+    let module DB = (val db : Caqti_lwt.CONNECTION) in
+    let%lwt records_or_error = DB.collect_list q () in
     match records_or_error with
     | Ok records -> begin
       Dream.stream

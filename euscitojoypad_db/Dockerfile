@@ -4,31 +4,31 @@
 FROM python:3.13.3-alpine3.21 AS build-image
 
 RUN apk update \
- && apk add --no-cache \
-        autoconf \
-        automake \
-        bash \
-        build-base \
-        cargo \
-        cmake \
-        g++ \
-        gcc \
-        git \
-        libffi \
-        libtool \
-        czmq-dev \
-        jpeg-dev \
-        libffi-dev \
-        libwebp-dev \
-        libxml2-dev \
-        libxslt-dev \
-        make \
-        musl-dev \
-        openssl-dev \
-        python3-dev \
-        unixodbc-dev \
-        zlib-dev \
-        libpq-dev
+    && apk add --no-cache \
+    autoconf \
+    automake \
+    bash \
+    build-base \
+    cargo \
+    cmake \
+    g++ \
+    gcc \
+    git \
+    libffi \
+    libtool \
+    czmq-dev \
+    jpeg-dev \
+    libffi-dev \
+    libwebp-dev \
+    libxml2-dev \
+    libxslt-dev \
+    make \
+    musl-dev \
+    openssl-dev \
+    python3-dev \
+    unixodbc-dev \
+    zlib-dev \
+    libpq-dev
 
 
 RUN /usr/local/bin/pip install poetry
@@ -41,10 +41,10 @@ WORKDIR $HOME
 COPY pyproject.toml poetry.lock ./
 
 RUN python3 -m venv $VIRTUAL_ENV            \
- && source $VIRTUAL_ENV/bin/activate        \
- && pip install --upgrade pip               \
- && poetry config virtualenvs.create false  \
- && poetry install --no-interaction --no-root --without dev
+    && source $VIRTUAL_ENV/bin/activate        \
+    && pip install --upgrade pip               \
+    && poetry config virtualenvs.create false  \
+    && poetry install --no-interaction --no-root --without dev
 
 ########################
 # STEP 2: DEPLOY IMAGE #
@@ -56,25 +56,25 @@ ENV UID=1000
 ENV GID=1000
 ENV HOME="/app"
 ENV VIRTUAL_ENV=/venv
-ENV GUNICORN_TIMEOUT 30
-ENV GUNICORN_WORKERS 4
+ENV GUNICORN_TIMEOUT=30
+ENV GUNICORN_WORKERS=4
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR $HOME
 
 RUN apk update                                                          \
     && apk add --no-cache                                               \
-        bash sudo jpeg zlib libtool unixodbc                            \
-        libffi czmq libxml2 libxslt openssl libwebp-dev libwebp ncdu    \
-        htop gettext mailcap libpq                                      \
+    bash sudo jpeg zlib libtool unixodbc                            \
+    libffi czmq libxml2 libxslt openssl libwebp-dev libwebp ncdu    \
+    htop gettext mailcap libpq                                      \
     && addgroup -g "$GID" -S "$USER"                                    \
     && adduser                                                          \
-       --disabled-password                                              \
-       --gecos ""                                                       \
-       --home "$HOME"                                                   \
-       --ingroup "$USER"                                                \
-       --no-create-home                                                 \
-       --uid "$UID" "$USER"                                             \
+    --disabled-password                                              \
+    --gecos ""                                                       \
+    --home "$HOME"                                                   \
+    --ingroup "$USER"                                                \
+    --no-create-home                                                 \
+    --uid "$UID" "$USER"                                             \
     && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER      \
     && chmod 0440 /etc/sudoers.d/$USER
 

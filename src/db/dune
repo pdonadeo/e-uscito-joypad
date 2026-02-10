@@ -1,12 +1,16 @@
 (library
  (name db)
- (modules db db_common django__episodio django__videogame django__associazioneepisodiovideogame)
+ (modules
+  db
+  db_common
+  django__episodio
+  django__videogame
+  django__associazioneepisodiovideogame)
  (preprocess
   (pps
    lwt_ppx
    ppx_deriving_yojson
    ppx_deriving.show
    ppx_sexp_conv
-   ppx_rapper
    ppx_enumerate))
- (libraries decimal timedesc ppx_rapper_lwt caqti-lwt dream))
+ (libraries decimal timedesc caqti-lwt dream))

@@ -1,4 +1,4 @@
-(lang dune 3.6)
+(lang dune 3.20)
 
 (name e-uscito-joypad)
 
@@ -21,32 +21,67 @@
 (package
  (name e-uscito-joypad)
  (version 13)
- (synopsis "\195\136 uscito Joypad")
+ (synopsis "È uscito Joypad")
  (description
-  "Semplice pagina di informazione per sapere se e quando \195\168 uscito\nJoypad, il podcast a tema videoludico di Matteo Bordone (Corri!),\nFrancesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)")
-
+  "Semplice pagina di informazione per sapere se e quando è uscito\nJoypad, il podcast a tema videoludico di Matteo Bordone (Corri!),\nFrancesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)")
  (depends
-  (ocaml (= 4.14.1))
-  (batteries (= 3.6.0))
-  (timedesc (= 0.9.1))
-  (cohttp-lwt-unix (= 5.0.0))
-  (lambdasoup (= 0.7.3))
-  (re2 (= v0.15.0))
-  (dream (= 1.0.0~alpha4))
-  (tyxml-ppx (= 4.5.0))
-  (ppx_deriving_yojson (= 3.7.0))
-  (caqti-driver-postgresql (= 1.9.1))
-  (ppx_rapper_lwt (= 3.1.0))
-  (decimal (= 0.3.0))
-  (crunch (= 3.3.1))
-  (dune (and :dev (= 3.6.1)))
-  (utop (and :dev (= 2.10.0)))
-  (merlin (and :dev (= 4.7-414)))
-  (ocp-indent (and :dev (= 1.8.1)))
-  (ocp-index (and :dev (= 1.3.4)))
-  (ocamlformat (and :dev (= 0.24.1)))
-  (ocaml-lsp-server (and :dev (= 1.14.2)))
-  (odoc (and :dev (= 2.2.0)))
-  (odig (and :dev (= 0.0.8)))
- )
-)
+  (ocaml
+   (= 5.3.0))
+  (batteries
+   (= 3.10.0))
+  (timedesc
+   (= 3.1.0))
+  (cohttp-lwt-unix
+   (= 6.1.1))
+  (lambdasoup
+   (= 1.1.1))
+  (re2
+   (= v0.17.0))
+  (dream
+   (= 1.0.0~alpha8))
+  (tyxml-ppx
+   (= 4.6.0))
+  (ppx_deriving_yojson
+   (= 3.9.1))
+  (caqti-driver-postgresql
+   (= 2.2.4))
+  (decimal
+   (= 1.0.2))
+  (crunch
+   (= 4.0.0))
+  (dune
+   (and
+    :dev
+    (= 3.20.2)))
+  (utop
+   (and
+    :dev
+    (= 2.16.0)))
+  (merlin
+   (and
+    :dev
+    (= 5.6-503)))
+  (ocp-indent
+   (and
+    :dev
+    (= 1.9.0)))
+  (ocp-index
+   (and
+    :dev
+    (= 1.4.0)))
+  (ocamlformat
+   (and
+    :dev
+    (= 0.28.1)))
+  (ocaml-lsp-server
+   (and
+    :dev
+    (= 1.23.1)))
+  (odoc
+   (and
+    :dev
+    (= 3.1.0)))
+  (odig
+   (and
+    :dev
+    (= 0.1.0)))))
