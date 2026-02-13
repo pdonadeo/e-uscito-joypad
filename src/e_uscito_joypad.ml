@@ -29,10 +29,16 @@ let loader root path _request =
   | None -> Dream.empty `Not_Found
   | Some asset -> Dream.respond asset
 
+let with_noindex_follow handler req =
+  let%lwt resp = handler req in
+  let () = Dream.add_header resp "X-Robots-Tag" "noindex, follow" in
+  Lwt.return resp
+
 let default_handler _req =
   let uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.elabora_risposta () in
   Dream.html (Views.index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no)
 
+let game_page_handler req = with_noindex_follow default_handler req
 let joycord_json_tree : string option ref = ref None
 
 let store_joycord_json_tree req =
@@ -83,9 +89,9 @@ let server =
          post "/api/joycord/channels" store_joycord_json_tree;
          get "/api/joycord/channels" get_joycord_json_tree;
          get "/api/joycord/games-for-score.tsv" (fun r -> Dream.sql r (Rest.Games_for_score.view r));
-         get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" default_handler;
+         get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" game_page_handler;
          get "/joycord/channels" default_handler;
-         get "/sitemap.xml" (fun r -> Dream.sql r (Sitemap.view r));
+         get "/sitemap.xml" Sitemap.view;
          get "/" default_handler;
        ]
 
