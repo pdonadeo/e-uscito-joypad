@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # pyppeteer è abbandonato ma usato solo in uno script locale di scraping
+      # lanciato manualmente e mai esposto online.
+      # Blocca urllib3 a <2.0.0 ma non rappresenta un rischio reale.
+      - dependency-name: "urllib3"
+        versions: [">=2.0.0"]
+      - dependency-name: "pyppeteer"
