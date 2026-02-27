@@ -42,18 +42,18 @@ let extract_date desc =
   let year = matches.(3) |> Utils.option_value |> int_of_string in
   Timedesc.Date.of_iso8601_exn (Utils.spf "%04d-%02d-%02d" year month day)
 
-let title_reg = Re2.create_exn "(Ep\\. +)?(\\w+) +(?:–|—) +(.*)"
+let title_reg = Re2.create_exn "((Ep\\. +)?(\\w+) *(?:–|—) *)?([^–—]*)"
 
 let extract_ep_num_and_title data_title =
   (* "Ep. 47 – Quello con Elden Ring, il nuovo Monkey Island e il PlayStation Plus Extra Premium toppissimo" *)
   let m = Re2.find_submatches_exn title_reg data_title in
-  let ep_num = m.(2) |> Option.map (fun s -> s |> String.trim) in
+  let ep_num = m.(3) |> Option.map (fun s -> s |> String.trim) in
   let ep_num =
     match ep_num with
     | None -> NonSpecificato
     | Some s -> ( try Intero (int_of_string s) with _ -> Stringa s)
   in
-  let title = m.(3) |> Utils.option_value in
+  let title = m.(4) |> Utils.option_value in
   (ep_num, title)
 
 let extract_data_from_page () =

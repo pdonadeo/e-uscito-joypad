@@ -11,7 +11,7 @@ const Message = ({ dati }) => {
     } else if (ep_num[0] === "Stringa") {
       ep_num_decoded = ep_num[1];
     } else {
-      ep_num_decoded = ep_num;
+      ep_num_decoded = "";
     }
   } else {
     return <div />;
