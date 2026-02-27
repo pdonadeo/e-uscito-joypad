@@ -4,7 +4,7 @@
 
 (using directory-targets 0.1)
 
-(version 39)
+(version 40)
 
 (generate_opam_files true)
 
@@ -20,7 +20,7 @@
 
 (package
  (name e-uscito-joypad)
- (version 39)
+ (version 40)
  (synopsis "È uscito Joypad")
  (description
   "Semplice pagina di informazione per sapere se e quando è uscito\nJoypad, il podcast a tema videoludico di Matteo Bordone (Corri!),\nFrancesco Fossetti (Salta!) e Alessandro Zampini (Spara! per finta)")
