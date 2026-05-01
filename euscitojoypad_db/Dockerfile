@@ -66,7 +66,7 @@ RUN apk update                                                          \
     && apk add --no-cache                                               \
     bash sudo jpeg zlib libtool unixodbc                            \
     libffi czmq libxml2 libxslt openssl libwebp-dev libwebp ncdu    \
-    htop gettext mailcap libpq                                      \
+    htop gettext mailcap libpq postgresql-client jq                 \
     && addgroup -g "$GID" -S "$USER"                                    \
     && adduser                                                          \
     --disabled-password                                              \
