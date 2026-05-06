@@ -7,7 +7,7 @@ license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
-    "django (>=6.0.2,<7.0.0)",
+    "django (>=6.0.5,<7.0.0)",
     "django-extensions (>=4.1,<5.0)",
     "uvicorn[standard] (>=0.40.0,<0.41.0)",
     "gunicorn (>=25.1.0,<26.0.0)",
