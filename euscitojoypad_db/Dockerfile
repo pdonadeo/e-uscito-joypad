@@ -40,10 +40,10 @@ WORKDIR $HOME
 
 COPY pyproject.toml poetry.lock ./
 
-RUN python3 -m venv $VIRTUAL_ENV            \
-    && source $VIRTUAL_ENV/bin/activate        \
-    && pip install --upgrade pip               \
-    && poetry config virtualenvs.create false  \
+RUN python3 -m venv $VIRTUAL_ENV \
+    && source $VIRTUAL_ENV/bin/activate \
+    && pip install --upgrade pip \
+    && poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-root --without dev
 
 ########################
@@ -62,26 +62,38 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR $HOME
 
-RUN apk update                                                          \
-    && apk add --no-cache                                               \
-    bash sudo jpeg zlib libtool unixodbc                            \
-    libffi czmq libxml2 libxslt openssl libwebp-dev libwebp ncdu    \
-    htop gettext mailcap libpq postgresql-client jq                 \
-    && addgroup -g "$GID" -S "$USER"                                    \
-    && adduser                                                          \
-    --disabled-password                                              \
-    --gecos ""                                                       \
-    --home "$HOME"                                                   \
-    --ingroup "$USER"                                                \
-    --no-create-home                                                 \
-    --uid "$UID" "$USER"                                             \
-    && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER      \
+
+RUN apk update \
+    && apk add --no-cache \
+    bash sudo jpeg zlib libtool unixodbc \
+    libffi czmq libxml2 libxslt openssl libwebp-dev libwebp ncdu \
+    postgresql-client jq neovim \
+    htop gettext mailcap libpq postgresql-client jq \
+    && addgroup -g "$GID" -S "$USER" \
+    && adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "$HOME" \
+    --ingroup "$USER" \
+    --no-create-home \
+    --uid "$UID" "$USER" \
+    && echo "$USER ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER \
     && chmod 0440 /etc/sudoers.d/$USER
 
 COPY --from=build-image $VIRTUAL_ENV $VIRTUAL_ENV
 ADD . ./
 RUN chmod +x ./docker-entrypoint.sh
 RUN chown ${UID}:${GID} /app
+RUN printf '%s\n' \
+    "# Bash aliases" \
+    "alias l='ls -altrh --color'" \
+    "alias v='nvim'" \
+    > /app/.bashrc \
+    && printf '%s\n' \
+    "# Load .bashrc for login shells" \
+    "[ -f ~/.bashrc ] && . ~/.bashrc" \
+    > /app/.bash_profile \
+    && chown ${UID}:${GID} /app/.bashrc /app/.bash_profile
 
 USER ${UID}:${GID}
 
@@ -101,6 +113,6 @@ ENV PGDATABASE="CHANGE ME IN PRODUCTION"
 ENV MEDIA_URL="bo/files/"
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD /venv/bin/gunicorn --bind :8000 --workers $GUNICORN_WORKERS     \
-    --timeout $GUNICORN_TIMEOUT -k uvicorn.workers.UvicornWorker    \
+CMD /venv/bin/gunicorn --bind :8000 --workers $GUNICORN_WORKERS \
+    --timeout $GUNICORN_TIMEOUT -k uvicorn.workers.UvicornWorker \
     euscitojoypad_db.asgi:application
