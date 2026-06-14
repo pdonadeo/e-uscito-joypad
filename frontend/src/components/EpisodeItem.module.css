@@ -120,10 +120,21 @@
 @media screen and (max-width: 920px) {
    .card {
       border-radius: 0px;
-      height: 13.7rem;
+      min-height: 13.7rem;
+      height: auto;
       width: 100vw;
       display: flex;
       align-items: center;
       justify-content: flex-start;
+   }
+
+   .textBox {
+      height: auto;
+      justify-content: flex-start;
+      gap: 0.6rem;
+   }
+
+   .actions {
+      position: static;
    }
 }

@@ -35,3 +35,8 @@ _opam/
 data/
 .DS_Store
 compose_env_prod
+
+# Playwright
+/node_modules/
+/screenshots/
+/test-results/

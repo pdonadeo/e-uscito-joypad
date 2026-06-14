@@ -1,0 +1,24 @@
+{
+  "name": "e-uscito-joypad",
+  "version": "1.0.0",
+  "description": "[![Build Docker and push to registry](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-dream.yml/badge.svg)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-dream.yml)",
+  "main": "index.js",
+  "scripts": {
+    "screenshots": "PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pdonadeo/e-uscito-joypad.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pdonadeo/e-uscito-joypad/issues"
+  },
+  "homepage": "https://github.com/pdonadeo/e-uscito-joypad#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}

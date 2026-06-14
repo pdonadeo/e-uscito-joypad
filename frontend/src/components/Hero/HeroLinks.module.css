@@ -41,12 +41,27 @@ p.service {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap:.4rem;
+  gap: 0.4rem;
 }
 
 .followUs p {
   font-size: 1.6rem;
   letter-spacing: -0.03em;
+}
+
+@media screen and (max-width: 920px) {
+  .linkBoxes {
+    width: 100%;
+    max-width: 33.6rem;
+  }
+  .linkBoxes a {
+    flex: 1 1 calc(50% - 0.5rem);
+    min-width: 0;
+  }
+  .linkBoxes a svg {
+    width: 100%;
+    height: auto;
+  }
 }
 
 @media screen and (min-width: 921px) {

@@ -1,0 +1,9 @@
+@media screen and (min-width: 921px) {
+  .innerRow {
+    display: flex;
+    flex-direction: row;
+    margin: 0 auto;
+    width: 91.9rem;
+    justify-content: space-between;
+  }
+}

@@ -5,6 +5,13 @@
   justify-content: center;
 }
 
+@media screen and (max-width: 920px) {
+  .container {
+    padding-bottom: 6rem;
+  }
+}
+
 .title {
   font-size: 1.4rem;
 }
+

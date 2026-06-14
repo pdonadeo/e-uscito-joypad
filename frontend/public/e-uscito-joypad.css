@@ -13,16 +13,18 @@ font-family: 'Rokkitt', serif; */
 
 html {
   font-size: 62.5%;
+  overflow-x: hidden;
 }
 
 body {
-    min-height: calc(100vh - 20px);
-    display: flex;
-    flex-direction: column;
-    font-family: "Montserrat", sans-serif;
-    text-align: left;
-    background-color: #f7f7f8;
-    width: 100%;
+  min-height: calc(100vh - 20px);
+  display: flex;
+  flex-direction: column;
+  font-family: "Montserrat", sans-serif;
+  text-align: left;
+  background-color: #f7f7f8;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* header {
@@ -94,3 +96,4 @@ a:hover {
     margin-bottom: 1.6rem;
   }
 } */
+
