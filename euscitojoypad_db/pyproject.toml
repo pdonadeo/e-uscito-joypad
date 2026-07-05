@@ -27,7 +27,7 @@ jupyter = "^1.1.1"
 humanize = "^4.16.0"
 black = "^26.5.1"
 djlint = "^1.39.2"
-click = "^8.4.1"
+click = "^8.4.2"
 pyppeteer = "^2.0.0"
 urllib3 = ">=1.25.8,<2.0.0"
 
