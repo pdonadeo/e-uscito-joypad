@@ -1,4 +1,4 @@
-FROM golang:1.24.1-alpine3.21 AS build-stage
+FROM golang:1.26-alpine3.24 AS build-stage
 
 USER root
 ADD  ./go.mod ./go.sum ./bot.go /app/

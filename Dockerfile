@@ -1,9 +1,10 @@
 #################
 # BUILD PHASE 1 #
 #################
-FROM node:22.21-alpine3.22 AS build-stage-1
+FROM node:26-alpine3.24 AS build-stage-1
 WORKDIR /app
 COPY ./frontend/package.json ./frontend/yarn.lock ./
+RUN npm install -g yarn@latest
 RUN yarn
 COPY ./frontend/ ./
 RUN yarn build
@@ -38,7 +39,7 @@ RUN chown root:root /usr/local/bin/e_uscito_joypad
 ################
 # DEPLOY PHASE #
 ################
-FROM alpine:3.22
+FROM alpine:3.24
 COPY --from=build-stage-2 /usr/local/bin/e_uscito_joypad /usr/local/bin/
 RUN apk update
 RUN apk add --no-cache                                  \
