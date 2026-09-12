@@ -56,31 +56,27 @@ let extract_ep_num_and_title data_title =
   let title = m.(4) |> Utils.option_value in
   (ep_num, title)
 
-let extract_data_from_page () =
-  let open Soup in
-  let%lwt body = body () in
-  let soup = parse body in
+(* Il div con data e durata ha una classe generata (CSS module), del tipo
+   "_episode-item__details_wwhwj_80", e non è un figlio diretto del div della
+   puntata: sta annidato in un wrapper. Lo cerchiamo quindi fra i discendenti. *)
+let details_selector = "div[class*=_details_]"
 
+let extract_data_from_soup soup =
+  let open Soup in
   let first_div = soup $$ "main div" |> R.first in
   let title_link = first_div $$ "h3 a" |> R.first in
   let data_title = try trimmed_texts title_link |> List.hd with Failure _ -> failwith "non c'è un titolo" in
 
   let data_desc =
-    with_stop (fun stop ->
-        first_div
-        |> children
-        |> elements
-        |> iter (fun el ->
-               if has_attribute "class" el
-               then begin
-                 let class_text = classes el |> List.hd in
-                 if Str.string_match (Str.regexp ".*_details_.*") class_text 0 then stop.throw el
-               end);
-        failwith "Non trovo la data di pubblicazione")
-    |> trimmed_texts
-    |> String.concat " "
+    match first_div $$ details_selector |> first with
+    | None -> failwith "Non trovo la data di pubblicazione"
+    | Some el -> el |> trimmed_texts |> String.concat " "
   in
-  Lwt.return (data_title, data_desc)
+  (data_title, data_desc)
+
+let extract_data_from_page () =
+  let%lwt body = body () in
+  Lwt.return (extract_data_from_soup (Soup.parse body))
 
 let elabora_risposta () =
   match !last_episode_data with
