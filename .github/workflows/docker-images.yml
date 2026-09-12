@@ -9,6 +9,9 @@ jobs:
   push:
     name: Build and push (${{ matrix.name }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     strategy:
       # Se una delle tre immagini fallisce, le altre due vengono comunque
       # buildate e pushate.
@@ -27,7 +30,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       -
         name: Docker Metadata action
         id: meta
@@ -37,8 +40,11 @@ jobs:
           images: |
             ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           # generate Docker tags based on the following events/attributes
+          # Lo schema dei tag di questo repo (v40, v41, …) non è semver, quindi
+          # `type=semver` non produrrebbe nulla e loggherebbe solo un warning:
+          # le immagini sono identificate dallo sha del commit, che per un
+          # deploy manuale è quello che serve.
           tags: |
-            type=semver,pattern={{version}}
             type=sha
       -
         name: Docker Setup QEMU
