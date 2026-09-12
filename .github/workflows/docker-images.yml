@@ -1,13 +1,29 @@
-name: Build Docker and push to registry (Dream)
+name: Build Docker images and push to registry
 on:
   #push:
   #  branches: [ main ]
   release:
-    types: [published, created, edited]
+    types: [published]
   workflow_dispatch:
 jobs:
   push:
+    name: Build and push (${{ matrix.name }})
     runs-on: ubuntu-latest
+    strategy:
+      # Se una delle tre immagini fallisce, le altre due vengono comunque
+      # buildate e pushate.
+      fail-fast: false
+      matrix:
+        include:
+          - name: Dream
+            context: .
+            image: e-uscito-joypad
+          - name: Django
+            context: ./euscitojoypad_db/
+            image: e-uscito-joypad-db
+          - name: Discord bot
+            context: ./discord-bot/
+            image: e-uscito-joypad-bot
     steps:
       -
         name: Checkout
@@ -19,7 +35,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/${{ github.repository_owner }}/e-uscito-joypad
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}
           # generate Docker tags based on the following events/attributes
           tags: |
             type=semver,pattern={{version}}
@@ -41,10 +57,12 @@ jobs:
         name: Build and push Docker images
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ${{ matrix.context }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Scope separato per immagine: i tre job girano in parallelo e con lo
+          # scope di default (`buildkit`) si sovrascriverebbero la cache a vicenda.
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
