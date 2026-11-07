@@ -11,3 +11,8 @@ updates:
       - dependency-name: "urllib3"
         versions: [">=2.0.0"]
       - dependency-name: "pyppeteer"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
