@@ -2833,11 +2833,6 @@ vite@^6.4.5:
   optionalDependencies:
     fsevents "~2.3.3"
 
-web-vitals@^4.2.4:
-  version "4.2.4"
-  resolved "https://registry.yarnpkg.com/web-vitals/-/web-vitals-4.2.4.tgz#1d20bc8590a37769bd0902b289550936069184b7"
-  integrity sha512-r4DIlprAGwJ7YM11VZp4R884m0Vmgr6EAKe3P+kO0PPj3Unqyvv59rczf6UiGcb9Z8QxZVcqKNwv/g0WNdWwsw==
-
 which-boxed-primitive@^1.1.0, which-boxed-primitive@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/which-boxed-primitive/-/which-boxed-primitive-1.1.1.tgz#d76ec27df7fa165f18d5808374a5fe23c29b176e"
