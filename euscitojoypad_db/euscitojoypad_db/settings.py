@@ -87,7 +87,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_ROOT = BASE_DIR / "STATIC"
-STATIC_URL = "bo/static/"
+STATIC_URL = "legacy-bo/static/"
 MEDIA_ROOT = BASE_DIR / "MEDIA"
 MEDIA_URL = "bo/files/"
 
