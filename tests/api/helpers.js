@@ -1,4 +1,5 @@
 const { expect } = require('@playwright/test');
+const { randomInt } = require('node:crypto');
 const { API_URL, RAWG_PORT } = require('./env');
 
 const enc = (v) => encodeURIComponent(JSON.stringify(v));
@@ -29,7 +30,7 @@ async function rawgCalls(request) {
   return Number(await res.text());
 }
 
-const uniq = () => `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+const uniq = () => `${Date.now()}-${randomInt(1e6)}`;
 
 // PNG 1x1 valido e JPEG minimale (solo i magic bytes contano per il server).
 const PNG_1x1 = Buffer.from(
