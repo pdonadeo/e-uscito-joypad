@@ -1,0 +1,18 @@
+(library
+ (name admin)
+ (preprocess
+  (pps lwt_ppx))
+ (libraries
+  dream
+  settings
+  caqti
+  caqti-lwt
+  yojson
+  digestif
+  base64
+  uri
+  timedesc
+  lwt.unix
+  cohttp
+  cohttp-lwt
+  cohttp-lwt-unix))

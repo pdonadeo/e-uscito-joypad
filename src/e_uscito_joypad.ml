@@ -51,19 +51,42 @@ let get_joycord_json_tree _req =
   | None -> Dream.json "[]"
   | Some json -> Dream.json json
 
+(* Admin react-admin (Fase 3): SPA con HashRouter, una sola pagina. *)
+let bo_index _req =
+  match Static_filesystem.read "/bo/index.html" with
+  | None -> Dream.empty `Not_Found
+  | Some page -> Dream.html ~headers:[("Cache-Control", "no-cache")] page
+
+let check_admin_settings () =
+  let placeholder = Settings.dream_secret = Some "DREAM SECRET CHANGE ME IN PRODUCTION" in
+  if (not Settings.debug) && (Settings.dream_secret = None || placeholder)
+  then begin
+    prerr_endline
+      "ERRORE: con DEBUG=False serve una DREAM_SECRET vera (cifra le sessioni dell'admin): genera con `openssl rand \
+       -base64 48`.";
+    exit 1
+  end;
+  if Settings.dream_secret = None
+  then log.warning (fun m -> m "DREAM_SECRET non impostata: le sessioni dell'admin non sopravvivono al riavvio")
+
 let server =
+  check_admin_settings ();
   Lwt.async Joypad_monitor.monitor (* TODO ELIMINARE Lwt.async *);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec) (* TODO ELIMINARE Lwt.async *);
 
   serve
     ~interface:Settings.listen_address
     ~port:Settings.listen_port
-    ~error_handler:Dream.debug_error_handler (* TODO BOH... come si disattiva 'sto coso? *)
+    ~error_handler:
+      (Admin.Routes.error_handler
+         ~is_admin_api:Middlewares.is_admin_api
+         ~fallback:Dream.debug_error_handler (* TODO BOH... come si disattiva 'sto coso? *))
     ~stop:will_stop
   @@ logger
-  @@ (if Settings.debug then Dream.no_middleware else Dream.origin_referrer_check)
-  @@ (if Settings.debug then Middlewares.Cors.middleware else Dream.no_middleware)
-  @@ (if Settings.debug then Middlewares.Json_debug.middleware ~log else Dream.no_middleware)
+  @@ Middlewares.except_admin_api (if Settings.debug then Dream.no_middleware else Dream.origin_referrer_check)
+  @@ Middlewares.except_admin_api (if Settings.debug then Middlewares.Cors.middleware else Dream.no_middleware)
+  @@ Middlewares.except_admin_api
+       (if Settings.debug then Middlewares.Json_debug.middleware ~log else Dream.no_middleware)
   @@ Middlewares.No_trailing_slash.middleware
   @@ Dream.sql_pool Settings.django_connection_string
   @@ router
@@ -92,6 +115,10 @@ let server =
          get "/se-ne-parla-qui/:selectedGameIdUrl/:searchInputUrl" game_page_handler;
          get "/joycord/channels" default_handler;
          get "/sitemap.xml" Sitemap.view;
+         Admin.Routes.routes;
+         get "/bo/files/**" (fun _ -> Dream.empty `Not_Found) (* servito da nginx *);
+         get "/bo" bo_index;
+         get "/bo/**" bo_index;
          get "/" default_handler;
        ]
 
