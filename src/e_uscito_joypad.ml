@@ -85,7 +85,11 @@ let server =
     ~error_handler:
       (Admin.Routes.error_handler
          ~is_admin_api:Middlewares.is_admin_api
-         ~fallback:Dream.debug_error_handler (* TODO BOH... come si disattiva 'sto coso? *))
+         ~fallback:
+           (* in produzione niente pagine di debug: echeggerebbero gli header,
+              compreso il cookie di sessione dell'admin *)
+           (if Settings.debug then Dream.debug_error_handler
+            else Dream.error_template (fun _error _debug_dump response -> Lwt.return response)))
     ~stop:will_stop
   @@ logger
   @@ Middlewares.except_admin_api (if Settings.debug then Dream.no_middleware else Dream.origin_referrer_check)
