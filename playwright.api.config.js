@@ -1,14 +1,16 @@
 // @ts-check
-// Test d'integrazione HTTP dell'API admin (/api/bo), Fase 2 della rimozione di Django.
+// Test d'integrazione HTTP dell'API admin (/api/bo, Fase 2 della rimozione di Django)
+// e test e2e del frontend react-admin su /bo (tests/admin.spec.js, Fase 3).
 // Avvia un Dream locale (build di dune) e un finto RAWG; usa il PostgreSQL del
 // compose di sviluppo e il container Django per creare gli utenti di test.
 //
-//   opam exec -- dune build @install && npx playwright test -c playwright.api.config.js
+//   (cd frontend && yarn build) && opam exec -- dune build @install && npx playwright test -c playwright.api.config.js
 const { defineConfig } = require('@playwright/test');
 const { API_URL, API_PORT, RAWG_PORT, RAWG_KEY, BINARY, dreamEnv } = require('./tests/api/env');
 
 module.exports = defineConfig({
-  testDir: './tests/api',
+  testDir: './tests',
+  testMatch: ['api/**/*.spec.js', 'admin.spec.js'],
   timeout: 60000,
   workers: 1,
   fullyParallel: false,
