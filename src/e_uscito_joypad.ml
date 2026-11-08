@@ -55,7 +55,12 @@ let get_joycord_json_tree _req =
 let bo_index _req =
   match Static_filesystem.read "/bo/index.html" with
   | None -> Dream.empty `Not_Found
-  | Some page -> Dream.html ~headers:[("Cache-Control", "no-cache")] page
+  | Some page ->
+    (* come l'admin Django: niente framing (clickjacking) *)
+    Dream.html
+      ~headers:
+        [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
+      page
 
 let check_admin_settings () =
   let placeholder = Settings.dream_secret = Some "DREAM SECRET CHANGE ME IN PRODUCTION" in

@@ -71,7 +71,7 @@
    (bash
     "cp %{project_root}/euscitojoypad_db/prerendered_index.html %{project_root}/static_filesystem/")
    (bash
-    "if [ -d %{project_root}/frontend/build/bo ]; then cp -a %{project_root}/frontend/build/bo %{project_root}/static_filesystem/; fi")
+    "cp -a %{project_root}/frontend/build/bo %{project_root}/static_filesystem/")
    (with-stdout-to
     %{target}
     (run ocaml-crunch -m plain %{project_root}/static_filesystem)))))

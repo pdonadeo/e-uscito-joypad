@@ -6,3 +6,4 @@ _opam/
 data/
 frontend/node_modules
 docker-compose.yml
+**/.omc
