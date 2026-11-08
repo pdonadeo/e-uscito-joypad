@@ -32,14 +32,24 @@ export const VideogameList = () => (
   </List>
 );
 
-// rawg_json in sola lettura, come il JSONEditorWidget in modalità "view" di Django
+// rawg_json in sola lettura, come il JSONEditorWidget in modalità "view" di Django.
+// Le righe lunghe (es. "description") vanno a capo: senza pre-wrap la larghezza
+// minima del <pre> è la riga più lunga e allarga tutta la pagina oltre la viewport.
 const RawgJson = () => {
   const record = useRecordContext();
   if (!record?.rawg_json) return null;
   return (
     <Labeled label="RAWG JSON data" fullWidth>
       <pre
-        style={{ maxHeight: 400, overflow: "auto", fontSize: 12, background: "rgba(0,0,0,0.04)", padding: 8 }}
+        style={{
+          maxHeight: 400,
+          overflow: "auto",
+          whiteSpace: "pre-wrap",
+          overflowWrap: "anywhere",
+          fontSize: 12,
+          background: "rgba(0,0,0,0.04)",
+          padding: 8,
+        }}
         data-testid="rawg-json"
       >
         {JSON.stringify(record.rawg_json, null, 2)}
