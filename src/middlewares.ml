@@ -66,3 +66,13 @@ module No_trailing_slash = struct
       then Dream.redirect request (String.sub target 0 (String.length target - 1))
       else inner_handler request
 end
+
+(* Applica [middleware] a tutto tranne che alle rotte /api/bo, che hanno i loro
+   controlli (Origin/Referer, sessioni) e non devono passare dal CORS di debug. *)
+let is_admin_api request =
+  let path = Dream.target request |> String.split_on_char '?' |> List.hd in
+  path = "/api/bo" || String.starts_with ~prefix:"/api/bo/" path
+
+let except_admin_api (middleware : Dream.middleware) : Dream.middleware =
+ fun inner_handler request ->
+  if is_admin_api request then inner_handler request else middleware inner_handler request

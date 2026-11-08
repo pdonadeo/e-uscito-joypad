@@ -11,5 +11,5 @@ if settings.DEBUG:
 
 
 urlpatterns += [
-    path("bo/", admin.site.urls),
+    path("legacy-bo/", admin.site.urls),
 ]

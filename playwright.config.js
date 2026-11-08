@@ -7,6 +7,8 @@ const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './tests',
+  // i test dell'admin (API e frontend) hanno la loro config: playwright.api.config.js
+  testIgnore: ['**/api/**', '**/admin.spec.js'],
   timeout: 30000,
   reporter: 'list',
   use: {
