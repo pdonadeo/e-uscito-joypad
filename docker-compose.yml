@@ -41,7 +41,10 @@ services:
     environment:
       PGHOST: "postgresql"
       PGPORT: "5432"
+      MEDIA_ROOT: "/media"
     env_file: ./compose_env
+    volumes:
+      - ./euscitojoypad_db/MEDIA:/media
 
   # Backoffice (Django)
   backoffice:
