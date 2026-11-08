@@ -70,7 +70,9 @@ Il database utilizzato è [PostgreSQL](https://www.postgresql.org/).
 
 ### Backoffice
 
-Per il _data entry_ di episodi e giochi occorre un [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) di accesso al database. È stato realizzato con [Django](https://www.djangoproject.com/) e, una volta fatto partire il progetto con `docker-compose`, è accessibile a questo indirizzo: http://localhost:5000/legacy-bo/
+Per il _data entry_ di episodi e giochi occorre un [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) di accesso al database. È realizzato con [react-admin](https://marmelab.com/react-admin/) (codice in `frontend/src/bo/`) sopra un'API REST servita da Dream sotto `/api/bo` (codice in `src/admin/`). Una volta fatto partire il progetto con `docker-compose`, è accessibile a questo indirizzo: http://localhost:5000/bo
+
+Il vecchio backoffice [Django](https://www.djangoproject.com/) è ancora disponibile, in convivenza e in attesa di essere rimosso, su http://localhost:5000/legacy-bo/ . Usa gli stessi utenti del nuovo admin.
 
 ### Variabili d'ambiente per la configurazione del progetto
 
