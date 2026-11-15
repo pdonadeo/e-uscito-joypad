@@ -215,6 +215,7 @@ Il perimetro segue `/bo`.
 - **Q-2. Esportazione CSV.** È un default di react-admin che Django non ha, e nessuno l'ha mai chiesta esplicitamente. **Deciso da Paolo (2026-11-15):** esclusa.
 - **Q-3. Vincoli `V-` fuori dal lint dello schema.** Il lint di 3.3b verifica che nello schema compaiano solo gli ID `F-`. I vincoli `V-` si verificano con i test API di 3.5 e non hanno un e2e dedicato. **Deciso da Paolo (2026-11-15):** divisione approvata.
 - **Q-4. Funzioni dell'API non usate da `/bo`** (F-AS-02, filtro `id` sugli episodi, ordinamenti per `id` e `ts`). **Deciso da Paolo (2026-11-15):** in GraphQL c'è solo F-AS-02, per la parità delle route richiesta da AC-4; gli altri non si replicano.
+- **Q-4b. Ordinamento degli utenti per `date_joined`.** L'API lo ammette, ma `/bo` non mostra la colonna. **Deciso da Paolo (2026-11-15):** escluso da GraphQL, come `id` e `ts` in Q-4.
 - **Q-5. Associazioni dalla pagina del videogame.** Django le rende modificabili (`admin.py:90`), `/bo` le mostra in sola lettura (F-VG-08). **Deciso da Paolo (2026-11-15):** restano in sola lettura, perché nessuno le modifica da lì.
 - **Q-6. Ricerca.** Django divide la stringa in parole e le cerca tutte, `/bo` cerca la stringa intera come sottostringa (F-EP-03, F-VG-03, F-UT-02). **Deciso da Paolo (2026-11-15):** si cerca per sottostringa come in `/bo`, che basta.
 
@@ -226,6 +227,7 @@ Il perimetro segue `/bo`.
   - 409 dei duplicati, che il piano unisce a `BAD_USER_INPUT`.
 
   Mappati su `INTERNAL`, i primi due perderebbero il loro significato. Da decidere nello schema, per esempio con `RATE_LIMITED` e `UPSTREAM_ERROR`.
+- **Divergenze da REST decise con lo spike** (`docs/spike-graphql.md`, punto 6): in GraphQL `associazioni` assente o `null` lascia le associazioni come sono (F-EP-07), e `istante` assente o `null` lascia il campo vuoto (F-EP-09). Il default `0:00:00` lo mette l'interfaccia.
 - Il filtro per lista di `id` (`getMany`) è un meccanismo interno di react-admin. In GraphQL forse non serve, perché l'episodio porta già `videogame_titolo` per ogni associazione.
 
 ## Tabella di copertura

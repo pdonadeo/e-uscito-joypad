@@ -1,0 +1,459 @@
+# Contratto GraphQL di /new-bo (Fase 3.3b)
+#
+# Endpoint: POST /api/graphql. Body JSON {"query", "variables", "operationName"},
+# header Content-Type: application/json esatto, senza charset.
+# Ogni operazione cita gli ID di docs/analisi.md (# F-xx-nn). La parità con
+# /api/bo e i vincoli V-01…V-08 valgono come in analisi.md.
+#
+# Sessione: è la stessa di /api/bo, nel cookie dream.session con Path=/.
+# Un login o un logout su REST vale anche qui, e viceversa (V-03).
+# Origine: Origin o Referer è obbligatorio (V-01). Se manca o non è
+# consentito, la risposta è 403 con il JSON REST {"message": …}, non errors[].
+#
+# Accesso:
+# - anonimo: solo `login`, `logout` (che riesce sempre, come in REST) e
+#   l'introspection (__schema, __type), che è consentita; tutto il resto
+#   risponde UNAUTHENTICATED;
+# - staff (is_active e is_staff): tutto tranne le operazioni sugli utenti;
+# - superuser: tutto (F-AU-04).
+#
+# Errori: errors[].extensions.code assume uno di questi valori.
+#   UNAUTHENTICATED     sessione assente o non più valida, login rifiutato (401 REST)
+#   FORBIDDEN           operazione riservata ai superuser (403 REST)
+#   BAD_USER_INPUT      validazione, duplicato, body o Content-Type non validi (400/409 REST)
+#   NOT_FOUND           id inesistente (404 REST)
+#   RATE_LIMITED        troppi calcoli di hash in corso (429 REST, V-04): login,
+#                       creaUtente e aggiornaUtente con una password
+#   UPSTREAM_ERROR      RAWG non raggiungibile o risposta non valida (502/504 REST)
+#   INTERNAL            errore interno o del database (500 REST)
+#   GRAPHQL_VALIDATION  query non valida per lo schema (errore della libreria)
+# Il messaggio (errors[].message) è lo stesso testo italiano di /api/bo.
+# Hanno status HTTP 400 solo gli errori sul body (JSON non valido o non un
+# oggetto) e sul Content-Type. Tutti gli altri, compresi gli errori di sintassi
+# GraphQL (GRAPHQL_VALIDATION) e quelli dei resolver, hanno status 200 con errors[].
+#
+# Formati, tutti come stringa:
+#   data       AAAA-MM-GG
+#   durata     in ingresso H:MM:SS o MM:SS (ore fino a 4 cifre); in uscita HH:MM:SS
+#   timestamp  ISO 8601 con fuso, come in /api/bo
+#   rawg_json  JSON serializzato
+# Gli id sono Int, come in /api/bo. GraphQL Int è a 32 bit (oggi gli id sono
+# molto più piccoli); un id che non corrisponde a un record, anche se fuori
+# intervallo, risponde NOT_FOUND.
+#
+# Elenchi: offset e limit sono opzionali. Senza limit si ottengono tutte le
+# righe, come REST senza range; offset senza limit parte da offset e arriva in
+# fondo. Valori ammessi: offset ≥ 0, 1 ≤ limit ≤ 1000 (V-06). Fuori intervallo:
+# BAD_USER_INPUT «Parametro «offset»: deve essere ≥ 0» oppure
+# «Parametro «limit»: deve essere tra 1 e 1000».
+# L'ordinamento usa un enum per risorsa più una direzione; senza argomenti vale
+# il default indicato. A parità di valore decide l'id, e i null vanno in fondo.
+# La ricerca è "contiene", senza distinzione tra maiuscole e minuscole, sulla
+# stringa intera (Q-6).
+#
+# Input: per la libreria un campo assente e un campo null sono la stessa cosa
+# (docs/spike-graphql.md, punto 6).
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  # F-AU-03 F-AU-04 F-AU-05
+  "Utente della sessione corrente."
+  me: UtenteCorrente!
+
+  # F-EP-01 F-EP-02 F-EP-03 F-EP-04
+  "Elenco degli episodi. Default: DATA_USCITA, DESC."
+  elencoEpisodi(
+    offset: Int
+    limit: Int
+    "Cerca in numero e titolo."
+    ricerca: String
+    "Filtro «Pubblicato»: null = tutti."
+    pubblicato: Boolean
+    ordinamento: OrdinamentoEpisodi
+    direzione: Direzione
+  ): PaginaEpisodi!
+
+  # F-EP-05 F-EP-09 F-EP-10 F-EP-11
+  "Dettaglio di un episodio, con le associazioni. NOT_FOUND se non esiste."
+  episodio(id: Int!): Episodio!
+
+  # F-VG-01 F-VG-02 F-VG-03
+  "Elenco dei videogame. Default: TITOLO, ASC. Serve anche a scegliere il videogame di un'associazione (F-EP-09)."
+  elencoVideogame(
+    offset: Int
+    limit: Int
+    "Cerca in titolo, descrizione testuale e slug RAWG."
+    ricerca: String
+    ordinamento: OrdinamentoVideogame
+    direzione: Direzione
+  ): PaginaVideogame!
+
+  # F-VG-04
+  "Dettaglio di un videogame. NOT_FOUND se non esiste."
+  videogame(id: Int!): Videogame!
+
+  # F-AS-01 F-VG-08
+  "Associazioni filtrate per videogame o per episodio. Default: DATA_USCITA (poi istante), ASC. Per «Citato negli episodi» (F-VG-08): videogame_id, DATA_USCITA, DESC."
+  elencoAssociazioni(
+    episodio_id: Int
+    videogame_id: Int
+    offset: Int
+    limit: Int
+    ordinamento: OrdinamentoAssociazioni
+    direzione: Direzione
+  ): PaginaAssociazioni!
+
+  # F-AS-02
+  "Dettaglio di un'associazione. NOT_FOUND se non esiste."
+  associazione(id: Int!): Associazione!
+
+  # F-UT-01 F-UT-02 (solo superuser)
+  "Elenco degli utenti. Default: USERNAME, ASC."
+  elencoUtenti(
+    offset: Int
+    limit: Int
+    "Cerca in username, email, nome e cognome."
+    ricerca: String
+    ordinamento: OrdinamentoUtenti
+    direzione: Direzione
+  ): PaginaUtenti!
+
+  # F-UT-03 (solo superuser)
+  "Dettaglio di un utente. NOT_FOUND se non esiste."
+  utente(id: Int!): Utente!
+}
+
+type Mutation {
+  # F-AU-01
+  "Login con username e password. Rigenera la sessione. Errori: UNAUTHENTICATED, RATE_LIMITED."
+  login(credenziali: CredenzialiInput!): UtenteCorrente!
+
+  # F-AU-02
+  "Logout: invalida la sessione. Risponde sempre true."
+  logout: Boolean!
+
+  # F-EP-06 F-EP-09 F-AS-03
+  "Crea un episodio con le sue associazioni, in un'unica transazione. La cover si carica dopo, via REST (F-EP-10)."
+  creaEpisodio(dati: EpisodioInput!): Episodio!
+
+  # F-EP-07 F-EP-09 F-AS-03
+  "Modifica un episodio. Sostituzione completa come PUT in REST: un campo opzionale assente o null viene azzerato (null, pubblicato false). Unica eccezione, associazioni: assente o null le lascia come sono; una lista le sostituisce ([] le cancella tutte)."
+  aggiornaEpisodio(id: Int!, dati: EpisodioInput!): Episodio!
+
+  # F-EP-08
+  "Elimina un episodio e le sue associazioni. Restituisce il record eliminato. Il file della cover resta su disco."
+  eliminaEpisodio(id: Int!): Episodio!
+
+  # F-VG-05
+  "Crea un videogame. Titolo, descrizioni, cover e rawg_json arrivano sempre da RAWG. Errori: BAD_USER_INPUT (slug non trovato o duplicato), UPSTREAM_ERROR."
+  creaVideogame(dati: VideogameInput!): Videogame!
+
+  # F-VG-06
+  "Modifica un videogame. Sostituzione completa: un campo opzionale assente o null viene azzerato. Se il record non ha ancora rawg_json (null), si interroga RAWG, che sovrascrive titolo, descrizioni e cover; altrimenti RAWG non viene interrogato. Errori: BAD_USER_INPUT (slug non trovato o duplicato), UPSTREAM_ERROR."
+  aggiornaVideogame(id: Int!, dati: VideogameInput!): Videogame!
+
+  # F-VG-07
+  "Elimina un videogame e le sue associazioni. Restituisce il record eliminato."
+  eliminaVideogame(id: Int!): Videogame!
+
+  # F-UT-04 (solo superuser)
+  "Crea un utente. La password è obbligatoria (almeno 8 caratteri)."
+  creaUtente(dati: UtenteInput!): Utente!
+
+  # F-UT-05 (solo superuser)
+  "Modifica un utente. Sostituzione completa: nome, cognome ed email assenti diventano vuoti, e i flag assenti tornano ai default (is_staff true, is_active true, is_superuser false), quindi vanno sempre mandati. Senza password, la password resta quella di prima. Non ci si può togliere staff, attivo o superuser."
+  aggiornaUtente(id: Int!, dati: UtenteInput!): Utente!
+
+  # F-UT-06 (solo superuser)
+  "Elimina un utente (non se stessi). Restituisce il record eliminato."
+  eliminaUtente(id: Int!): Utente!
+}
+
+# --- Tipi --------------------------------------------------------------------
+
+# F-AU-03
+"Utente della sessione: è la risposta di login e di me."
+type UtenteCorrente {
+  id: Int!
+  username: String!
+  "Nome e cognome, oppure lo username se sono vuoti."
+  fullName: String!
+  is_superuser: Boolean!
+}
+
+type Episodio {
+  id: Int!
+  titolo: String!
+  episodio_numero: String
+  "AAAA-MM-GG"
+  data_uscita: String!
+  "HH:MM:SS"
+  durata: String!
+  url: String
+  url_post: String
+  url_video: String
+  descrizione_html: String
+  descrizione_txt: String
+  note: String
+  pubblicato: Boolean!
+  # F-EP-10 F-EP-11: upload e rimozione via REST, POST e DELETE /api/bo/episodi/:id/cover
+  "Percorso relativo a MEDIA_ROOT; null o vuoto se manca la cover."
+  cover: String
+  "URL pubblico della cover (/bo/files/…), null se manca."
+  cover_url: String
+  ts_created: String!
+  ts: String!
+  # F-EP-09
+  "Associazioni con i videogame, ordinate per istante (null in fondo), poi per id."
+  associazioni: [AssociazioneEpisodio!]!
+}
+
+# F-EP-01: riga dell'elenco episodi, cioè Episodio senza le associazioni.
+type EpisodioInElenco {
+  id: Int!
+  titolo: String!
+  episodio_numero: String
+  data_uscita: String!
+  durata: String!
+  url: String
+  url_post: String
+  url_video: String
+  descrizione_html: String
+  descrizione_txt: String
+  note: String
+  pubblicato: Boolean!
+  cover: String
+  cover_url: String
+  ts_created: String!
+  ts: String!
+}
+
+# F-EP-09 F-AS-03: associazione vista dall'episodio (senza i campi dell'episodio).
+type AssociazioneEpisodio {
+  id: Int!
+  videogame_id: Int!
+  videogame_titolo: String
+  "HH:MM:SS, null se assente."
+  istante: String
+  speaker: Speaker!
+  tipologia: Tipologia!
+}
+
+type Videogame {
+  id: Int!
+  titolo: String
+  rawg_slug: String!
+  "URL dell'immagine (da RAWG)."
+  cover: String
+  descrizione_raw: String
+  descrizione_html: String
+  "Dati RAWG, JSON serializzato. Sola lettura."
+  rawg_json: String
+  ts_created: String!
+  ts: String!
+}
+
+# F-VG-01: riga dell'elenco videogame.
+type VideogameInElenco {
+  id: Int!
+  titolo: String
+  rawg_slug: String!
+  cover: String
+  ts: String!
+}
+
+# F-AS-01 F-AS-02 F-AS-03
+type Associazione {
+  id: Int!
+  episodio_id: Int!
+  videogame_id: Int!
+  "HH:MM:SS, null se assente."
+  istante: String
+  speaker: Speaker!
+  tipologia: Tipologia!
+  videogame_titolo: String
+  episodio_titolo: String!
+  episodio_numero: String
+  "Data di uscita dell'episodio (AAAA-MM-GG)."
+  data_uscita: String!
+}
+
+type Utente {
+  id: Int!
+  username: String!
+  first_name: String!
+  last_name: String!
+  email: String!
+  is_staff: Boolean!
+  is_active: Boolean!
+  is_superuser: Boolean!
+  "Timestamp, null se l'utente non è mai entrato."
+  last_login: String
+  date_joined: String!
+}
+
+type PaginaEpisodi {
+  "Righe che rispettano i filtri, senza offset e limit."
+  totale: Int!
+  elementi: [EpisodioInElenco!]!
+}
+
+type PaginaVideogame {
+  totale: Int!
+  elementi: [VideogameInElenco!]!
+}
+
+type PaginaAssociazioni {
+  totale: Int!
+  elementi: [Associazione!]!
+}
+
+type PaginaUtenti {
+  totale: Int!
+  elementi: [Utente!]!
+}
+
+# --- Enum ----------------------------------------------------------------------
+
+# F-AS-03: le descrizioni sono le etichette da mostrare.
+enum Speaker {
+  "Tutti"
+  TUTT
+  "Matteo Bordone (corri!)"
+  BORD
+  "Francesco Fossetti (salta!)"
+  FOSS
+  "Alessandro Zampini (spara!)"
+  ZAMP
+}
+
+# F-AS-03
+enum Tipologia {
+  "Chiacchiera libera"
+  FREE
+  "Recensione"
+  RECE
+  "Consiglio"
+  CONS
+  "Osservatorio Start Citizen"
+  STAR
+}
+
+enum Direzione {
+  ASC
+  DESC
+}
+
+# F-EP-02
+enum OrdinamentoEpisodi {
+  EPISODIO_NUMERO
+  TITOLO
+  DATA_USCITA
+  DURATA
+  PUBBLICATO
+}
+
+# F-VG-02
+enum OrdinamentoVideogame {
+  TITOLO
+  RAWG_SLUG
+}
+
+# F-AS-01
+enum OrdinamentoAssociazioni {
+  "data di uscita dell'episodio, poi istante"
+  DATA_USCITA
+  ISTANTE
+  SPEAKER
+  TIPOLOGIA
+  VIDEOGAME_TITOLO
+  EPISODIO_TITOLO
+}
+
+# F-UT-01
+enum OrdinamentoUtenti {
+  USERNAME
+  FIRST_NAME
+  LAST_NAME
+  EMAIL
+  IS_STAFF
+  IS_ACTIVE
+  IS_SUPERUSER
+  LAST_LOGIN
+}
+
+# --- Input ---------------------------------------------------------------------
+
+# F-AU-01
+input CredenzialiInput {
+  username: String!
+  password: String!
+}
+
+# F-EP-06 F-EP-07: le regole sono quelle della tabella Episodio di analisi.md.
+input EpisodioInput {
+  "Obbligatorio, al massimo 256 caratteri."
+  titolo: String!
+  "Al massimo 32 caratteri; vuoto equivale a null."
+  episodio_numero: String
+  "AAAA-MM-GG"
+  data_uscita: String!
+  "H:MM:SS o MM:SS"
+  durata: String!
+  "http:// o https://, al massimo 256 caratteri."
+  url: String
+  url_post: String
+  url_video: String
+  descrizione_html: String
+  descrizione_txt: String
+  note: String
+  "Default false."
+  pubblicato: Boolean
+  "Assente o null: non si toccano. Lista: sostituisce le associazioni."
+  associazioni: [AssociazioneInput!]
+}
+
+# F-EP-09 F-AS-03
+input AssociazioneInput {
+  "id di un'associazione dell'episodio da aggiornare; assente per crearne una nuova."
+  id: Int
+  videogame_id: Int!
+  "H:MM:SS; assente, null o vuoto lasciano il campo vuoto. Il default 0:00:00 lo mette l'interfaccia."
+  istante: String
+  "Default TUTT."
+  speaker: Speaker
+  "Default FREE."
+  tipologia: Tipologia
+}
+
+# F-VG-05 F-VG-06
+input VideogameInput {
+  "Obbligatorio: solo lettere, cifre, - e _."
+  rawg_slug: String!
+  titolo: String
+  descrizione_raw: String
+  descrizione_html: String
+  "http:// o https://, al massimo 200 caratteri."
+  cover: String
+}
+
+# F-UT-04 F-UT-05
+input UtenteInput {
+  "Obbligatorio, al massimo 150 caratteri: lettere, cifre e @ . + - _"
+  username: String!
+  "Almeno 8 caratteri. Obbligatoria in creazione; in modifica, assente o vuota lascia quella di prima."
+  password: String
+  first_name: String
+  last_name: String
+  email: String
+  "Default true."
+  is_staff: Boolean
+  "Default true."
+  is_active: Boolean
+  "Default false."
+  is_superuser: Boolean
+}
