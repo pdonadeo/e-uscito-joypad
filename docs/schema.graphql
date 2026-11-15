@@ -165,7 +165,7 @@ type Mutation {
   creaUtente(dati: UtenteInput!): Utente!
 
   # F-UT-05 (solo superuser)
-  "Modifica un utente. Sostituzione completa: nome, cognome ed email assenti diventano vuoti, e i flag assenti tornano ai default (is_staff true, is_active true, is_superuser false), quindi vanno sempre mandati. Senza password, la password resta quella di prima. Non ci si può togliere staff, attivo o superuser."
+  "Modifica un utente. Sostituzione completa: nome, cognome ed email assenti diventano vuoti; i flag sono obbligatori. Senza password, la password resta quella di prima. Non ci si può togliere staff, attivo o superuser."
   aggiornaUtente(id: Int!, dati: UtenteInput!): Utente!
 
   # F-UT-06 (solo superuser)
@@ -450,10 +450,9 @@ input UtenteInput {
   first_name: String
   last_name: String
   email: String
-  "Default true."
-  is_staff: Boolean
-  "Default true."
-  is_active: Boolean
-  "Default false."
-  is_superuser: Boolean
+  # Obbligatori: differenza voluta rispetto a REST, dove assenti valgono
+  # true, true, false (eccezione di parità P-5 del piano, Fase 3.5).
+  is_staff: Boolean!
+  is_active: Boolean!
+  is_superuser: Boolean!
 }
