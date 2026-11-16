@@ -15,6 +15,7 @@
   db
   rest
   admin
+  gql
   settings
   batteries
   malloc

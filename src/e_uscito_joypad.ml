@@ -125,6 +125,8 @@ let server =
          get "/joycord/channels" default_handler;
          get "/sitemap.xml" Sitemap.view;
          Admin.Routes.routes;
+         Gql.Routes.routes;
+         Gql.Routes.graphiql;
          get "/bo/files/**" (fun _ -> Dream.empty `Not_Found) (* servito da nginx *);
          get "/bo" bo_index;
          get "/bo/**" bo_index;

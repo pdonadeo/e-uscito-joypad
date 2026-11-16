@@ -183,6 +183,18 @@ test('elencoEpisodi: ogni ordinamento in entrambe le direzioni', async () => {
   }
 });
 
+test('elencoEpisodi: ordinamento indicato senza direzione → ASC (il default DESC vale solo senza argomenti)', async () => {
+  const ids = async (vars) => expectOk(await gql(api, ELENCO, { l: 50, ...vars })).elencoEpisodi.elementi.map((e) => e.id);
+  const asc = await ids({ ord: 'TITOLO', dir: 'ASC' });
+  expect(await ids({ ord: 'TITOLO' })).toEqual(asc);
+  // controllo che il test distingua le due direzioni
+  expect(await ids({ ord: 'TITOLO', dir: 'DESC' })).not.toEqual(asc);
+  // senza argomenti vale il default dell'elenco: DATA_USCITA, DESC
+  expect(await ids({})).toEqual(await ids({ ord: 'DATA_USCITA', dir: 'DESC' }));
+  // con la sola direzione la colonna resta quella di default
+  expect(await ids({ dir: 'ASC' })).toEqual(await ids({ ord: 'DATA_USCITA', dir: 'ASC' }));
+});
+
 test('aggiornaEpisodio: sostituisce le associazioni (aggiorna per id, cancella, inserisce)', async () => {
   const ep = await nuovoEpisodio();
   const [kept, removed] = ep.associazioni;

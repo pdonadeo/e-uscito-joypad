@@ -1,0 +1,5 @@
+(library
+ (name gql)
+ (preprocess
+  (pps lwt_ppx))
+ (libraries dream graphql-lwt admin settings caqti caqti-lwt yojson))

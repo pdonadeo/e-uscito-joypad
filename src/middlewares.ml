@@ -67,11 +67,16 @@ module No_trailing_slash = struct
       else inner_handler request
 end
 
-(* Applica [middleware] a tutto tranne che alle rotte /api/bo, che hanno i loro
-   controlli (Origin/Referer, sessioni) e non devono passare dal CORS di debug. *)
+(* Applica [middleware] a tutto tranne che alle rotte /api/bo e a /api/graphql,
+   che hanno i loro controlli (Origin/Referer, sessioni) e non devono passare dal
+   CORS di debug. /api/graphql/ è compreso perché il suo redirect non finisca
+   nella pagina di debug. *)
 let is_admin_api request =
   let path = Dream.target request |> String.split_on_char '?' |> List.hd in
-  path = "/api/bo" || String.starts_with ~prefix:"/api/bo/" path
+  path = "/api/bo"
+  || String.starts_with ~prefix:"/api/bo/" path
+  || path = "/api/graphql"
+  || path = "/api/graphql/"
 
 let except_admin_api (middleware : Dream.middleware) : Dream.middleware =
  fun inner_handler request ->

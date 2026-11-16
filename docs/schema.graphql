@@ -46,8 +46,11 @@
 # fondo. Valori ammessi: offset ≥ 0, 1 ≤ limit ≤ 1000 (V-06). Fuori intervallo:
 # BAD_USER_INPUT «Parametro «offset»: deve essere ≥ 0» oppure
 # «Parametro «limit»: deve essere tra 1 e 1000».
-# L'ordinamento usa un enum per risorsa più una direzione; senza argomenti vale
-# il default indicato. A parità di valore decide l'id, e i null vanno in fondo.
+# L'ordinamento usa un enum per risorsa più una direzione. Il default indicato
+# (colonna e direzione) vale solo se mancano entrambi; con l'ordinamento
+# indicato e la direzione assente la direzione è ASC; con la sola direzione la
+# colonna è quella di default. A parità di valore decide l'id, e i null vanno
+# in fondo.
 # La ricerca è "contiene", senza distinzione tra maiuscole e minuscole, sulla
 # stringa intera (Q-6).
 #
@@ -65,7 +68,7 @@ type Query {
   me: UtenteCorrente!
 
   # F-EP-01 F-EP-02 F-EP-03 F-EP-04
-  "Elenco degli episodi. Default: DATA_USCITA, DESC."
+  "Elenco degli episodi. Default: DATA_USCITA, DESC. Con ordinamento indicato e direzione assente: ASC."
   elencoEpisodi(
     offset: Int
     limit: Int
@@ -82,7 +85,7 @@ type Query {
   episodio(id: Int!): Episodio!
 
   # F-VG-01 F-VG-02 F-VG-03
-  "Elenco dei videogame. Default: TITOLO, ASC. Serve anche a scegliere il videogame di un'associazione (F-EP-09)."
+  "Elenco dei videogame. Default: TITOLO, ASC. Con ordinamento indicato e direzione assente: ASC. Serve anche a scegliere il videogame di un'associazione (F-EP-09)."
   elencoVideogame(
     offset: Int
     limit: Int
@@ -97,7 +100,7 @@ type Query {
   videogame(id: Int!): Videogame!
 
   # F-AS-01 F-VG-08
-  "Associazioni filtrate per videogame o per episodio. Default: DATA_USCITA (poi istante), ASC. Per «Citato negli episodi» (F-VG-08): videogame_id, DATA_USCITA, DESC."
+  "Associazioni filtrate per videogame o per episodio. Default: DATA_USCITA (poi istante), ASC. Con ordinamento indicato e direzione assente: ASC. Per «Citato negli episodi» (F-VG-08): videogame_id, DATA_USCITA, DESC."
   elencoAssociazioni(
     episodio_id: Int
     videogame_id: Int
@@ -112,7 +115,7 @@ type Query {
   associazione(id: Int!): Associazione!
 
   # F-UT-01 F-UT-02 (solo superuser)
-  "Elenco degli utenti. Default: USERNAME, ASC."
+  "Elenco degli utenti. Default: USERNAME, ASC. Con ordinamento indicato e direzione assente: ASC."
   elencoUtenti(
     offset: Int
     limit: Int

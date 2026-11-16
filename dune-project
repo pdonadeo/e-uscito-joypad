@@ -39,6 +39,8 @@
    (= v0.17.0))
   (dream
    (= 1.0.0~alpha8))
+  (graphql-lwt
+   (= 0.14.0))
   (tyxml-ppx
    (= 4.6.0))
   (ppx_deriving_yojson
