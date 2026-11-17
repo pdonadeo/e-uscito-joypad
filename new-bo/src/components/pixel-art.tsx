@@ -218,6 +218,22 @@ const PLAY = {
     '###.......',
     '#.........',
   ],
+  // 11 × 13: «▶ SALVA» e «▶ CREA» nella barra delle azioni (modifica-episodio-*.png)
+  medio: [
+    '#..........',
+    '###........',
+    '####.......',
+    '######.....',
+    '########...',
+    '#########..',
+    '###########',
+    '#########..',
+    '########...',
+    '######.....',
+    '####.......',
+    '###........',
+    '#..........',
+  ],
   // 14 × 16: «▶ ENTRA» del login e voce EPISODI della rotaia (login-*.png, elenco-episodi-1180.png)
   grande: [
     '#.............',
@@ -321,7 +337,17 @@ const STELLA = {
 } as const satisfies Record<string, Bitmap>
 
 const CHIUDI = {
-  // 8 × 8: «✕» dell'Alert del login (login-errore-*.png)
+  // 7 × 7: «✕» nei bottoni ELIMINA (modifica-episodio-*.png, elenco-episodi-*.png)
+  bottone: [
+    '##...##',
+    '.##.##.',
+    '..###..',
+    '...#...',
+    '..###..',
+    '.##.##.',
+    '##...##',
+  ],
+  // 8 × 8: «✕» dell'Alert del login, del bottone `destructive` · `icon` e del filtro (login-errore-*.png)
   piccolo: ['#......#', '##....##', '.##..##.', '..####..', '..####..', '.##..##.', '##....##', '#......#'],
   // 10 × 10: «✕» che chiude lo Sheet (menu-390.png)
   grande: [
@@ -379,4 +405,134 @@ export function GlifoGiu({ className }: { className?: string }) {
 
 export function GlifoEspelli({ className }: { className?: string }) {
   return <Glifo bitmap={ESPELLI} className={className} />
+}
+
+// 9 × 11: «◀» per tornare all'elenco e nella Pagination: è il «▶» dell'occhiello rovesciato
+const INDIETRO: Bitmap = PLAY.occhiello.map((riga) => [...riga].reverse().join(''))
+
+const TENDINA = {
+  // 6 × 6: «▾» del Select `con-etichetta` (filtro «Pubblicato», ORDINA)
+  piccola: ['######', '######', '.####.', '.####.', '..##..', '..##..'],
+  // 7 × 6: «▾» dei Select `default`, `tabella` e `xs`
+  normale: ['#######', '.#####.', '.#####.', '..###..', '..###..', '...#...'],
+} as const satisfies Record<string, Bitmap>
+
+// 9 × 8: «⌕» dell'Input `ricerca`
+const LENTE: Bitmap = [
+  '..#####..',
+  '.##...##.',
+  '.#.....#.',
+  '.#.....#.',
+  '.##...##.',
+  '..#####..',
+  '.##......',
+  '##.......',
+]
+
+// 13 × 12: «▦» dell'Input `data`
+const CALENDARIO: Bitmap = [
+  '#############',
+  '#############',
+  '#...........#',
+  '###.##.##.###',
+  '###.##.##.###',
+  '#...........#',
+  '###.##.##.###',
+  '###.##.##.###',
+  '#...........#',
+  '###.##.##.###',
+  '###.##.##.###',
+  '#############',
+]
+
+const SPUNTA = {
+  // 6 × 6: «✔ PUBBLICATO» e «✔ COVER» nei Badge
+  badge: ['.....#', '....##', '#..##.', '####..', '.##...', '.#....'],
+  // 7 × 6: Checkbox selezionata
+  casella: ['......#', '.....##', '#...##.', '##.##..', '.###...', '..#....'],
+  // 9 × 8: colonne «presente» della tabella episodi
+  riga: [
+    '.......##',
+    '......###',
+    '.....###.',
+    '....###..',
+    '.#####...',
+    '#####....',
+    '.####....',
+    '.###.....',
+  ],
+} as const satisfies Record<string, Bitmap>
+
+// 9 × 8: «▲» della colonna ordinata (TableHeader); «▼» è lo stesso capovolto
+const SU: Bitmap = [
+  '....#....',
+  '...###...',
+  '...###...',
+  '..#####..',
+  '.#######.',
+  '.#######.',
+  '#########',
+  '#########',
+]
+
+// 11 × 8: «↵» del ComboboxItem evidenziato
+const INVIO: Bitmap = [
+  '.........##',
+  '.........##',
+  '..#......##',
+  '.##......##',
+  '###########',
+  '###########',
+  '.##........',
+  '..#........',
+]
+
+// 13 × 7: «↑↓» nel piede del Combobox
+const FRECCE: Bitmap = [
+  '..#.......#..',
+  '.###......#..',
+  '#.#.#.....#..',
+  '..#.......#..',
+  '..#.....#.#.#',
+  '..#......###.',
+  '..#.......#..',
+]
+
+// 8 × 2: «–» della Checkbox `indeterminate`
+const MENO: Bitmap = ['########', '########']
+
+export function GlifoIndietro({ className }: { className?: string }) {
+  return <Glifo bitmap={INDIETRO} className={className} />
+}
+
+export function GlifoTendina({ misura, className }: Misure<typeof TENDINA>) {
+  return <Glifo bitmap={TENDINA[misura]} className={className} />
+}
+
+export function GlifoLente({ className }: { className?: string }) {
+  return <Glifo bitmap={LENTE} className={className} />
+}
+
+export function GlifoCalendario({ className }: { className?: string }) {
+  return <Glifo bitmap={CALENDARIO} className={className} />
+}
+
+export function GlifoSpunta({ misura, className }: Misure<typeof SPUNTA>) {
+  return <Glifo bitmap={SPUNTA[misura]} className={className} />
+}
+
+export function GlifoOrdine({ verso, className }: { verso: 'su' | 'giu'; className?: string }) {
+  return <Glifo bitmap={verso === 'su' ? SU : [...SU].reverse()} className={className} />
+}
+
+export function GlifoInvio({ className }: { className?: string }) {
+  return <Glifo bitmap={INVIO} className={className} />
+}
+
+export function GlifoFrecce({ className }: { className?: string }) {
+  return <Glifo bitmap={FRECCE} className={className} />
+}
+
+export function GlifoMeno({ className }: { className?: string }) {
+  return <Glifo bitmap={MENO} className={className} />
 }

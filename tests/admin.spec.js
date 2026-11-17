@@ -179,7 +179,7 @@ test('crea un videogame da RAWG, un episodio con 2 associazioni e cover, lo pubb
   );
   await page.getByRole('button', { name: 'Salva' }).click();
   expect((await coverDeleted).status()).toBe(200);
-  await expect(page).toHaveURL(/#\/episodi$/); // redirect alla lista dopo il salvataggio
+  await expect(page).toHaveURL(/#\/episodi(\?.*)?$/); // redirect alla lista dopo il salvataggio
   await expect(page.locator(`img[src="${saved.cover_url}"]`)).toHaveCount(0);
   const noCover = await (await api.get(`/api/bo/episodi/${episodioId}`)).json();
   expect(noCover.cover).toBeNull();
@@ -192,7 +192,7 @@ test('crea un videogame da RAWG, un episodio con 2 associazioni e cover, lo pubb
   await expect(field(page, 'titolo')).toHaveValue(titolo);
   await page.getByRole('button', { name: 'Elimina' }).click();
   await page.getByRole('button', { name: 'Conferma' }).click();
-  await expect(page).toHaveURL(/#\/episodi$/);
+  await expect(page).toHaveURL(/#\/episodi(\?.*)?$/);
   expect((await api.get(`/api/bo/episodi/${episodioId}`)).status()).toBe(404);
   expect(await (await api.get('/api/last-episodes/5/0')).text()).not.toContain(titolo);
 

@@ -272,9 +272,9 @@ Le varianti sono quelle del file. Nella colonna «Token» compaiono fondo, bordo
 
 | Variante | Token | Uso |
 |---|---|---|
-| `default` · `default` | `bg-viola` · `border-2 border-inchiostro` · `shadow-pixel-md shadow-rosa-acceso` · `py-12 px-18` · `text-md` bianco | «+ NUOVO EPISODIO/VIDEOGAME/UTENTE» su desktop |
+| `default` · `default` | `bg-viola` · `border-2 border-inchiostro` · `shadow-pixel-md` · `py-12 px-18` · `text-md` bianco | «+ NUOVO EPISODIO/VIDEOGAME/UTENTE» su desktop |
 | `default` · `sm` | come sopra, `py-10 px-14` | «+ NUOVO» a 390 |
-| `default-su-scuro` · `lg` | `bg-viola` · `border-2 border-crema` · `shadow-pixel-md shadow-rosa-acceso` · `py-14 px-16` · `text-lg tracking-wider` bianco | «▶ SALVA», «▶ CREA DA RAWG» nella barra delle azioni |
+| `default-su-scuro` · `lg` | `bg-viola` · `border-2 border-crema` · `shadow-pixel-md` · `py-14 px-16` · `text-lg tracking-wider` bianco | «▶ SALVA», «▶ CREA DA RAWG» nella barra delle azioni |
 | `secondary` · `lg` | `bg-crema`, senza bordo · `py-14 px-16` · `text-md` inchiostro | «ANNULLA» nella barra delle azioni |
 | `outline` · `lg` | `bg-bianco border-2 border-inchiostro` · `py-14 px-16` · `text-md` | «ANNULLA» nei dialoghi (focus iniziale) |
 | `outline` · `default` | come sopra, `py-12 px-14` | «ESCI» nello Sheet |
@@ -421,7 +421,7 @@ F-UT-01, F-VG-08).
 | | `mobile` | `bg-crema border-2 p-12 gap-10`: riga «◀ PAGINA 1 DI 32 ▶», sotto «1–20 di 313 · righe per pagina» + Select `xs` |
 | | `compatta` | solo il testo «1–4 DI 4 · 25 PER PAGINA» (episodi citati, F-VG-08) |
 
-Il selettore offre 5, 10, 25, 50. Nei PNG desktop dell'elenco episodi è su 10 per non
+Il selettore offre 5, 10, 20, 25, 50. Nei PNG desktop dell'elenco episodi è su 10 per non
 disegnare 20 righe, ma il default resta 20 (F-EP-01).
 
 ### Dialog → `alert-dialog`

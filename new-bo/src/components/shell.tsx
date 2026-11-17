@@ -87,10 +87,14 @@ function VociMenu({ me, onScelta }: { me: UtenteCorrente; onScelta?: () => void 
   )
 }
 
+// Marchio: text-3xl nella Barra app desktop; a 390 (Barra app mobile e Sheet) i PNG lo hanno
+// più piccolo, text-xl tracking-wide (146 × 12 px di inchiostro, come nei PNG).
+const MARCHIO_MOBILE = 'font-titolo text-xl font-bold tracking-wide text-crema'
+
 function Marchio({ conSottotitolo }: { conSottotitolo: boolean }) {
   return (
     <span className="flex items-baseline gap-12">
-      <span className="font-titolo text-3xl font-bold text-crema">RETROBOTTEGA</span>
+      <span className={conSottotitolo ? 'font-titolo text-3xl font-bold text-crema' : MARCHIO_MOBILE}>RETROBOTTEGA</span>
       {conSottotitolo && <span className="font-testo text-md text-inchiostro-200">di «È uscito Joypad?»</span>}
     </span>
   )
@@ -124,7 +128,7 @@ function MenuMobile({ me, esci }: { me: UtenteCorrente; esci: () => void }) {
       </SheetTrigger>
       <SheetContent aria-describedby={undefined}>
         <SheetHeader>
-          <SheetTitle>RETROBOTTEGA</SheetTitle>
+          <SheetTitle className={MARCHIO_MOBILE}>RETROBOTTEGA</SheetTitle>
           <SheetClose
             aria-label="Chiudi il menu"
             className="flex size-32 items-center justify-center text-crema outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-viola"

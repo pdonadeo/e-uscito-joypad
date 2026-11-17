@@ -212,6 +212,11 @@
   body {
     @apply bg-crema font-ui text-inchiostro;
   }
+  /* interlinea «Auto» di FigCraft = normal (docs/ui.md, tabella dei token): il preflight di
+     Tailwind metterebbe 1.5 a tutta la pagina */
+  html {
+    line-height: normal;
+  }
   #root {
     @apply min-h-dvh;
   }

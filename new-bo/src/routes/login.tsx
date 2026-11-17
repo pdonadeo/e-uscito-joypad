@@ -13,8 +13,9 @@ import { login, utenteCorrente } from '@/lib/sessione'
 import { cn } from '@/lib/utils'
 
 // Login (F-AU-01): schermate «Login» e «Login · errore» di docs/ui.md, PNG login-*.png.
-// Le spaziature verticali sotto lg sono misurate su login-390.png e login-errore-390.png;
-// da lg restano quelle già allineate a login-1440.png.
+// Le spaziature verticali sono misurate su login-*.png e login-errore-*.png, con l'interlinea
+// normal del resto dell'interfaccia. Da lg l'Alert dista 22 px dal campo e 26 dal bottone (login-errore-1180/1440.png: 22 e 25;
+// 25 non è tra le spaziature ammesse, il px in più compensa l'Alert alto 42 invece di 43).
 
 const documentoSessioneAttiva = graphql(`
   query SessioneAttiva {
@@ -39,9 +40,8 @@ export const Route = createFileRoute('/login')({
   component: PaginaLogin,
 })
 
-// Etichette dei campi: sotto lg interlinea stretta, così etichetta e campo distano 9 px come in
-// login-390.png; da lg l'interlinea normale (1,5) di login-1440.png.
-const ETICHETTA = 'leading-titolo lg:leading-ariosa'
+// Etichette dei campi: interlinea stretta, così etichetta e campo distano 9 px come nei PNG.
+const ETICHETTA = 'leading-titolo'
 
 function Paesaggio({ errore }: { errore: boolean }) {
   return (
@@ -82,17 +82,17 @@ function PaginaLogin() {
   })
 
   return (
-    <div className="relative flex min-h-dvh justify-center bg-linear-to-b from-cielo to-rosa px-16 pt-80 pb-160 lg:items-center lg:pt-0 lg:pb-28">
+    <div className="relative flex min-h-dvh justify-center bg-linear-to-b from-cielo to-rosa px-16 pt-80 pb-160 lg:items-center lg:pt-0 lg:pb-40">
       <Paesaggio errore={errore !== null} />
 
       {/* Dialog `retro`: cornice inchiostro > bianco > crema, ombra inchiostro al 30 % */}
       <main className="relative h-fit w-full max-w-500 bg-inchiostro p-8 shadow-pixel-3xl shadow-inchiostro/30">
         <div className="bg-bianco p-6">
-          <div className="flex flex-col bg-crema px-10 pt-21 pb-32 lg:px-24 lg:pt-28 lg:pb-20">
+          <div className="flex flex-col bg-crema px-10 pt-27 pb-36 lg:px-24 lg:pt-31 lg:pb-18">
             <h1 className="text-center font-titolo text-7xl font-bold text-inchiostro">RETROBOTTEGA</h1>
-            <p className="mt-0 text-center font-testo lg:mt-4 text-base text-inchiostro-600">di «È uscito Joypad?»</p>
+            <p className="mt-8 text-center font-testo lg:mt-10 text-base text-inchiostro-600">di «È uscito Joypad?»</p>
 
-            <p className="mt-23 text-lg leading-ariosa lg:mt-20 text-inchiostro">
+            <p className="mt-24 text-lg leading-ariosa lg:mt-28 text-inchiostro">
               {errore === null ? (
                 <>
                   Un JOYPAD selvatico appare!
@@ -107,7 +107,7 @@ function PaginaLogin() {
                 </>
               )}
             </p>
-            <p className="mt-12 flex items-center gap-6 text-sm font-extrabold">
+            <p className="mt-12 flex items-center gap-6 text-sm font-extrabold lg:mt-14">
               <span className="mr-4">HP</span>
               <span className="sr-only">{errore === null ? '3 su 3' : '2 su 3'}</span>
               <Cuore pieno />
@@ -116,7 +116,7 @@ function PaginaLogin() {
             </p>
 
             <form
-              className="mt-24 flex flex-col"
+              className="mt-24 flex flex-col lg:mt-30"
               noValidate
               onSubmit={(e) => {
                 e.preventDefault()
@@ -125,7 +125,7 @@ function PaginaLogin() {
             >
               <form.Field name="username">
                 {(campo) => (
-                  <div className="flex flex-col gap-6 lg:gap-8">
+                  <div className="flex flex-col gap-6">
                     <Label htmlFor="username" className={ETICHETTA}>Nome utente</Label>
                     <Input
                       id="username"
@@ -144,7 +144,7 @@ function PaginaLogin() {
               </form.Field>
               <form.Field name="password">
                 {(campo) => (
-                  <div className="mt-16 flex flex-col gap-6 lg:mt-20 lg:gap-8">
+                  <div className="mt-16 flex flex-col gap-6 lg:mt-20">
                     <Label htmlFor="password" className={ETICHETTA}>Parola d'ordine</Label>
                     <Input
                       id="password"
@@ -162,7 +162,7 @@ function PaginaLogin() {
               </form.Field>
 
               {errore !== null && (
-                <Alert icona={<GlifoChiudi misura="piccolo" />} className="mt-12 lg:mt-14">
+                <Alert icona={<GlifoChiudi misura="piccolo" />} className="mt-12 lg:mt-22">
                   {errore}
                 </Alert>
               )}
@@ -174,7 +174,7 @@ function PaginaLogin() {
                     variant="retro"
                     size="xl"
                     aria-busy={invio}
-                    className={cn('gap-17 aria-busy:cursor-wait', errore === null ? 'mt-20 lg:mt-32' : 'mt-6 lg:mt-10')}
+                    className={cn('gap-17 aria-busy:cursor-wait', errore === null ? 'mt-20 lg:mt-34' : 'mt-6 lg:mt-26')}
                   >
                     <GlifoPlay misura="grande" /> {invio ? 'Attendi…' : 'Entra'}
                   </Button>
@@ -182,7 +182,7 @@ function PaginaLogin() {
               </form.Subscribe>
             </form>
 
-            <p className="mt-26 flex items-center justify-between text-sm lg:mt-24 text-inchiostro-300">
+            <p className="mt-24 flex items-center justify-between text-sm lg:mt-26 text-inchiostro-300">
               <span className="lg:hidden">Tocca ENTRA per continuare</span>
               <span className="hidden lg:inline">Premi INVIO per continuare</span>
               <GlifoGiu className="mr-3 text-inchiostro lg:mr-4" />

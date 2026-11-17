@@ -16,9 +16,9 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'border-2 border-inchiostro bg-viola text-bianco shadow-pixel-md shadow-rosa-acceso active:translate-x-3 active:translate-y-3 active:shadow-none',
+          'border-2 border-inchiostro bg-viola text-bianco shadow-pixel-md active:translate-x-3 active:translate-y-3 active:shadow-none',
         'default-su-scuro':
-          'border-2 border-crema bg-viola text-bianco tracking-wider shadow-pixel-md shadow-rosa-acceso active:translate-x-3 active:translate-y-3 active:shadow-none',
+          'border-2 border-crema bg-viola text-bianco tracking-wider shadow-pixel-md active:translate-x-3 active:translate-y-3 active:shadow-none',
         secondary: 'bg-crema text-inchiostro hover:bg-viola-100',
         outline: 'border-2 border-inchiostro bg-bianco text-inchiostro hover:bg-viola-100',
         'outline-ombra':

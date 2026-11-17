@@ -8,6 +8,7 @@ import '@fontsource/jetbrains-mono/latin-700.css'
 import '@fontsource/jetbrains-mono/latin-800.css'
 import '@fontsource/nunito-sans/latin-400.css'
 import './index.css'
+import { Toaster } from '@/components/ui/sonner'
 import { eErroreApi } from '@/lib/graphql'
 import { routeTree } from './routeTree.gen'
 
@@ -48,6 +49,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
+      <Toaster />
     </QueryClientProvider>
   </StrictMode>,
 )
