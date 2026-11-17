@@ -44,6 +44,7 @@
  (target static_filesystem.ml)
  (deps
   (glob_files_rec %{project_root}/frontend/build/*)
+  (glob_files_rec %{project_root}/new-bo/dist/*)
   (file %{project_root}/euscitojoypad_db/prerendered_index.html))
  (action
   (progn
@@ -73,6 +74,8 @@
     "cp %{project_root}/euscitojoypad_db/prerendered_index.html %{project_root}/static_filesystem/")
    (bash
     "cp -a %{project_root}/frontend/build/bo %{project_root}/static_filesystem/")
+   (bash
+    "if [ -d %{project_root}/new-bo/dist ]; then cp -a %{project_root}/new-bo/dist %{project_root}/static_filesystem/new-bo; fi")
    (with-stdout-to
     %{target}
     (run ocaml-crunch -m plain %{project_root}/static_filesystem)))))

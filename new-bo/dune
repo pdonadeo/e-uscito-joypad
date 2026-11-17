@@ -1,0 +1,3 @@
+; Bundle di /new-bo (Bun + Vite): dune non deve scandire le dipendenze JS né
+; l'output della build. src/dune legge comunque dist/ con glob_files_rec.
+(data_only_dirs node_modules dist)

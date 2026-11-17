@@ -62,6 +62,17 @@ let bo_index _req =
         [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
       page
 
+(* /new-bo (Fase 3.6b): SPA con router a path, ogni rotta sotto /new-bo serve index.html. *)
+let new_bo_index _req =
+  match Static_filesystem.read "/new-bo/index.html" with
+  | None -> Dream.empty `Not_Found
+  | Some page ->
+    (* come /bo: niente framing (clickjacking) *)
+    Dream.html
+      ~headers:
+        [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
+      page
+
 let check_admin_settings () =
   let placeholder = Settings.dream_secret = Some "DREAM SECRET CHANGE ME IN PRODUCTION" in
   if (not Settings.debug) && (Settings.dream_secret = None || placeholder)
@@ -130,6 +141,9 @@ let server =
          get "/bo/files/**" (fun _ -> Dream.empty `Not_Found) (* servito da nginx *);
          get "/bo" bo_index;
          get "/bo/**" bo_index;
+         get "/new-bo/assets/**" @@ static ~loader "/new-bo/assets";
+         get "/new-bo" new_bo_index;
+         get "/new-bo/**" new_bo_index;
          get "/" default_handler;
        ]
 

@@ -5,5 +5,7 @@ _build
 _opam/
 data/
 frontend/node_modules
+new-bo/node_modules
+new-bo/dist
 docker-compose.yml
 **/.omc
