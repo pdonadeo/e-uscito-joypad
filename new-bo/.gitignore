@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# generati da `bun run codegen` (graphql-codegen e TanStack Router)
+src/gql/
+src/routeTree.gen.ts

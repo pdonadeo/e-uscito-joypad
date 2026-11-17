@@ -1,111 +1,223 @@
+/* Tema dello stile C «Avventura 8-bit».
+ * Il blocco tra «inizio» e «fine» è copiato così com'è da docs/ui.md
+ * («Token → @theme di Tailwind v4»): non modificarlo qui, ma in ui.md. */
+
+/* animazioni di Dialog e Sheet (fade-in-0, slide-in-from-left…), come in shadcn */
+@import "tw-animate-css";
+
+/* --- inizio blocco di docs/ui.md --- */
+@import "tailwindcss";
+
+@theme static {
+  /* reset: solo i token dello stile C */
+  --color-*: initial;
+  --font-*: initial;
+  --font-weight-*: initial;
+  --text-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
+  --shadow-*: initial;
+  --radius-*: initial;
+
+  /* colori: palette */
+  --color-inchiostro: #3A2E5C;
+  --color-viola: #6C63FF;
+  --color-crema: #FFF8E7;
+  --color-bianco: #FFFFFF;
+  --color-rosa: #FFE3F1;
+  --color-rosa-acceso: #FF7AB6;
+  --color-rosso: #D63A5A;
+  --color-verde: #6CC97E;
+  --color-giallo: #FFD84D;
+  --color-cielo: #8FCBFF;
+  /* colori: gradazioni */
+  --color-inchiostro-100: #D9D4EE;
+  --color-inchiostro-200: #B9B3D9;
+  --color-inchiostro-300: #A79BC9;
+  --color-inchiostro-400: #9A93C4;
+  --color-inchiostro-500: #8A82B8;
+  --color-inchiostro-600: #7A6FA8;
+  --color-inchiostro-700: #5C5288;
+  --color-inchiostro-900: #2A2145;
+  --color-viola-50: #F3F1FF;
+  --color-viola-100: #E9E6FF;
+  --color-viola-300: #B9B3FF;
+  --color-rosa-200: #FFD3E8;
+  --color-rosa-300: #FFB3D1;
+  --color-rosso-400: #FF5C7A;
+  --color-verde-100: #DDF5E3;
+  --color-verde-200: #B8F5C8;
+  --color-verde-300: #8BD3A8;
+  --color-verde-600: #2F9E52;
+  --color-verde-700: #2F7A45;
+  --color-giallo-100: #FFF1B8;
+  --color-giallo-300: #FFE066;
+  --color-giallo-600: #E0A800;
+  /* colori: illustrazioni e segnaposto delle cover */
+  --color-arancio: #FF9F43;
+  --color-lime: #B8E986;
+  --color-terra: #B9784C;
+  --color-notte: #2B3A67;
+  /* colori con trasparenza (inchiostro) */
+  --color-linea: rgb(58 46 92 / 0.2);
+  --color-velo: rgb(58 46 92 / 0.7216);
+  --color-trasparente: rgb(58 46 92 / 0);
+
+  /* font */
+  --font-titolo: "Comfortaa", ui-rounded, sans-serif;
+  --font-ui: "JetBrains Mono", ui-monospace, monospace;
+  --font-testo: "Nunito Sans", ui-sans-serif, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* dimensioni del testo (interlinea: normal, come «Auto» in FigCraft) */
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-base: 14px;
+  --text-lg: 15px;
+  --text-xl: 16px;
+  --text-2xl: 18px;
+  --text-3xl: 20px;
+  --text-4xl: 22px;
+  --text-5xl: 24px;
+  --text-6xl: 30px;
+  --text-7xl: 32px;
+  --tracking-normal: 0px;
+  --tracking-wide: 1px;
+  --tracking-wider: 2px;
+  --leading-titolo: 1.3;
+  --leading-compatta: 1.4;
+  --leading-testo: 1.45;
+  --leading-ariosa: 1.5;
+
+  /* spaziature: 1 unità = 1px, quindi p-12 = 12px, h-44 = 44px */
+  --spacing: 1px;
+  --spacing-0: 0px;
+  --spacing-2: 2px;
+  --spacing-3: 3px;
+  --spacing-4: 4px;
+  --spacing-6: 6px;
+  --spacing-7: 7px;
+  --spacing-8: 8px;
+  --spacing-10: 10px;
+  --spacing-12: 12px;
+  --spacing-14: 14px;
+  --spacing-16: 16px;
+  --spacing-18: 18px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-28: 28px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-94: 94px;
+
+  /* bordi (spessori) e angoli */
+  --border-0: 0px;
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-3: 3px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+
+  /* ombre «pixel»: offset senza sfocatura */
+  --pixel-shadow-none: 0px;
+  --pixel-shadow-sm: 2px;
+  --pixel-shadow-md: 3px;
+  --pixel-shadow-lg: 4px;
+  --pixel-shadow-xl: 5px;
+  --pixel-shadow-2xl: 6px;
+  --pixel-shadow-3xl: 12px;
+  --shadow-pixel-sm: 2px 2px 0 0 #3A2E5C;
+  --shadow-pixel-md: 3px 3px 0 0 #3A2E5C;
+  --shadow-pixel-lg: 4px 4px 0 0 #3A2E5C;
+  --shadow-pixel-xl: 5px 5px 0 0 #3A2E5C;
+  --shadow-pixel-2xl: 6px 6px 0 0 #3A2E5C;
+  --shadow-pixel-3xl: 12px 12px 0 0 #3A2E5C;
+
+  /* opacità */
+  --opacity-30: 30%;
+  --opacity-80: 80%;
+}
+
+/* raccordo con le variabili semantiche di shadcn/ui */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --radius: 0px;
+  --background: var(--color-crema);
+  --foreground: var(--color-inchiostro);
+  --card: var(--color-crema);
+  --card-foreground: var(--color-inchiostro);
+  --popover: var(--color-bianco);
+  --popover-foreground: var(--color-inchiostro);
+  --primary: var(--color-viola);
+  --primary-foreground: var(--color-bianco);
+  --secondary: var(--color-crema);
+  --secondary-foreground: var(--color-inchiostro);
+  --muted: var(--color-viola-100);
+  --muted-foreground: var(--color-inchiostro-500);
+  --accent: var(--color-viola);
+  --accent-foreground: var(--color-bianco);
+  --destructive: var(--color-rosso);
+  --border: var(--color-inchiostro);
+  --input: var(--color-inchiostro);
+  --ring: var(--color-viola);
+  --sidebar: var(--color-crema);
+  --sidebar-foreground: var(--color-inchiostro);
+  --sidebar-primary: var(--color-viola);
+  --sidebar-primary-foreground: var(--color-bianco);
+  --sidebar-accent: var(--color-viola-100);
+  --sidebar-accent-foreground: var(--color-inchiostro);
+  --sidebar-border: var(--color-inchiostro);
+  --sidebar-ring: var(--color-viola);
+}
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+/* --- fine blocco di docs/ui.md --- */
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
+@layer base {
+  html,
+  body {
+    @apply bg-crema font-ui text-inchiostro;
   }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  #root {
+    @apply min-h-dvh;
   }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  /* proposta (stati non disegnati): mano sui bottoni attivi */
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }

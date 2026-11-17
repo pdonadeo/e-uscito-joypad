@@ -610,7 +610,7 @@ rg -n --pcre2 -o "$pattern" "$dir" -g '*.tsx' -g '*.ts'
 status_classi=$?   # 0 = trovate classi vietate
 mancanti=$(rg --files-without-match --fixed-strings 'stile C: adattato secondo docs/ui.md' "$dir/components/ui" -g '*.tsx' 2>/dev/null)
 [ -n "$mancanti" ] && printf 'Componenti non adattati:\n%s\n' "$mancanti"
-[ $status_classi -ne 0 ] && [ -z "$mancanti" ]
+[ $status_classi -eq 1 ] && [ -z "$mancanti" ]
 ```
 
 L'ho provato il 2026-11-16 in tutti e due i sensi:
