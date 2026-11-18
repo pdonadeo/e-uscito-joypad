@@ -2782,10 +2782,10 @@ ra-core@^5.15.6:
     react-error-boundary "^4.0.13"
     react-is "^18.2.0 || ^19.0.0"
 
-ra-data-simple-rest@^5.15.6:
-  version "5.15.6"
-  resolved "https://registry.yarnpkg.com/ra-data-simple-rest/-/ra-data-simple-rest-5.15.6.tgz#3533122489df08af5b2b3bac8f3f871c188a060b"
-  integrity sha512-wy9cDz9NzcNBzn8fk5hVrZxI5RXVQSqxoExGWzpUdfbuDsZdqDBBw8P/WINn4IxGjrXrK7Rk0t2/cgzMdzDrIQ==
+ra-data-simple-rest@^5.15.7:
+  version "5.15.7"
+  resolved "https://registry.yarnpkg.com/ra-data-simple-rest/-/ra-data-simple-rest-5.15.7.tgz#f808dd41db23a72b30fa20b218c04b5645b1d7b9"
+  integrity sha512-yZH5vSYInVVQ6U+bL9bPToxVxelaT3wB1MIAaLt+ruLa/2QklurrX0IXHqNyiEkpRfZDpvNO+hSrupPPRVB33w==
   dependencies:
     "@marmelab/query-string" "^7.1.4"
 
