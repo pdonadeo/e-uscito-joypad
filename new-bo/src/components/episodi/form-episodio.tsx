@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useForm } from '@tanstack/react-form'
+import { useForm, useStore } from '@tanstack/react-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Campo, InputData } from '@/components/campi'
@@ -14,13 +14,14 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { chiudiErrori, mostraErrore } from '@/components/ui/sonner'
+import { chiudiErrori, mostraErrore, mostraSuccesso } from '@/components/ui/sonner'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
 import {
   aggiornaEpisodio,
   caricaCover,
+  episodio as dettaglio,
   creaEpisodio,
   durataBreve,
   eliminaEpisodio,
@@ -39,6 +40,8 @@ import { cn } from '@/lib/utils'
 // «Modifica episodio» (F-EP-05, F-EP-07, F-EP-09, F-EP-10, F-EP-11, F-AS-03) e «Nuovo episodio»
 // (F-EP-06), che è la stessa schermata con le differenze di docs/ui.md («Schermate non
 // disegnate»). Il salvataggio è pessimistico: aspetta il server, poi carica o toglie la cover.
+// «Salva e continua» (solo nella modifica) salva come «Salva» ma resta sulla pagina: il form si
+// reimposta con i dati restituiti dal server e torna «non modificato».
 
 type Riga = {
   chiave: string
@@ -65,6 +68,10 @@ type Valori = {
   note: string
   associazioni: Riga[]
 }
+
+// Quale bottone ha inviato il form: «Salva»/«Crea» (anche con INVIO) o «Salva e continua».
+type Invio = { continua: boolean }
+type Salvataggio = { v: Valori; cover: SceltaCover; continua: boolean }
 
 let contatore = 0
 const nuovaChiave = () => `r${++contatore}`
@@ -110,8 +117,9 @@ function valoriIniziali(e: Episodio | null): Valori {
     descrizione_txt: e.descrizione_txt ?? '',
     descrizione_html: e.descrizione_html ?? '',
     note: e.note ?? '',
+    // chiave stabile per le righe salvate: gli stessi dati danno gli stessi valori iniziali
     associazioni: e.associazioni.map((a) => ({
-      chiave: nuovaChiave(),
+      chiave: `a${a.id}`,
       id: a.id,
       videogame_id: a.videogame_id,
       videogame_titolo: a.videogame_titolo ?? '',
@@ -163,9 +171,10 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
   const [conferma, setConferma] = React.useState(false)
   const [mostraInvalidi, setMostraInvalidi] = React.useState(false)
   const [daAprire, setDaAprire] = React.useState<string | null>(null)
+  const [continua, setContinua] = React.useState(false)
 
   const salva = useMutation({
-    mutationFn: async (v: Valori) => {
+    mutationFn: async ({ v, cover, continua }: Salvataggio): Promise<Episodio | number> => {
       if (episodio == null) {
         const id = await creaEpisodio(dati(v))
         if (cover.file) {
@@ -180,16 +189,42 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
         }
         return id
       }
-      await aggiornaEpisodio(episodio.id, dati(v))
+      const salvato = await aggiornaEpisodio(episodio.id, dati(v))
+      const conCover = cover.file != null || (cover.rimuovi && episodio.cover != null)
       if (cover.file) await caricaCover(episodio.id, cover.file)
       else if (cover.rimuovi && episodio.cover) await rimuoviCover(episodio.id)
-      return episodio.id
+      if (!continua) return episodio.id
+      // la cover cambia dopo la mutation: in quel caso il dettaglio si rilegge
+      return conCover ? await queryClient.fetchQuery(dettaglio(episodio.id)) : salvato
     },
-    onSuccess: async (id) => {
-      await queryClient.invalidateQueries({ queryKey: ['episodi'] })
-      // Dopo «Crea» si apre la modifica (F-EP-06); dopo «Salva» si torna all'elenco (prototipo).
-      if (nuovo) await navigate({ to: '/episodi/$id', params: { id } })
-      else await navigate({ to: '/episodi' })
+    onSuccess: async (esito, inviato) => {
+      if (nuovo) {
+        // Dopo «Crea» si apre la modifica (F-EP-06).
+        await queryClient.invalidateQueries({ queryKey: ['episodi'] })
+        await navigate({ to: '/episodi/$id', params: { id: esito as number } })
+      } else if (typeof esito === 'object') {
+        // «Salva e continua»: gli elenchi si rileggeranno quando si riaprono; il dettaglio in
+        // cache diventa quello salvato (intestazione e cover), senza che una rilettura già
+        // partita lo sovrascriva con dati vecchi.
+        const chiave = dettaglio(esito.id).queryKey
+        await queryClient.invalidateQueries({ queryKey: ['episodi'], refetchType: 'none' })
+        await queryClient.cancelQueries({ queryKey: chiave })
+        queryClient.setQueryData(chiave, esito)
+        // Il form riparte dai dati salvati solo se durante l'invio non è cambiato nulla: le
+        // modifiche fatte nel frattempo restano, da salvare col prossimo invio (le righe ancora
+        // senza id si reinseriscono, il server non le duplica).
+        if (form.state.values === inviato.v) {
+          form.reset(valoriIniziali(esito))
+          setMostraInvalidi(false)
+          setDaAprire(null)
+        }
+        setCover((c) => (c === inviato.cover ? { file: null, rimuovi: false } : c))
+        mostraSuccesso('Modifiche salvate')
+      } else {
+        // Dopo «Salva» si torna all'elenco (prototipo).
+        await queryClient.invalidateQueries({ queryKey: ['episodi'] })
+        await navigate({ to: '/episodi' })
+      }
     },
     onError: (e) => {
       if (!eErroreApi(e, 'UNAUTHENTICATED')) mostraErrore(e.message)
@@ -212,18 +247,27 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
 
   const form = useForm({
     defaultValues: valoriIniziali(episodio),
-    onSubmit: async ({ value }) => {
+    onSubmitMeta: { continua: false } as Invio,
+    onSubmit: async ({ value, meta }) => {
       chiudiErrori()
       if (value.associazioni.some((a) => a.videogame_id == null)) {
         setMostraInvalidi(true)
         mostraErrore(MANCA_VIDEOGAME)
         return
       }
-      await salva.mutateAsync(value).catch((e: unknown) => {
+      await salva.mutateAsync({ v: value, cover, continua: meta.continua }).catch((e: unknown) => {
         if (!(e instanceof ErroreApi)) throw e
       })
     },
   })
+  // «non modificato»: nessun campo toccato dall'ultimo caricamento o salvataggio, cover compresa
+  const modificato = useStore(form.store, (s) => s.isDirty) || cover.file != null || cover.rimuovi
+
+  const invia = (meta: Invio) => {
+    if (form.state.isSubmitting) return
+    setContinua(meta.continua)
+    void form.handleSubmit(meta)
+  }
 
   const testoCampo = (
     nome: 'titolo' | 'episodio_numero' | 'durata' | 'url' | 'url_post' | 'url_video',
@@ -550,6 +594,24 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
     </Button>
   )
 
+  // «Salva e continua» non è un submit: INVIO in un campo resta «Salva» (il primo submit del form).
+  const bottoneContinua = (
+    <form.Subscribe selector={(s) => s.isSubmitting}>
+      {(invio) => (
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
+          aria-busy={invio}
+          className="aria-busy:cursor-wait max-lg:w-full"
+          onClick={() => invia({ continua: true })}
+        >
+          {invio && continua ? 'Attendi…' : 'Salva e continua'}
+        </Button>
+      )}
+    </form.Subscribe>
+  )
+
   const azioni = (
     <form.Subscribe selector={(s) => s.isSubmitting}>
       {(invio) => (
@@ -557,6 +619,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
           <Button asChild variant="secondary" size="lg">
             <Link to="/episodi">Annulla</Link>
           </Button>
+          {desktop && !nuovo && bottoneContinua}
           <Button
             type="submit"
             variant="default-su-scuro"
@@ -564,7 +627,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
             aria-busy={invio}
             className="gap-14 aria-busy:cursor-wait max-lg:flex-1 lg:min-w-200"
           >
-            <GlifoPlay misura="medio" /> {invio ? 'Attendi…' : nuovo ? 'Crea' : 'Salva'}
+            <GlifoPlay misura="medio" /> {invio && !continua ? 'Attendi…' : nuovo ? 'Crea' : 'Salva'}
           </Button>
         </>
       )}
@@ -574,10 +637,11 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
   return (
     <form
       noValidate
+      data-modificato={modificato}
       className="flex flex-col gap-18 lg:gap-20"
       onSubmit={(e) => {
         e.preventDefault()
-        if (!form.state.isSubmitting) void form.handleSubmit()
+        invia({ continua: false })
       }}
     >
       <IntestazionePagina
@@ -611,7 +675,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
             </div>
           </div>
           {pannelloAssociazioni}
-          <div className="flex items-center justify-between gap-16 bg-inchiostro px-16 py-12">
+          <div data-testid="barra-azioni" className="flex items-center justify-between gap-16 bg-inchiostro px-16 py-12">
             <div>{!nuovo && bottoneElimina(false)}</div>
             <div className="flex items-center gap-12">{azioni}</div>
           </div>
@@ -624,8 +688,13 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
           {pannelloAssociazioni}
           {pannelloDescrizioni}
           {!nuovo && bottoneElimina(true)}
-          <div className="sticky bottom-0 z-30 -mx-16 -mb-24 flex items-center gap-12 bg-inchiostro px-16 pt-12 pb-20">
-            {azioni}
+          {/* a 390 «Salva e continua» sta in una riga sua, sopra ANNULLA e SALVA */}
+          <div
+            data-testid="barra-azioni"
+            className="sticky bottom-0 z-30 -mx-16 -mb-24 flex flex-col gap-12 bg-inchiostro px-16 pt-12 pb-20"
+          >
+            {!nuovo && bottoneContinua}
+            <div className="flex items-center gap-12">{azioni}</div>
           </div>
         </>
       )}

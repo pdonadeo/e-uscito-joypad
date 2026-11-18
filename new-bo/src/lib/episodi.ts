@@ -161,10 +161,33 @@ const documentoCrea = graphql(`
   }
 `)
 
+// Restituisce il dettaglio completo, come la query Episodio: «Salva e continua» reimposta il form
+// con i dati salvati (le associazioni nuove prendono il loro id).
 const documentoAggiorna = graphql(`
   mutation AggiornaEpisodio($id: Int!, $dati: EpisodioInput!) {
     aggiornaEpisodio(id: $id, dati: $dati) {
       id
+      titolo
+      episodio_numero
+      data_uscita
+      durata
+      url
+      url_post
+      url_video
+      descrizione_html
+      descrizione_txt
+      note
+      pubblicato
+      cover
+      cover_url
+      associazioni {
+        id
+        videogame_id
+        videogame_titolo
+        istante
+        speaker
+        tipologia
+      }
     }
   }
 `)
@@ -181,8 +204,8 @@ export async function creaEpisodio(dati: EpisodioInput) {
   return (await esegui(documentoCrea, { dati })).creaEpisodio.id
 }
 
-export async function aggiornaEpisodio(id: number, dati: EpisodioInput) {
-  return (await esegui(documentoAggiorna, { id, dati })).aggiornaEpisodio.id
+export async function aggiornaEpisodio(id: number, dati: EpisodioInput): Promise<Episodio> {
+  return (await esegui(documentoAggiorna, { id, dati })).aggiornaEpisodio
 }
 
 export async function eliminaEpisodio(id: number) {

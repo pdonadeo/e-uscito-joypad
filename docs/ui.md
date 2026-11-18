@@ -275,7 +275,7 @@ Le varianti sono quelle del file. Nella colonna «Token» compaiono fondo, bordo
 | `default` · `default` | `bg-viola` · `border-2 border-inchiostro` · `shadow-pixel-md` · `py-12 px-18` · `text-md` bianco | «+ NUOVO EPISODIO/VIDEOGAME/UTENTE» su desktop |
 | `default` · `sm` | come sopra, `py-10 px-14` | «+ NUOVO» a 390 |
 | `default-su-scuro` · `lg` | `bg-viola` · `border-2 border-crema` · `shadow-pixel-md` · `py-14 px-16` · `text-lg tracking-wider` bianco | «▶ SALVA», «▶ CREA DA RAWG» nella barra delle azioni |
-| `secondary` · `lg` | `bg-crema`, senza bordo · `py-14 px-16` · `text-md` inchiostro | «ANNULLA» nella barra delle azioni |
+| `secondary` · `lg` | `bg-crema`, senza bordo · `py-14 px-16` · `text-md` inchiostro | «ANNULLA» e «SALVA E CONTINUA» nella barra delle azioni |
 | `outline` · `lg` | `bg-bianco border-2 border-inchiostro` · `py-14 px-16` · `text-md` | «ANNULLA» nei dialoghi (focus iniziale) |
 | `outline` · `default` | come sopra, `py-12 px-14` | «ESCI» nello Sheet |
 | `outline-ombra` · `xs` | `bg-bianco border-2 border-inchiostro shadow-pixel-sm` · `py-8 px-10` · `text-xs tracking-normal` | «SOSTITUISCI» della cover |
@@ -451,13 +451,16 @@ Si apre sopra un velo `bg-velo`. Il dialogo di sistema non c'è: si usa sempre q
 
 ### Toast → `sonner`
 
-Una sola variante, `destructive`: 420 px su desktop, a tutta larghezza a 390.
-- Contenitore: `bg-rosa border-3 border-rosso shadow-pixel-lg p-14 gap-12`.
-- Contenuto: «✕» rosso, occhiello «MISSIONE FALLITA» `text-xs font-extrabold text-rosso`,
-  messaggio del server `text-base font-bold`, «✕» per chiudere.
+Due varianti, 420 px su desktop e a tutta larghezza a 390, nella stessa posizione. Un Toast
+nuovo sostituisce quello mostrato.
 
-Mostra i messaggi del server (errori di RAWG di F-VG-05, 403 di F-AU-04, errori di
-validazione).
+| Variante | Contenitore | Contenuto | Durata | Uso |
+|---|---|---|---|---|
+| `destructive` | `bg-rosa border-3 border-rosso shadow-pixel-lg p-14 gap-12`, `role="alert"` | «✕» rosso, occhiello «MISSIONE FALLITA» `text-xs font-extrabold text-rosso`, messaggio del server `text-base font-bold`, «✕» per chiudere | resta finché non si chiude con «✕» o non si invia di nuovo | i messaggi del server (errori di RAWG di F-VG-05, 403 di F-AU-04, errori di validazione) |
+| `success` (non disegnata) | `bg-verde-100 border-3 border-verde-600 shadow-pixel-lg p-14 gap-12`, `role="status"` | «✔» `verde-600` (la spunta di 9 × 8 px delle colonne «presente»), occhiello «CHECKPOINT» `text-xs font-extrabold text-verde-700`, messaggio `text-base font-bold`, «✕» per chiudere | si chiude da sola dopo 4 s (il conto si ferma col puntatore sopra), oppure con «✕» | «Modifiche salvate» dopo «SALVA E CONTINUA» |
+
+La variante `success` usa solo token già nel tema, gli stessi di Badge `success-tenue`
+(`verde-700` su `verde-100` ha contrasto 4,6:1).
 
 ### Card → `card`
 
@@ -699,10 +702,12 @@ Cosa cambia:
   | Modifica utente | ACCOUNT, PERMESSI | REGOLE DEL GIOCO, REGISTRO | — | account, permessi, regole del gioco, registro |
 - **Barra delle azioni** (`bg-inchiostro`).
   - Desktop: in fondo al contenuto, `py-12 px-16`, con ELIMINA a sinistra e ANNULLA + SALVA a
-    destra.
+    destra. In «Modifica episodio» a destra ci sono ANNULLA · SALVA E CONTINUA · ▶ SALVA, con
+    `gap-12`.
   - 390: **fissa in basso** (sticky), `pt-12 pb-20 px-16 gap-12`. ANNULLA è largo quanto il
     suo testo e SALVA occupa il resto. ELIMINA sta nel contenuto, in fondo all'ultimo pannello,
-    come Button `destructive` a tutta larghezza.
+    come Button `destructive` a tutta larghezza. In «Modifica episodio» la barra ha due righe
+    (`gap-12`): sopra SALVA E CONTINUA a tutta larghezza, sotto ANNULLA + SALVA come sopra.
 - **Toast.**
   - Desktop: in alto a destra, 24 px dal bordo destro e 20 px sotto la barra app, largo
     420 px.
@@ -732,6 +737,23 @@ Stessa schermata di «Modifica episodio», con queste differenze:
 - niente «✕ ELIMINA EPISODIO»;
 - barra delle azioni: ANNULLA e «▶ CREA». Dopo il salvataggio si apre la modifica del nuovo
   episodio.
+
+### «SALVA E CONTINUA» in Modifica episodio
+
+Miglioria fuori specifica decisa da Paolo (Fase 3.6c.2b), solo nella modifica dell'episodio:
+non c'è in «Nuovo episodio», dove «▶ CREA» apre già la modifica.
+
+- Button `secondary` · `lg`, come ANNULLA; posizione nella [barra delle
+  azioni](#comportamento-responsive).
+- Salva come «▶ SALVA», cover compresa, ma resta sulla pagina: il form si reimposta con i dati
+  restituiti dal server (le associazioni nuove prendono il loro id e si riordinano per istante,
+  la cover mostra il file caricato, l'intestazione il titolo e lo stato salvati) e torna «non
+  modificato». Un secondo invio senza modifiche non crea associazioni doppie né ricarica la
+  cover. Se durante l'invio si modifica il form, quelle modifiche restano (e il form resta
+  «modificato»), da salvare con l'invio successivo.
+- Riuscito: Toast `success` «CHECKPOINT · Modifiche salvate».
+- Errore: come «▶ SALVA», Toast `destructive` e il form resta com'era.
+- Durante l'invio il bottone premuto mostra «Attendi…». INVIO in un campo resta «▶ SALVA».
 
 ### Nuovo utente (F-UT-04)
 

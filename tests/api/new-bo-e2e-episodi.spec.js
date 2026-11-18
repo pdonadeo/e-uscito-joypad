@@ -335,14 +335,14 @@ test.describe('modifica a 1440', () => {
     await entra(page);
     await page.goto(`/new-bo/episodi/${e.id}`);
     await page.getByLabel('Titolo').fill('');
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(toast(page)).toContainText('titolo');
     await expect(page).toHaveURL(new RegExp(`/episodi/${e.id}$`));
     await page.getByLabel('Titolo').fill(`${e.titolo} bis`);
     await page.getByLabel('Durata').fill('2:00:00');
     await page.getByLabel('URL audio').fill('');
     await page.getByRole('switch', { name: 'Pubblicato' }).click();
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     await expect(toast(page)).toHaveCount(0);
     const { body } = await leggi(e.id);
@@ -403,14 +403,14 @@ test.describe('modifica a 1440', () => {
     await expect(page.getByRole('textbox', { name: 'Istante, riga 3' })).toHaveValue('0:00:00');
     await expect(page.getByRole('combobox', { name: 'Speaker, riga 3' })).toHaveText(/Tutti/);
     await expect(page.getByRole('combobox', { name: 'Tipologia, riga 3' })).toHaveText(/Chiacchiera libera/);
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(toast(page)).toContainText('videogame');
     await scegliGioco(page, 3, giochi[2]);
     await page.getByRole('textbox', { name: 'Istante, riga 3' }).fill('');
     // toglie la seconda riga
     await page.getByRole('button', { name: `Rimuovi ${giochi[1].titolo}` }).click();
     await expect(page.getByText('Videogiochi citati · 2')).toBeVisible();
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.associazioni.map((a) => [a.videogame_id, a.istante, a.speaker, a.tipologia])).toEqual([
@@ -442,7 +442,7 @@ test.describe('modifica a 1440', () => {
     await expect(campo).toHaveValue(giochi[2].rawg_slug);
     await campo.press('Enter');
     await expect(campo).toHaveValue(giochi[2].titolo);
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.associazioni.map((a) => a.videogame_id)).toEqual([giochi[2].id]);
@@ -459,7 +459,7 @@ test.describe('modifica a 1440', () => {
     await page.getByTestId('file-cover').setInputFiles({ name: 'nuova.png', mimeType: 'image/png', buffer: PNG_1x1 });
     await expect(page.getByTestId('nome-cover')).toHaveText('nuova.png');
     expect((await leggi(e.id)).body.cover).toBe(prima);
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     const dopo = (await leggi(e.id)).body.cover;
     expect(dopo).not.toBe(prima);
@@ -474,7 +474,7 @@ test.describe('modifica a 1440', () => {
     await page.getByRole('button', { name: 'Rimuovi', exact: true }).click();
     await expect(page.getByTestId('nome-cover')).toHaveText('Nessuna cover');
     expect((await leggi(e.id)).body.cover).not.toBeNull();
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     expect((await leggi(e.id)).body.cover).toBeNull();
   });
@@ -495,7 +495,7 @@ test.describe('modifica a 1180', () => {
     await expect(page.getByRole('option')).toContainText(giochi[1].rawg_slug);
     await page.getByRole('combobox', { name: 'Videogame, riga 1' }).press('Enter');
     await expect(page.getByRole('combobox', { name: 'Videogame, riga 1' })).toHaveValue(giochi[1].titolo);
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.episodio_numero).toBe('118');
@@ -520,8 +520,8 @@ test.describe('modifica a 390', () => {
     await page.getByTestId('scheda-associazione').nth(1).getByLabel('Istante').fill('0:06:00');
     await page.getByLabel('Durata').fill('45:00');
     // la barra delle azioni resta visibile in fondo allo schermo
-    await expect(page.getByRole('button', { name: 'Salva' })).toBeInViewport();
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await expect(page.getByRole('button', { name: 'Salva', exact: true })).toBeInViewport();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.durata).toBe('00:45:00');
@@ -594,7 +594,7 @@ test.describe('associazioni', () => {
     await scegliGioco(page, 2, giochi[0]);
     await page.getByRole('textbox', { name: 'Istante, riga 2' }).fill('0:10:00');
     await scegli(page, 'Tipologia, riga 2', 'Recensione');
-    await page.getByRole('button', { name: 'Salva' }).click();
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
     return e;
   }
@@ -632,3 +632,210 @@ test.describe('associazioni', () => {
     expect(nf.errors[0].extensions.code).toBe('NOT_FOUND');
   });
 });
+
+// --- «Salva e continua» nella modifica (Fase 3.6c.2b) -----------------------------------------
+
+// Aspetta la risposta della mutation di salvataggio (aggiornaEpisodio).
+const aggiornato = (page) =>
+  page.waitForResponse((r) => r.url().endsWith('/api/graphql') && (r.request().postData() ?? '').includes('AggiornaEpisodio'));
+
+const salvaEContinua = (page) => page.getByRole('button', { name: 'Salva e continua' });
+
+// GraphQL con la sessione del browser (come gqlPagina di «associazioni»).
+async function gqlSessione(page, query, variables) {
+  const res = await page.request.post('/api/graphql', { data: { query, variables }, headers: ORIGIN });
+  expect(res.status()).toBe(200);
+  return res.json();
+}
+const barra = (page) => page.getByTestId('barra-azioni');
+
+test.describe('salva e continua a 1440', () => {
+  test.use({ viewport: VIEWPORT[1440] });
+
+  test('resta sulla modifica, mostra il Toast «Checkpoint» e il form riparte dai dati salvati', async ({ page }) => {
+    const e = await nuovoEpisodio({ episodio_numero: '321', associazioni: [{ videogame_id: giochi[0].id, istante: '0:20:00' }] });
+    await conCover(e.id);
+    const coverPrima = (await leggi(e.id)).body.cover;
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    const form = page.locator('form');
+    await expect(form).toHaveAttribute('data-modificato', 'false');
+    await page.getByLabel('Titolo').fill(`${e.titolo} ter`);
+    await page.getByLabel('Durata').fill('1:30:00');
+    await page.getByRole('switch', { name: 'Pubblicato' }).click();
+    await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
+    await scegliGioco(page, 2, giochi[1]);
+    await page.getByRole('textbox', { name: 'Istante, riga 2' }).fill('0:05:00');
+    await page.getByTestId('file-cover').setInputFiles({ name: 'continua.png', mimeType: 'image/png', buffer: PNG_1x1 });
+    await expect(form).toHaveAttribute('data-modificato', 'true');
+    await salvaEContinua(page).click();
+    // resta sull'URL della modifica, con il Toast di conferma
+    await expect(toast(page)).toHaveAttribute('data-variant', 'success');
+    await expect(toast(page)).toContainText('Checkpoint');
+    await expect(toast(page)).toContainText('Modifiche salvate');
+    await expect(toast(page)).toHaveAttribute('role', 'status');
+    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
+    await expect(form).toHaveAttribute('data-modificato', 'false');
+    // sul server
+    const { body } = await leggi(e.id);
+    expect(body).toMatchObject({ titolo: `${e.titolo} ter`, durata: '01:30:00', pubblicato: true });
+    expect(body.cover).not.toBe(coverPrima);
+    expect(body.cover).toMatch(/^covers\/episodi-321-continua.*\.png$/);
+    expect(body.associazioni.map((a) => [a.videogame_id, a.istante])).toEqual([
+      [giochi[1].id, '00:05:00'],
+      [giochi[0].id, '00:20:00'],
+    ]);
+    // nel form: i dati salvati, le righe ordinate per istante, la cover caricata
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Ep. 321 · ${e.titolo} ter`);
+    await expect(page.locator('[data-slot=badge]').first()).toHaveText(/Pubblicato/);
+    await expect(page.getByLabel('Titolo')).toHaveValue(`${e.titolo} ter`);
+    await expect(page.getByLabel('Durata')).toHaveValue('1:30:00');
+    await expect(page.getByRole('switch', { name: 'Pubblicato' })).toBeChecked();
+    await expect(page.getByRole('combobox', { name: 'Videogame, riga 1' })).toHaveValue(giochi[1].titolo);
+    await expect(page.getByRole('textbox', { name: 'Istante, riga 1' })).toHaveValue('0:05:00');
+    await expect(page.getByRole('combobox', { name: 'Videogame, riga 2' })).toHaveValue(giochi[0].titolo);
+    await expect(page.locator('tbody tr[data-nuova=true]')).toHaveCount(0);
+    await expect(page.getByTestId('nome-cover')).toHaveText(body.cover.split('/').pop());
+    await expect(page.getByRole('button', { name: 'Sostituisci', exact: true })).toBeVisible();
+    // proposta: il Toast di conferma si chiude da solo
+    await expect(toast(page)).toHaveCount(0, { timeout: 8000 });
+  });
+
+  test('aggiunge un\'associazione e una cover, SALVA E CONTINUA due volte: nessun doppione, cover caricata una volta', async ({ page }) => {
+    const e = await nuovoEpisodio();
+    let upload = 0;
+    page.on('request', (r) => {
+      if (r.method() === 'POST' && /\/api\/bo\/episodi\/\d+\/cover$/.test(r.url())) upload++;
+    });
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
+    await scegliGioco(page, 1, giochi[2]);
+    await page.getByTestId('file-cover').setInputFiles({ name: 'due-volte.png', mimeType: 'image/png', buffer: PNG_1x1 });
+    let risposta = aggiornato(page);
+    await salvaEContinua(page).click();
+    await risposta;
+    await expect(toast(page)).toContainText('Modifiche salvate');
+    const primo = (await leggi(e.id)).body;
+    expect(primo.associazioni).toHaveLength(1);
+    // secondo invio senza modifiche, dopo aver chiuso il primo Toast
+    await toast(page).getByRole('button', { name: "Chiudi l'avviso" }).click();
+    await expect(toast(page)).toHaveCount(0);
+    risposta = aggiornato(page);
+    await salvaEContinua(page).click();
+    await risposta;
+    await expect(toast(page)).toContainText('Modifiche salvate');
+    await expect(page.locator('form')).toHaveAttribute('data-modificato', 'false');
+    const secondo = (await leggi(e.id)).body;
+    expect(secondo.associazioni).toHaveLength(1);
+    expect(secondo.associazioni[0]).toMatchObject({ id: primo.associazioni[0].id, videogame_id: giochi[2].id });
+    expect(secondo.cover).toBe(primo.cover);
+    expect(upload).toBe(1);
+    // la stessa verifica via GraphQL
+    const r = await gqlSessione(page, 'query($e: Int) { elencoAssociazioni(episodio_id: $e) { totale } }', { e: e.id });
+    expect(r.data.elencoAssociazioni.totale).toBe(1);
+  });
+
+  test('le modifiche fatte durante l\'invio restano nel form', async ({ page }) => {
+    const e = await nuovoEpisodio();
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    // trattiene la risposta di aggiornaEpisodio finché il test non scrive nel campo
+    let rilascia;
+    const trattenuta = new Promise((ok) => (rilascia = ok));
+    await page.route('**/api/graphql', async (route) => {
+      if ((route.request().postData() ?? '').includes('AggiornaEpisodio')) {
+        const res = await route.fetch();
+        await trattenuta;
+        await route.fulfill({ response: res });
+      } else await route.fallback();
+    });
+    await page.getByLabel('Titolo').fill(`${e.titolo} uno`);
+    const risposta = aggiornato(page);
+    await salvaEContinua(page).click();
+    await expect(salvaEContinua(page)).toHaveCount(0); // mostra «Attendi…»
+    await page.getByLabel('Note libere').fill('scritta durante il salvataggio');
+    rilascia();
+    await risposta;
+    await expect(toast(page)).toContainText('Modifiche salvate');
+    await expect(page.getByLabel('Titolo')).toHaveValue(`${e.titolo} uno`);
+    await expect(page.getByLabel('Note libere')).toHaveValue('scritta durante il salvataggio');
+    await expect(page.locator('form')).toHaveAttribute('data-modificato', 'true');
+    expect((await leggi(e.id)).body).toMatchObject({ titolo: `${e.titolo} uno`, note: null });
+  });
+
+  test('un errore del server si comporta come SALVA: Toast d\'errore e form invariato', async ({ page }) => {
+    const e = await nuovoEpisodio();
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.getByLabel('Titolo').fill('');
+    await salvaEContinua(page).click();
+    await expect(toast(page)).toHaveAttribute('data-variant', 'destructive');
+    await expect(toast(page)).toContainText('Missione fallita');
+    await expect(toast(page)).toContainText('titolo');
+    await expect(page).toHaveURL(new RegExp(`/episodi/${e.id}$`));
+    await expect(page.getByLabel('Titolo')).toHaveValue('');
+    await expect(page.locator('form')).toHaveAttribute('data-modificato', 'true');
+    expect((await leggi(e.id)).body.titolo).toBe(e.titolo);
+  });
+
+  test('«Nuovo episodio» non ha SALVA E CONTINUA', async ({ page }) => {
+    await entra(page);
+    await page.goto('/new-bo/episodi/nuovo');
+    await expect(page.getByRole('button', { name: 'Crea' })).toBeVisible();
+    await expect(salvaEContinua(page)).toHaveCount(0);
+  });
+});
+
+for (const formato of [390, 1180, 1440]) {
+  test.describe(`barra delle azioni a ${formato}`, () => {
+    test.use({ viewport: VIEWPORT[formato] });
+
+    test('ELIMINA, ANNULLA, SALVA E CONTINUA e SALVA al loro posto', async ({ page }) => {
+      const e = await nuovoEpisodio({ associazioni: [{ videogame_id: giochi[0].id, istante: '0:01:00' }] });
+      await entra(page);
+      await page.goto(`/new-bo/episodi/${e.id}`);
+      const b = barra(page);
+      const annulla = b.getByRole('link', { name: 'Annulla' });
+      const continua = b.getByRole('button', { name: 'Salva e continua' });
+      const salva = b.getByRole('button', { name: 'Salva', exact: true });
+      const [rb, ra, rc, rs] = await Promise.all([b, annulla, continua, salva].map((l) => l.boundingBox()));
+      if (formato === 390) {
+        // due righe: sopra SALVA E CONTINUA a tutta larghezza, sotto ANNULLA + SALVA
+        await expect(salva).toBeInViewport();
+        await expect(continua).toBeInViewport();
+        expect(rc.width).toBeCloseTo(rb.width - 32, 0);
+        expect(rc.y + rc.height).toBeLessThanOrEqual(ra.y);
+        expect(Math.abs(ra.y + ra.height / 2 - (rs.y + rs.height / 2))).toBeLessThan(1);
+        expect(ra.x).toBeLessThan(rs.x);
+        expect(rs.x + rs.width).toBeCloseTo(rb.x + rb.width - 16, 0);
+        await expect(b.getByRole('button', { name: 'Elimina episodio' })).toHaveCount(0);
+        await expect(page.getByRole('button', { name: 'Elimina episodio' })).toBeVisible();
+      } else {
+        // una riga: ELIMINA a sinistra; a destra ANNULLA · SALVA E CONTINUA · ▶ SALVA
+        const re = await b.getByRole('button', { name: 'Elimina episodio' }).boundingBox();
+        for (const r of [re, ra, rc]) expect(Math.abs(r.y + r.height / 2 - (rs.y + rs.height / 2))).toBeLessThan(1);
+        expect(re.x).toBeCloseTo(rb.x + 16, 0);
+        expect(re.x + re.width).toBeLessThan(ra.x);
+        expect(ra.x + ra.width).toBeLessThan(rc.x);
+        expect(rc.x + rc.width).toBeLessThan(rs.x);
+        expect(rs.x + rs.width).toBeCloseTo(rb.x + rb.width - 16, 0);
+      }
+      // SALVA E CONTINUA ha lo stile di ANNULLA (secondary · lg)
+      const stile = (l) => l.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return [s.backgroundColor, s.color, s.borderTopWidth, s.paddingTop, s.fontSize, s.height];
+      });
+      expect(await stile(continua)).toEqual(await stile(annulla));
+      await b.scrollIntoViewIfNeeded();
+      await page.screenshot({ path: test.info().outputPath(`barra-azioni-${formato}.png`) });
+      if (formato !== 1180) {
+        await continua.click();
+        await expect(toast(page)).toContainText('Modifiche salvate');
+        // fotografia a entrata finita (sonner anima l'opacità)
+        await expect(page.locator('[data-sonner-toast]')).toHaveCSS('opacity', '1');
+        await page.screenshot({ path: test.info().outputPath(`toast-success-${formato}.png`) });
+      }
+    });
+  });
+}
