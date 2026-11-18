@@ -17,7 +17,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.107.1",
     "framer-motion": "^14.9.1",
-    "ra-data-simple-rest": "^5.15.6",
+    "ra-data-simple-rest": "^5.15.7",
     "ra-i18n-polyglot": "^5.15.6",
     "ra-language-english": "^5.15.6",
     "react": "^18.3.1",
