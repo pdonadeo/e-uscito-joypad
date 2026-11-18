@@ -24,7 +24,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.1.1"
-humanize = "^4.16.0"
+humanize = "^4.17.0"
 black = "^26.10.1"
 djlint = "^1.39.2"
 click = "^8.5.1"
