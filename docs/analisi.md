@@ -232,40 +232,41 @@ Il perimetro segue `/bo`.
 
 ## Tabella di copertura
 
-Si riempie nelle Fasi 3.5 (test API) e 3.6c (test e2e).
+Si riempie nelle Fasi 3.5 (test API) e 3.6c (test e2e). I file sono in `tests/api/`, con il
+nome senza `.spec.js`; i nomi lunghi dei test sono abbreviati con «…».
 
 | ID | Test API (GraphQL) | Test e2e (`/new-bo`) |
 |---|---|---|
-| F-AU-01 | | |
-| F-AU-02 | | |
-| F-AU-03 | | |
-| F-AU-04 | | |
-| F-AU-05 | | |
-| F-EP-01 | | |
-| F-EP-02 | | |
-| F-EP-03 | | |
-| F-EP-04 | | |
-| F-EP-05 | | |
-| F-EP-06 | | |
-| F-EP-07 | | |
-| F-EP-08 | | |
-| F-EP-09 | | |
-| F-EP-10 | | |
-| F-EP-11 | | |
-| F-VG-01 | | |
-| F-VG-02 | | |
-| F-VG-03 | | |
-| F-VG-04 | | |
-| F-VG-05 | | |
-| F-VG-06 | | |
-| F-VG-07 | | |
-| F-VG-08 | | |
-| F-AS-01 | | |
-| F-AS-02 | | |
-| F-AS-03 | | |
-| F-UT-01 | | |
-| F-UT-02 | | |
-| F-UT-03 | | |
-| F-UT-04 | | |
-| F-UT-05 | | |
-| F-UT-06 | | |
+| F-AU-01 | `graphql-auth` › «login di un utente staff → UtenteCorrente, poi me»; «login rifiutato: … → UNAUTHENTICATED, nessuna sessione» | `new-bo-e2e` › «credenziali sbagliate: messaggio del server nell'Alert…»; «un utente non staff o non attivo non entra…» |
+| F-AU-02 | `graphql-auth` › «anonimo: logout riesce sempre»; «logout su GraphQL → anonimo su GraphQL e su REST» | `new-bo-e2e` › «ESCI chiude la sessione, anche per /api/bo» |
+| F-AU-03 | `graphql-auth` › «login di un utente staff → UtenteCorrente, poi me»; «login su REST → me su GraphQL» | `new-bo-e2e` › «staff: Sidebar espansa senza UTENTI, nome utente ed ESCI nella barra»; «senza sessione ogni pagina porta al login…» |
+| F-AU-04 | `graphql-auth` › «staff: le operazioni sugli utenti → FORBIDDEN, il resto è consentito» | `new-bo-e2e-utenti` › «F-AU-04: uno staff non vede UTENTI e l'indirizzo lo riporta agli episodi»; `new-bo-e2e` › «superuser: Sidebar a rotaia con UTENTI» |
+| F-AU-05 | `graphql-auth` › «un utente disattivato perde subito l'accesso anche su GraphQL»; «il cambio password con aggiornaUtente chiude le sessioni di quell'utente»; `graphql-utenti` › «un superuser che cambia la propria password con aggiornaUtente resta loggato» | `new-bo-e2e-utenti` › «F-AU-05: se l'utente viene disattivato…»; «F-AU-05: se un'altra sessione gli cambia la password…»; «F-AU-05, F-UT-05: chi cambia la propria password resta dentro» |
+| F-EP-01 | `graphql-episodi` › «elencoEpisodi: default data_uscita decrescente, totale, offset e limit» | `new-bo-e2e-episodi` › «F-EP-01: righe con numero, titolo, data…; 20 righe di default; clic → modifica»; «F-EP-01: righe per pagina e pagine» |
+| F-EP-02 | `graphql-episodi` › «elencoEpisodi: ogni ordinamento in entrambe le direzioni» | `new-bo-e2e-episodi` › «F-EP-02: default data decrescente, clic sulle intestazioni ordina nei due versi» |
+| F-EP-03 | `graphql-episodi` › «elencoEpisodi: ricerca in titolo e numero, senza maiuscole, con il filtro pubblicato» | `new-bo-e2e-episodi` › «F-EP-03: la ricerca è «contiene», senza maiuscole…» |
+| F-EP-04 | `graphql-episodi` › «elencoEpisodi: ricerca in titolo e numero, senza maiuscole, con il filtro pubblicato» | `new-bo-e2e-episodi` › «F-EP-04: «+ Aggiungi filtro» aggiunge «Pubblicato»…» |
+| F-EP-05 | `graphql-episodi` › «episodio: dettaglio con le associazioni ordinate per istante; id inesistente → NOT_FOUND» | `new-bo-e2e-episodi` › «F-EP-05: il form parte dal dettaglio completo, associazioni per istante» |
+| F-EP-06 | `graphql-episodi` › «creaEpisodio con associazioni: default di speaker e tipologia…»; «creaEpisodio: durata MM:SS e numero vuoto → null» | `new-bo-e2e-episodi` › «F-EP-06: valori iniziali, CREA con associazione e cover, poi la modifica» |
+| F-EP-07 | `graphql-episodi` › «aggiornaEpisodio: sostituzione completa…»; «aggiornaEpisodio: payload non valido → BAD_USER_INPUT senza scritture parziali» | `new-bo-e2e-episodi` › «F-EP-07: salva i campi e torna all'elenco; un errore del server va nel Toast» |
+| F-EP-08 | `graphql-episodi` › «eliminaEpisodio: restituisce il record e cancella le associazioni» | `new-bo-e2e-episodi` › «F-EP-08: elimina dalla modifica, con ANNULLA che non cancella»; «F-EP-08: eliminazione in blocco con conferma…» |
+| F-EP-09 | `graphql-episodi` › «aggiornaEpisodio: sostituisce le associazioni (aggiorna per id, cancella, inserisce)»; «aggiornaEpisodio: associazioni [] le cancella tutte» | `new-bo-e2e-episodi` › «F-EP-09, F-AS-03: aggiunge, modifica e toglie righe…»; «F-EP-09: nel Combobox INVIO prima dei risultati…» |
+| F-EP-10 | `graphql-episodi` › «cover: caricata via REST, letta da GraphQL (F-EP-10, F-EP-11)» | `new-bo-e2e-episodi` › «F-EP-10: SOSTITUISCI carica il PNG dopo il salvataggio…»; «F-EP-10: se in creazione l'upload fallisce…» |
+| F-EP-11 | `graphql-episodi` › «cover: caricata via REST, letta da GraphQL (F-EP-10, F-EP-11)» | `new-bo-e2e-episodi` › «F-EP-11: RIMUOVI toglie la cover al salvataggio» |
+| F-VG-01 | `graphql-videogame` › «elencoVideogame: ricerca, totale, righe leggere senza rawg_json» | `new-bo-e2e-videogame` › «F-VG-01: miniatura della cover, titolo e slug; 10 righe di default…»; «F-VG-01: righe per pagina e pagine» |
+| F-VG-02 | `graphql-videogame` › «elencoVideogame: default per titolo crescente, ordinamento per slug nelle due direzioni» | `new-bo-e2e-videogame` › «F-VG-02: default titolo crescente; titolo e slug ordinano nei due versi, la cover no» |
+| F-VG-03 | `graphql-videogame` › «elencoVideogame: ricerca, totale, righe leggere senza rawg_json» | `new-bo-e2e-videogame` › «F-VG-03: la ricerca è «contiene», senza maiuscole, su titolo, descrizione e slug» |
+| F-VG-04 | `graphql-videogame` › «videogame: dettaglio con rawg_json serializzato; id inesistente → NOT_FOUND» | `new-bo-e2e-videogame` › «F-VG-04: il form parte dal dettaglio; rawg_json in sola lettura, al massimo 400 px…» |
+| F-VG-05 | `graphql-videogame` › «creaVideogame: titolo, descrizioni, cover e rawg_json arrivano da RAWG»; «creaVideogame: errori di RAWG e di validazione, nessun salvataggio» | `new-bo-e2e-videogame` › «F-VG-05: solo lo slug; CREA DA RAWG…»; «F-VG-05: gli errori di RAWG e lo slug già usato vanno nel Toast…» |
+| F-VG-06 | `graphql-videogame` › «aggiornaVideogame: con rawg_json presente non interroga RAWG; opzionali assenti azzerati» | `new-bo-e2e-videogame` › «F-VG-06: con rawg_json presente salva i campi senza interrogare RAWG…»; «F-VG-06: senza rawg_json il salvataggio interroga RAWG…» |
+| F-VG-07 | `graphql-videogame` › «eliminaVideogame: restituisce il record e cancella solo le associazioni» | `new-bo-e2e-videogame` › «F-VG-07: elimina dalla modifica, con il numero dei collegamenti…»; «F-VG-07: eliminazione in blocco…» |
+| F-VG-08 | `graphql-videogame` › «elencoAssociazioni ed associazione (F-AS-01, F-AS-02, F-VG-08)» | `new-bo-e2e-videogame` › «F-VG-08: episodi citati per data decrescente…»; «F-VG-08: 25 righe per pagina» |
+| F-AS-01 | `graphql-videogame` › «elencoAssociazioni ed associazione (F-AS-01, F-AS-02, F-VG-08)» | `new-bo-e2e-videogame` › «F-AS-01: la tabella è l'elenco delle associazioni filtrato per videogame»; `new-bo-e2e-episodi` › «F-AS-01: le associazioni salvate dall'interfaccia…» |
+| F-AS-02 | `graphql-videogame` › «elencoAssociazioni ed associazione (F-AS-01, F-AS-02, F-VG-08)» | `new-bo-e2e-episodi` › «F-AS-02: un'associazione salvata dall'interfaccia si legge per id…» |
+| F-AS-03 | `graphql-schema` › «le etichette di Speaker e Tipologia sono le descrizioni dei valori (F-AS-03)»; `graphql-episodi` › «valori di speaker e tipologia fuori dagli enum → GRAPHQL_VALIDATION» | `new-bo-e2e-episodi` › «F-EP-09, F-AS-03: aggiunge, modifica e toglie righe; etichette e non codici» |
+| F-UT-01 | `graphql-utenti` › «elencoUtenti: ricerca, ordinamento di default per username, nessun campo password»; `graphql-parity` › «F-UT-01 F-UT-02 elenco, ricerca e ordinamento…» (ogni ordinamento) | `new-bo-e2e-utenti` › «F-UT-01: colonne, «—» e «mai», 10 righe di default…»; «F-UT-01: default username crescente, tutte le colonne si ordinano…» |
+| F-UT-02 | `graphql-utenti` › «elencoUtenti: ricerca, ordinamento di default per username, nessun campo password» | `new-bo-e2e-utenti` › «F-UT-02: la ricerca è «contiene», senza maiuscole, su username, email, nome e cognome» |
+| F-UT-03 | `graphql-utenti` › «utente: dettaglio; id inesistente → NOT_FOUND» | `new-bo-e2e-utenti` › «F-UT-03: il form parte dal dettaglio, senza password…» |
+| F-UT-04 | `graphql-utenti` › «creaUtente: hash Django valido, login GraphQL…»; «creaUtente: validazioni → BAD_USER_INPUT» | `new-bo-e2e-utenti` › «F-UT-04: password obbligatoria, permessi iniziali; CREA apre la modifica»; «F-UT-04: uno username già usato va nel Toast» |
+| F-UT-05 | `graphql-utenti` › «creaUtente: …; aggiornaUtente senza password la conserva»; «un superuser non può cancellarsi né togliersi i privilegi» | `new-bo-e2e-utenti` › «F-UT-05: salva i campi; senza password la password resta…»; «F-UT-05: un superuser non può togliersi i privilegi…» |
+| F-UT-06 | `graphql-utenti` › «eliminaUtente: un utente con righe in django_admin_log si cancella»; «un superuser non può cancellarsi né togliersi i privilegi» | `new-bo-e2e-utenti` › «F-UT-06: elimina dalla modifica…»; «F-UT-06: nel proprio account ELIMINA è disattivato…»; «F-UT-06: la propria riga non ha la casella…»; «F-UT-06: eliminazione in blocco…» |

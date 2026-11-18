@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 // «▶ SALVA» è il submit del form (anche INVIO in un campo); SALVA E CONTINUA è un bottone a sé.
 // Durante l'invio il bottone premuto dice «Attendi…».
 
-export type Annulla = { to: '/episodi' | '/videogame' } | { onClick: () => void }
+export type Annulla = { to: '/episodi' | '/videogame' | '/utenti' } | { onClick: () => void }
 
 export function BarraAzioni({
   desktop,
