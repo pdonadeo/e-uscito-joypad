@@ -305,6 +305,17 @@ const STELLA = {
     '.##.##.',
     '##...##',
   ],
+  // 9 × 8: titolo delle Card `sezione-scura` («★ QUEST LOG», nuovo-videogame-1440.png)
+  titolo: [
+    '....#....',
+    '...###...',
+    '...###...',
+    '#########',
+    '.#######.',
+    '..#####..',
+    '..##.##..',
+    '.##...##.',
+  ],
   // 11 × 10: voce UTENTI della Sidebar espansa e dello Sheet
   voce: [
     '.....#.....',
@@ -535,4 +546,30 @@ export function GlifoFrecce({ className }: { className?: string }) {
 
 export function GlifoMeno({ className }: { className?: string }) {
   return <Glifo bitmap={MENO} className={className} />
+}
+
+// 13 × 11: «⚠» dell'Alert `warning` (nuovo-videogame-1440.png), col «!» vuoto
+const AVVISO: Bitmap = [
+  '......#......',
+  '.....###.....',
+  '.....###.....',
+  '....##.##....',
+  '....##.##....',
+  '...###.###...',
+  '...###.###...',
+  '..#########..',
+  '..####.####..',
+  '.###########.',
+  '#############',
+]
+
+export function GlifoAvviso({ className }: { className?: string }) {
+  return <Glifo bitmap={AVVISO} className={className} />
+}
+
+// 6 × 7: «▸» in fondo alle righe degli episodi citati (modifica-videogame-*.png)
+const APRI: Bitmap = ['#.....', '###...', '#####.', '######', '#####.', '###...', '#.....']
+
+export function GlifoApri({ className }: { className?: string }) {
+  return <Glifo bitmap={APRI} className={className} />
 }

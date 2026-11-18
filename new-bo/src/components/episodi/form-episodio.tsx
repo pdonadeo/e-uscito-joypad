@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { useNavigate } from '@tanstack/react-router'
+import { BarraAzioni } from '@/components/barra-azioni'
 import { Campo, InputData } from '@/components/campi'
 import { ConfermaEliminazione } from '@/components/conferma-eliminazione'
 import { PannelloCover, type SceltaCover } from '@/components/episodi/cover'
 import { SceltaVideogame } from '@/components/episodi/scelta-videogame'
 import { IntestazionePagina } from '@/components/intestazione-pagina'
-import { GlifoChiudi, GlifoOrdine, GlifoPlay, GlifoSpunta } from '@/components/pixel-art'
+import { GlifoChiudi, GlifoOrdine, GlifoSpunta } from '@/components/pixel-art'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardTitle } from '@/components/ui/card'
@@ -440,9 +441,9 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
                         </TableHead>
                       </tr>
                     </TableHeader>
-                    <TableBody className="[&>tr:nth-child(even)]:bg-bianco [&>tr]:bg-bianco">
+                    <TableBody>
                       {campo.state.value.map((riga, i) => (
-                        <TableRow key={riga.chiave} data-nuova={riga.nuova} className="h-60">
+                        <TableRow key={riga.chiave} data-nuova={riga.nuova} className="h-60 even:bg-bianco">
                           <TableCell className="pl-12">{cellaVideogame(i, riga)}</TableCell>
                           <TableCell className="pl-12">{cellaIstante(i)}</TableCell>
                           <TableCell className="pl-12">{cellaScelta(i, 'tipologia', 'tabella')}</TableCell>
@@ -595,41 +596,18 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
   )
 
   // «Salva e continua» non è un submit: INVIO in un campo resta «Salva» (il primo submit del form).
-  const bottoneContinua = (
+  const barra = (
     <form.Subscribe selector={(s) => s.isSubmitting}>
       {(invio) => (
-        <Button
-          type="button"
-          variant="secondary"
-          size="lg"
-          aria-busy={invio}
-          className="aria-busy:cursor-wait max-lg:w-full"
-          onClick={() => invia({ continua: true })}
-        >
-          {invio && continua ? 'Attendi…' : 'Salva e continua'}
-        </Button>
-      )}
-    </form.Subscribe>
-  )
-
-  const azioni = (
-    <form.Subscribe selector={(s) => s.isSubmitting}>
-      {(invio) => (
-        <>
-          <Button asChild variant="secondary" size="lg">
-            <Link to="/episodi">Annulla</Link>
-          </Button>
-          {desktop && !nuovo && bottoneContinua}
-          <Button
-            type="submit"
-            variant="default-su-scuro"
-            size="lg"
-            aria-busy={invio}
-            className="gap-14 aria-busy:cursor-wait max-lg:flex-1 lg:min-w-200"
-          >
-            <GlifoPlay misura="medio" /> {invio && !continua ? 'Attendi…' : nuovo ? 'Crea' : 'Salva'}
-          </Button>
-        </>
+        <BarraAzioni
+          desktop={desktop}
+          invio={invio}
+          inCorso={continua ? 'continua' : 'salva'}
+          elimina={!nuovo && bottoneElimina(false)}
+          annulla={{ to: '/episodi' }}
+          etichettaSalva={nuovo ? 'Crea' : 'Salva'}
+          onContinua={nuovo ? undefined : () => invia({ continua: true })}
+        />
       )}
     </form.Subscribe>
   )
@@ -675,10 +653,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
             </div>
           </div>
           {pannelloAssociazioni}
-          <div data-testid="barra-azioni" className="flex items-center justify-between gap-16 bg-inchiostro px-16 py-12">
-            <div>{!nuovo && bottoneElimina(false)}</div>
-            <div className="flex items-center gap-12">{azioni}</div>
-          </div>
+          {barra}
         </>
       ) : (
         <>
@@ -688,14 +663,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
           {pannelloAssociazioni}
           {pannelloDescrizioni}
           {!nuovo && bottoneElimina(true)}
-          {/* a 390 «Salva e continua» sta in una riga sua, sopra ANNULLA e SALVA */}
-          <div
-            data-testid="barra-azioni"
-            className="sticky bottom-0 z-30 -mx-16 -mb-24 flex flex-col gap-12 bg-inchiostro px-16 pt-12 pb-20"
-          >
-            {!nuovo && bottoneContinua}
-            <div className="flex items-center gap-12">{azioni}</div>
-          </div>
+          {barra}
         </>
       )}
 

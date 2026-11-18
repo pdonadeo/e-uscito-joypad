@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils'
 //   «presente» sono viola-300 (className della pagina).
 // - TableRow: bordo linea, testo text-base, righe a zebra bianco/crema; selezionata viola-100
 //   (data-state=selected), nuova viola-50 (data-nuova). Hover (non disegnato, proposta): viola-50
-//   sulle righe cliccabili (data-cliccabile).
+//   sulle righe cliccabili (data-cliccabile). La zebra sta sulla riga (`even:`), non sul tbody:
+//   così selezionata, nuova e hover vincono anche sulle righe pari. Una tabella senza zebra passa
+//   `even:bg-bianco` alle righe.
 // Le larghezze delle colonne le dà la pagina con <colgroup>.
 function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
@@ -25,7 +27,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<'thead'>) {
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
-  return <tbody data-slot="table-body" className={cn('[&>tr:nth-child(even)]:bg-crema', className)} {...props} />
+  return <tbody data-slot="table-body" className={className} {...props} />
 }
 
 function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
@@ -33,7 +35,7 @@ function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
     <tr
       data-slot="table-row"
       className={cn(
-        'border-b border-linea bg-bianco text-base last:border-b-0 data-[cliccabile=true]:cursor-pointer data-[cliccabile=true]:hover:bg-viola-50 data-[nuova=true]:bg-viola-50 data-[state=selected]:bg-viola-100 data-[state=selected]:hover:bg-viola-100',
+        'border-b border-linea bg-bianco text-base last:border-b-0 even:bg-crema data-[cliccabile=true]:cursor-pointer data-[cliccabile=true]:hover:bg-viola-50 data-[nuova=true]:bg-viola-50 data-[state=selected]:bg-viola-100 data-[state=selected]:hover:bg-viola-100',
         className,
       )}
       {...props}

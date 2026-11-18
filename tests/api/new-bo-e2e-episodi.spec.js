@@ -839,3 +839,27 @@ for (const formato of [390, 1180, 1440]) {
     });
   });
 }
+
+// --- Zebra e selezione (correzione della Fase 3.6c.3a) -----------------------------------------
+
+test.describe('elenco episodi: righe pari', () => {
+  test.use({ viewport: VIEWPORT[1440] });
+
+  test('F-EP-01, F-EP-08: una riga pari selezionata è viola-100 e non crema; l\'hover vince sulla zebra', async ({ page }) => {
+    const token = `zebra-${uniq()}`;
+    const e = [];
+    for (const data of ['2001-01-04', '2001-01-03', '2001-01-02', '2001-01-01'])
+      e.push(await nuovoEpisodio({ titolo: `[E2E] ${token} ${data}`, data_uscita: data }));
+    await entra(page);
+    await elenco(page, token);
+    await expect(righe(page)).toHaveCount(4);
+    const pari = righe(page).nth(1); // seconda riga: pari, a zebra crema
+    await page.mouse.move(0, 0);
+    await expect(pari).toHaveCSS('background-color', 'rgb(255, 248, 231)'); // crema
+    await page.getByRole('checkbox', { name: `Seleziona l'episodio ${e[1].titolo}` }).check();
+    await page.mouse.move(0, 0);
+    await expect(pari).toHaveCSS('background-color', 'rgb(233, 230, 255)'); // viola-100
+    await righe(page).nth(3).hover();
+    await expect(righe(page).nth(3)).toHaveCSS('background-color', 'rgb(243, 241, 255)'); // viola-50
+  });
+});

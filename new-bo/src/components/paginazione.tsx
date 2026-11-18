@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/pagination'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-// Pagination `desktop` e `mobile` di docs/ui.md (F-EP-01: righe per pagina e totale).
+// Pagination `desktop`, `mobile` e `compatta` di docs/ui.md (F-EP-01: righe per pagina e totale).
 // Pagine mostrate (proposta): la prima, l'ultima e quelle vicine alla corrente, con «…» nei buchi.
 
 function pagineVisibili(corrente: number, ultima: number): (number | '…')[] {
@@ -130,6 +130,43 @@ export function Paginazione({
           </PaginationContent>
         </Pagination>
       </div>
+    </div>
+  )
+}
+
+// Pagination `compatta` (episodi citati, F-VG-08): solo «1–4 DI 4 · 25 PER PAGINA».
+// Proposta: con più di una pagina compaiono anche «◀ ▶» per scorrere le pagine.
+export function PaginazioneCompatta({
+  pagina,
+  righe,
+  totale,
+  onPagina,
+}: {
+  pagina: number
+  righe: number
+  totale: number
+  onPagina: (n: number) => void
+}) {
+  const ultima = Math.max(1, Math.ceil(totale / righe))
+  const da = totale === 0 ? 0 : (pagina - 1) * righe + 1
+  const a = Math.min(totale, pagina * righe)
+  return (
+    <div className="flex items-center justify-end gap-8">
+      <span className="text-xs font-extrabold uppercase tracking-wide">
+        {da}–{a} di {totale} · {righe} per pagina
+      </span>
+      {ultima > 1 && (
+        <Pagination className="w-auto">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious disabled={pagina <= 1} onClick={() => onPagina(pagina - 1)} />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext disabled={pagina >= ultima} onClick={() => onPagina(pagina + 1)} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   )
 }

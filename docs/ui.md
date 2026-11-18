@@ -702,12 +702,13 @@ Cosa cambia:
   | Modifica utente | ACCOUNT, PERMESSI | REGOLE DEL GIOCO, REGISTRO | — | account, permessi, regole del gioco, registro |
 - **Barra delle azioni** (`bg-inchiostro`).
   - Desktop: in fondo al contenuto, `py-12 px-16`, con ELIMINA a sinistra e ANNULLA + SALVA a
-    destra. In «Modifica episodio» a destra ci sono ANNULLA · SALVA E CONTINUA · ▶ SALVA, con
-    `gap-12`.
+    destra. In «Modifica episodio» e «Modifica videogame» a destra ci sono ANNULLA · SALVA E
+    CONTINUA · ▶ SALVA, con `gap-12`.
   - 390: **fissa in basso** (sticky), `pt-12 pb-20 px-16 gap-12`. ANNULLA è largo quanto il
     suo testo e SALVA occupa il resto. ELIMINA sta nel contenuto, in fondo all'ultimo pannello,
-    come Button `destructive` a tutta larghezza. In «Modifica episodio» la barra ha due righe
-    (`gap-12`): sopra SALVA E CONTINUA a tutta larghezza, sotto ANNULLA + SALVA come sopra.
+    come Button `destructive` a tutta larghezza. In «Modifica episodio» e «Modifica videogame»
+    la barra ha due righe (`gap-12`): sopra SALVA E CONTINUA a tutta larghezza, sotto
+    ANNULLA + SALVA come sopra.
 - **Toast.**
   - Desktop: in alto a destra, 24 px dal bordo destro e 20 px sotto la barra app, largo
     420 px.
@@ -738,19 +739,23 @@ Stessa schermata di «Modifica episodio», con queste differenze:
 - barra delle azioni: ANNULLA e «▶ CREA». Dopo il salvataggio si apre la modifica del nuovo
   episodio.
 
-### «SALVA E CONTINUA» in Modifica episodio
+### «SALVA E CONTINUA» in Modifica episodio e Modifica videogame
 
-Miglioria fuori specifica decisa da Paolo (Fase 3.6c.2b), solo nella modifica dell'episodio:
-non c'è in «Nuovo episodio», dove «▶ CREA» apre già la modifica.
+Miglioria fuori specifica decisa da Paolo (Fase 3.6c.2b per l'episodio, 3.6c.3a per il
+videogame), solo nelle due schermate di modifica: non c'è in «Nuovo episodio» e in «Nuovo
+videogame», dove «▶ CREA» e «▶ CREA DA RAWG» aprono già la modifica.
 
 - Button `secondary` · `lg`, come ANNULLA; posizione nella [barra delle
-  azioni](#comportamento-responsive).
-- Salva come «▶ SALVA», cover compresa, ma resta sulla pagina: il form si reimposta con i dati
-  restituiti dal server (le associazioni nuove prendono il loro id e si riordinano per istante,
-  la cover mostra il file caricato, l'intestazione il titolo e lo stato salvati) e torna «non
-  modificato». Un secondo invio senza modifiche non crea associazioni doppie né ricarica la
-  cover. Se durante l'invio si modifica il form, quelle modifiche restano (e il form resta
-  «modificato»), da salvare con l'invio successivo.
+  azioni](#comportamento-responsive), la stessa nelle due schermate.
+- Salva come «▶ SALVA» ma resta sulla pagina: il form si reimposta con i dati restituiti dal
+  server, l'intestazione mostra il titolo salvato e il form torna «non modificato». Se durante
+  l'invio si modifica il form, quelle modifiche restano (e il form resta «modificato»), da
+  salvare con l'invio successivo.
+  - Episodio: cover compresa; le associazioni nuove prendono il loro id e si riordinano per
+    istante, la cover mostra il file caricato, l'intestazione anche lo stato. Un secondo invio
+    senza modifiche non crea associazioni doppie né ricarica la cover.
+  - Videogame: se il server ha interrogato RAWG (F-VG-06, record senza `rawg_json`), il form
+    mostra i dati arrivati da RAWG.
 - Riuscito: Toast `success` «CHECKPOINT · Modifiche salvate».
 - Errore: come «▶ SALVA», Toast `destructive` e il form resta com'era.
 - Durante l'invio il bottone premuto mostra «Attendi…». INVIO in un campo resta «▶ SALVA».

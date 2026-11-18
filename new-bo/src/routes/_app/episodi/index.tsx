@@ -2,10 +2,11 @@ import * as React from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { InputRicerca } from '@/components/campi'
+import { BarraSelezione, IntestazioneOrdinabile, useRicercaDifferita, Vuoto } from '@/components/elenco'
 import { ConfermaEliminazione } from '@/components/conferma-eliminazione'
 import { IntestazionePagina } from '@/components/intestazione-pagina'
 import { Paginazione } from '@/components/paginazione'
-import { GlifoChiudi, GlifoOrdine, GlifoSpunta } from '@/components/pixel-art'
+import { GlifoSpunta } from '@/components/pixel-art'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -133,13 +134,7 @@ function ElencoEpisodi() {
     })
 
   // Ricerca (F-EP-03): il campo è immediato, l'indirizzo si aggiorna dopo 300 ms di pausa.
-  const [testo, setTesto] = React.useState(ricerca.ricerca ?? '')
-  React.useEffect(() => {
-    const t = window.setTimeout(() => {
-      if ((ricerca.ricerca ?? '') !== testo) void vai({ ricerca: testo === '' ? undefined : testo })
-    }, 300)
-    return () => window.clearTimeout(t)
-  }, [testo])
+  const [testo, setTesto] = useRicercaDifferita(ricerca.ricerca, (v) => void vai({ ricerca: v }))
 
   const elementi = data?.elementi ?? []
   const totale = data?.totale ?? 0
@@ -241,28 +236,23 @@ function ElencoEpisodi() {
       </div>
 
       {!desktop && nSel > 0 && (
-        <div className="flex items-center justify-between border-2 border-inchiostro bg-viola-100 py-6 pr-6 pl-12 shadow-pixel-md">
-          <span className="text-sm font-extrabold uppercase tracking-wide">{conteggioSelezione(true)}</span>
-          <Button variant="destructive" size="xs" onClick={() => setConferma(true)}>
-            <GlifoChiudi misura="bottone" /> Elimina
-          </Button>
-        </div>
+        <BarraSelezione
+          desktop={false}
+          testo={conteggioSelezione(true)}
+          onDeseleziona={() => setSelezione(new Set())}
+          onElimina={() => setConferma(true)}
+        />
       )}
 
       {desktop ? (
         <div className="border-3 border-inchiostro bg-bianco shadow-pixel-lg">
           {nSel > 0 && (
-            <div className="flex h-49 items-center justify-between bg-viola-100 pr-8 pl-16">
-              <span className="text-sm font-extrabold uppercase tracking-wide">{conteggioSelezione(false)}</span>
-              <div className="flex items-center gap-24">
-                <Button variant="ghost" size="sm" onClick={() => setSelezione(new Set())}>
-                  Deseleziona
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => setConferma(true)}>
-                  <GlifoChiudi misura="bottone" /> Elimina selezionati
-                </Button>
-              </div>
-            </div>
+            <BarraSelezione
+              desktop
+              testo={conteggioSelezione(false)}
+              onDeseleziona={() => setSelezione(new Set())}
+              onElimina={() => setConferma(true)}
+            />
           )}
           <Table>
             <colgroup>
@@ -351,7 +341,7 @@ function ElencoEpisodi() {
               {elementi.length === 0 && (
                 <tr>
                   <td colSpan={10} className="h-48 px-16 text-md text-inchiostro-500">
-                    <Vuoto caricamento={isPending} errore={isError} />
+                    <Vuoto caricamento={isPending} errore={isError} testi={TESTI_VUOTO} />
                   </td>
                 </tr>
               )}
@@ -382,7 +372,7 @@ function ElencoEpisodi() {
             ))}
             {elementi.length === 0 && (
               <li className="border-2 border-inchiostro bg-bianco p-12 text-md text-inchiostro-500">
-                <Vuoto caricamento={isPending} errore={isError} />
+                <Vuoto caricamento={isPending} errore={isError} testi={TESTI_VUOTO} />
               </li>
             )}
           </ul>
@@ -416,8 +406,7 @@ function ElencoEpisodi() {
   )
 }
 
-// Intestazione di una colonna ordinabile (F-EP-02): un bottone; la colonna ordinata è gialla con
-// «▲/▼» (aria-sort sul th).
+// Intestazione di una colonna ordinabile (F-EP-02).
 function Intestazione({
   colonna,
   ricerca,
@@ -433,19 +422,15 @@ function Intestazione({
   className?: string
   children: React.ReactNode
 }) {
-  const attiva = (ricerca.ordina ?? 'data') === colonna
-  const verso = p.direzione === 'ASC' ? 'ascending' : 'descending'
   return (
-    <TableHead aria-sort={attiva ? verso : undefined} className={className}>
-      <button
-        type="button"
-        onClick={() => onOrdina(colonna)}
-        className="inline-flex items-center gap-8 uppercase outline-none hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-viola"
-      >
-        {children}
-        {attiva && <GlifoOrdine verso={verso === 'ascending' ? 'su' : 'giu'} />}
-      </button>
-    </TableHead>
+    <IntestazioneOrdinabile
+      attiva={(ricerca.ordina ?? 'data') === colonna}
+      ascendente={p.direzione === 'ASC'}
+      onOrdina={() => onOrdina(colonna)}
+      className={className}
+    >
+      {children}
+    </IntestazioneOrdinabile>
   )
 }
 
@@ -461,11 +446,9 @@ function Presenza({ valore, nome }: { valore: string | null | undefined; nome: s
   )
 }
 
-function Vuoto({ caricamento, errore }: { caricamento: boolean; errore: boolean }) {
-  // Stati non disegnati (proposta): testi semplici al posto delle righe.
-  if (caricamento) return <>Caricamento…</>
-  if (errore) return <>Non è stato possibile leggere gli episodi.</>
-  return <>Nessun episodio trovato.</>
+const TESTI_VUOTO = {
+  nessuno: 'Nessun episodio trovato.',
+  errore: 'Non è stato possibile leggere gli episodi.',
 }
 
 // Card `scheda-episodio` (390): checkbox, numero, badge pubblicato, titolo, data · durata e i badge
