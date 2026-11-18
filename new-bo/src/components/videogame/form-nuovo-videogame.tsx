@@ -30,12 +30,24 @@ import { cn } from '@/lib/utils'
 export type PropsFormNuovoVideogame = {
   onCreato: (v: Videogame) => void
   onAnnulla: () => void
+  // slug con cui parte il campo (il Dialog della modifica episodio lo ricava dal testo cercato)
+  slugIniziale?: string
+  // terzo passo del QUEST LOG: cosa succede dopo la creazione
+  passoFinale?: string
 }
 
-export function FormNuovoVideogame({ onCreato, onAnnulla }: PropsFormNuovoVideogame) {
+// Chiave della mutation: chi contiene il form (il Dialog) sa così se una creazione è in corso.
+export const CHIAVE_CREA_VIDEOGAME = ['videogame', 'crea'] as const
+
+export function FormNuovoVideogame({
+  onCreato,
+  onAnnulla,
+  slugIniziale = '',
+  passoFinale = 'Si apre la modifica del nuovo videogame.',
+}: PropsFormNuovoVideogame) {
   const desktop = useDesktop()
   const queryClient = useQueryClient()
-  const [slug, setSlug] = React.useState('')
+  const [slug, setSlug] = React.useState(slugIniziale)
   const [slugErrato, setSlugErrato] = React.useState(false)
   // id unici: il form potrà stare in un Dialog dentro la modifica episodio, che ha già «titolo»
   const id = React.useId()
@@ -49,6 +61,7 @@ export function FormNuovoVideogame({ onCreato, onAnnulla }: PropsFormNuovoVideog
   }
 
   const crea = useMutation({
+    mutationKey: CHIAVE_CREA_VIDEOGAME,
     mutationFn: (rawg_slug: string) => creaVideogame({ rawg_slug }),
     onSuccess: async (v) => {
       // elenco e scelta del videogame di un'associazione devono vedere il nuovo videogame
@@ -116,7 +129,7 @@ export function FormNuovoVideogame({ onCreato, onAnnulla }: PropsFormNuovoVideog
           2. Premi «Crea da RAWG»: titolo, descrizioni e cover arrivano da RAWG e sostituiscono quello che c'è nei
           campi.
         </li>
-        <li>3. Si apre la modifica del nuovo videogame.</li>
+        <li>3. {passoFinale}</li>
       </ol>
     </Card>
   )

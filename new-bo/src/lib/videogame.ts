@@ -202,3 +202,17 @@ export function jsonLeggibile(v: string): string {
     return v
   }
 }
+
+// Slug RAWG ricavato da un testo («The Legend of Zelda: Echoes» → «the-legend-of-zelda-echoes»):
+// minuscole, senza accenti, ogni sequenza di spazi e simboli diventa un solo «-», niente «-» in
+// testa e in coda. Testo vuoto → slug vuoto. Gli apostrofi spariscono, come negli slug di RAWG
+// («Assassin's Creed» → «assassins-creed»).
+export function slugDa(testo: string): string {
+  return testo
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}

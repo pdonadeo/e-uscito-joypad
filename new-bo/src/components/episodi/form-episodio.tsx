@@ -19,6 +19,7 @@ import { chiudiErrori, mostraErrore, mostraSuccesso } from '@/components/ui/sonn
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Textarea } from '@/components/ui/textarea'
+import { DialogNuovoVideogame } from '@/components/videogame/dialog-nuovo-videogame'
 import {
   aggiornaEpisodio,
   caricaCover,
@@ -36,6 +37,7 @@ import {
 } from '@/lib/episodi'
 import { useDesktop } from '@/lib/formato'
 import { eErroreApi, ErroreApi } from '@/lib/graphql'
+import { nomeVideogame, type Videogame } from '@/lib/videogame'
 import { cn } from '@/lib/utils'
 
 // «Modifica episodio» (F-EP-05, F-EP-07, F-EP-09, F-EP-10, F-EP-11, F-AS-03) e «Nuovo episodio»
@@ -173,6 +175,10 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
   const [mostraInvalidi, setMostraInvalidi] = React.useState(false)
   const [daAprire, setDaAprire] = React.useState<string | null>(null)
   const [continua, setContinua] = React.useState(false)
+  // Dialog «Nuovo videogame» aperto da «+ CREALO QUI» nel Combobox di una riga (docs/ui.md,
+  // «Nuovo videogame dal form dell'episodio»): la riga (per chiave) e il testo cercato.
+  const [creazione, setCreazione] = React.useState<{ n: number; chiave: string; testo: string } | null>(null)
+  const rigaCreazione = React.useRef<string | null>(null)
 
   const salva = useMutation({
     mutationFn: async ({ v, cover, continua }: Salvataggio): Promise<Episodio | number> => {
@@ -517,6 +523,11 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
                   t.handleChange(v.titolo)
                   f.handleChange(v.id)
                 }}
+                chiave={riga.chiave}
+                onCrea={(testo) => {
+                  rigaCreazione.current = riga.chiave
+                  setCreazione({ n: Date.now(), chiave: riga.chiave, testo })
+                }}
               />
             )}
           </form.Field>
@@ -612,73 +623,99 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
     </form.Subscribe>
   )
 
+  // Il videogame creato nel Dialog va nella riga da cui era partito; l'episodio non si salva.
+  const videogameCreato = (v: Videogame) => {
+    const i = form.state.values.associazioni.findIndex((a) => a.chiave === creazione?.chiave)
+    if (i >= 0) {
+      form.setFieldValue(`associazioni[${i}].videogame_titolo`, nomeVideogame(v))
+      form.setFieldValue(`associazioni[${i}].videogame_id`, v.id)
+    }
+    setCreazione(null)
+    mostraSuccesso(`Videogame creato: ${nomeVideogame(v)}`)
+  }
+
+  // Alla chiusura del Dialog il focus torna sul campo videogame della riga.
+  const focusSullaRiga = () => {
+    const chiave = rigaCreazione.current
+    if (chiave) document.querySelector<HTMLInputElement>(`input[data-chiave="${chiave}"]`)?.focus()
+  }
+
   return (
-    <form
-      noValidate
-      data-modificato={modificato}
-      className="flex flex-col gap-18 lg:gap-20"
-      onSubmit={(e) => {
-        e.preventDefault()
-        invia({ continua: false })
-      }}
-    >
-      <IntestazionePagina
-        className="lg:-mb-2"
-        indietro={{ to: '/episodi', etichetta: 'Episodi' }}
-        titolo={episodio ? nomeEpisodio(episodio) : 'Nuovo episodio'}
-        stato={
-          episodio &&
-          (episodio.pubblicato ? (
-            <Badge size="lg">
-              <GlifoSpunta misura="badge" /> Pubblicato
-            </Badge>
-          ) : (
-            <Badge size="lg" variant="destructive">
-              Non pubblicato
-            </Badge>
-          ))
-        }
+    <>
+      <form
+        noValidate
+        data-modificato={modificato}
+        className="flex flex-col gap-18 lg:gap-20"
+        onSubmit={(e) => {
+          e.preventDefault()
+          invia({ continua: false })
+        }}
+      >
+        <IntestazionePagina
+          className="lg:-mb-2"
+          indietro={{ to: '/episodi', etichetta: 'Episodi' }}
+          titolo={episodio ? nomeEpisodio(episodio) : 'Nuovo episodio'}
+          stato={
+            episodio &&
+            (episodio.pubblicato ? (
+              <Badge size="lg">
+                <GlifoSpunta misura="badge" /> Pubblicato
+              </Badge>
+            ) : (
+              <Badge size="lg" variant="destructive">
+                Non pubblicato
+              </Badge>
+            ))
+          }
+        />
+
+        {desktop ? (
+          <>
+            <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-24 xl:grid-cols-[minmax(0,1fr)_380px]">
+              <div className="flex flex-col gap-24">
+                {pannelloDati}
+                {pannelloDescrizioni}
+              </div>
+              <div className="flex flex-col gap-24">
+                {pannelloCover}
+                {pannelloLink}
+              </div>
+            </div>
+            {pannelloAssociazioni}
+            {barra}
+          </>
+        ) : (
+          <>
+            {pannelloDati}
+            {pannelloCover}
+            {pannelloLink}
+            {pannelloAssociazioni}
+            {pannelloDescrizioni}
+            {!nuovo && bottoneElimina(true)}
+            {barra}
+          </>
+        )}
+
+        {episodio && (
+          <ConfermaEliminazione
+            aperto={conferma}
+            onApertoChange={setConferma}
+            titolo="Eliminare l'episodio?"
+            inCorso={elimina.isPending}
+            onConferma={() => elimina.mutate()}
+          >
+            {testoEliminazione(episodio)}
+          </ConfermaEliminazione>
+        )}
+      </form>
+      {/* fuori dal <form> dell'episodio: dentro c'è il form del videogame */}
+      <DialogNuovoVideogame
+        richiesta={creazione}
+        onCreato={videogameCreato}
+        onChiudi={() => setCreazione(null)}
+        onFocusDopo={focusSullaRiga}
       />
-
-      {desktop ? (
-        <>
-          <div className="grid grid-cols-[minmax(0,1fr)_340px] items-start gap-24 xl:grid-cols-[minmax(0,1fr)_380px]">
-            <div className="flex flex-col gap-24">
-              {pannelloDati}
-              {pannelloDescrizioni}
-            </div>
-            <div className="flex flex-col gap-24">
-              {pannelloCover}
-              {pannelloLink}
-            </div>
-          </div>
-          {pannelloAssociazioni}
-          {barra}
-        </>
-      ) : (
-        <>
-          {pannelloDati}
-          {pannelloCover}
-          {pannelloLink}
-          {pannelloAssociazioni}
-          {pannelloDescrizioni}
-          {!nuovo && bottoneElimina(true)}
-          {barra}
-        </>
-      )}
-
-      {episodio && (
-        <ConfermaEliminazione
-          aperto={conferma}
-          onApertoChange={setConferma}
-          titolo="Eliminare l'episodio?"
-          inCorso={elimina.isPending}
-          onConferma={() => elimina.mutate()}
-        >
-          {testoEliminazione(episodio)}
-        </ConfermaEliminazione>
-      )}
-    </form>
+    </>
   )
 }
 

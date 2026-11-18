@@ -439,7 +439,9 @@ Struttura di `default` e `sm`, dall'alto:
 - Alert `destructive` `sm` «NON SI PUÒ ANNULLARE»;
 - azioni: Button `outline` `lg` (ANNULLA, con il **focus iniziale**) e `destructive-pieno` `lg`.
 
-Si apre sopra un velo `bg-velo`. Il dialogo di sistema non c'è: si usa sempre questo.
+Si apre sopra un velo `bg-velo`. Il dialogo di sistema non c'è: le conferme usano sempre
+`alert-dialog`, mentre il modale grande del nuovo videogame usa `dialog` (vedi [Nuovo videogame
+dal form dell'episodio](#nuovo-videogame-dal-form-dellepisodio)).
 
 ### Alert → `alert`
 
@@ -484,7 +486,8 @@ override del layout legato ai token `spacing`. A 390 le schede sono cliccabili c
     text-inchiostro-500`;
   - `evidenziato`: `bg-viola`, testi bianco e `viola-100`, «↵» a destra.
 - **Piede:** `bg-crema border border-linea`, con «↑↓ scegli · INVIO conferma · ESC chiudi» e
-  «Il gioco non c'è? Crealo prima da VIDEOGAME».
+  «Il gioco non c'è?» seguito dal Button `dashed` · `xs` «+ CREALO QUI», che apre il Dialog
+  «Nuovo videogame» ([Nuovo videogame dal form dell'episodio](#nuovo-videogame-dal-form-dellepisodio)).
 
 Il trigger è l'Input `ricerca` `sm`: la ricerca è quella di F-VG-03, con le opzioni ordinate
 per titolo (F-EP-09).
@@ -762,6 +765,44 @@ modifica.
 - Riuscito: Toast `success` «CHECKPOINT · Modifiche salvate».
 - Errore: come «▶ SALVA», Toast `destructive` e il form resta com'era.
 - Durante l'invio il bottone premuto mostra «Attendi…». INVIO in un campo resta «▶ SALVA».
+
+### Nuovo videogame dal form dell'episodio
+
+Miglioria fuori specifica decisa da Paolo (Fase 3.6c.4a), al posto del popup di Django: si crea
+un videogame senza lasciare «Modifica episodio» o «Nuovo episodio».
+
+1. **Dove si apre.** Nel piede del Combobox della scelta videogame c'è «Il gioco non c'è?» con
+   «+ CREALO QUI», anche quando l'elenco dice «Nessun videogame trovato.». Vale a 390, 1180 e
+   1440 (a 390 nell'overlay di scelta), in «Modifica episodio» e in «Nuovo episodio». Da
+   tastiera, con l'elenco aperto TAB dal campo porta a «+ CREALO QUI» del piede; ESC da lì chiude
+   l'elenco e torna al campo.
+2. **Il Dialog.** Modale grande sopra il velo `bg-velo`:
+   - desktop: occupa la viewport con 32 px di margine per lato, `bg-crema border-3
+     border-inchiostro shadow-pixel-xl shadow-viola`; a 390 tutto lo schermo, senza bordo;
+   - testata alta 64 px (56 a 390) con «▶ NUOVO VIDEOGAME» (`text-md font-extrabold viola`, è
+     il titolo del dialogo) e «✕» (40 × 40, `bg-bianco border-2`), separata da un bordo di 3 px;
+   - il corpo scorre dentro il Dialog, con il fondo dell'area principale (`from-cielo
+     to-rosa`) e i suoi padding;
+   - dentro c'è il form di [Nuovo videogame](#schermate) così com'è, con i suoi pannelli e la
+     sua barra delle azioni (ANNULLA, «▶ CREA DA RAWG»; a 390 fissa in fondo al Dialog); solo il
+     terzo passo del QUEST LOG cambia: «Il videogame finisce nella riga dell'episodio, che resta
+     da salvare.»;
+   - all'apertura il focus va sullo slug;
+   - lo slug parte dal testo cercato nel Combobox convertito in slug: minuscole, senza accenti,
+     gli apostrofi spariscono (come negli slug di RAWG: «Assassin's Creed» → «assassins-creed»),
+     ogni sequenza di spazi e altri simboli diventa un «-», niente «-» in testa e in coda. Testo
+     vuoto → slug vuoto.
+3. **Creazione riuscita.** Il Dialog si chiude, la riga dell'associazione da cui era partito ha
+   il nuovo videogame già scelto e il focus torna sul suo campo videogame; Toast `success`
+   «CHECKPOINT · Videogame creato: <titolo>». L'episodio non si salva: il form resta
+   «modificato», con le modifiche fatte prima di aprire il Dialog.
+4. **Errori** (RAWG, slug già usato): come in «Nuovo videogame», Toast `destructive` e slug
+   rosso; il Dialog resta aperto. Il Toast sta sopra il Dialog e si chiude con «✕» senza chiudere
+   il Dialog. Su desktop è nella posizione solita; a 390 sta in basso, 120 px sopra il bordo
+   dello schermo (sopra la barra delle azioni), per non coprire lo slug da correggere.
+5. **Chiusura senza creare.** ANNULLA, «✕», ESC o un clic sul velo chiudono il Dialog senza
+   chiedere conferma e tolgono l'eventuale Toast d'errore; la riga resta com'era e il focus
+   torna sul suo campo videogame. Mentre «▶ CREA DA RAWG» è in corso il Dialog non si chiude.
 
 ### Nuovo utente (F-UT-04)
 

@@ -20,7 +20,7 @@ function Toaster() {
     <Sonner
       position="top-right"
       offset={{ top: 84, right: 24 }}
-      mobileOffset={{ top: 72, left: 16, right: 16 }}
+      mobileOffset={{ top: 72, left: 16, right: 16, bottom: 120 }}
       gap={12}
       visibleToasts={3}
       toastOptions={{ unstyled: true }}
@@ -56,7 +56,9 @@ function Toast({ id, messaggio, variante }: { id: string | number; messaggio: st
       data-slot="toast"
       data-variant={variante}
       className={cn(
-        'flex w-full items-start gap-12 border-3 p-14 font-ui text-inchiostro shadow-pixel-lg sm:w-420',
+        // pointer-events-auto: sopra un Dialog modale Radix mette pointer-events: none sul body,
+        // e il Toast deve restare cliccabile («✕»)
+        'pointer-events-auto flex w-full items-start gap-12 border-3 p-14 font-ui text-inchiostro shadow-pixel-lg sm:w-420',
         v.contenitore,
       )}
     >
@@ -79,10 +81,18 @@ function Toast({ id, messaggio, variante }: { id: string | number; messaggio: st
   )
 }
 
+// A 390 dentro il Dialog grande il Toast in alto coprirebbe lo slug, cioè il campo da
+// correggere: lì sta in basso, 120 px sopra il bordo, cioè sopra la barra delle azioni (proposta).
+const sopraUnDialogA390 = () =>
+  document.querySelector('[data-slot=dialog-content]') != null && !window.matchMedia('(min-width: 1024px)').matches
+
 // Mostra un errore del server nel Toast. Un nuovo errore sostituisce il precedente.
 function mostraErrore(messaggio: string) {
   toast.dismiss()
-  toast.custom((id) => <Toast id={id} messaggio={messaggio} variante="destructive" />, { duration: Infinity })
+  toast.custom((id) => <Toast id={id} messaggio={messaggio} variante="destructive" />, {
+    duration: Infinity,
+    position: sopraUnDialogA390() ? 'bottom-center' : undefined,
+  })
 }
 
 // Conferma di un salvataggio riuscito, nella stessa posizione. Sostituisce l'avviso precedente.
