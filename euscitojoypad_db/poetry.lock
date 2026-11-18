@@ -675,14 +675,14 @@ django = ">=4.2"
 
 [[package]]
 name = "django-json-widget"
-version = "2.1.1"
+version = "2.2.0"
 description = "Django json widget is an alternative widget that makes it easy to edit the jsonfield field of django."
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "django_json_widget-2.1.1-py2.py3-none-any.whl", hash = "sha256:2fa3d6fb6dba9436a29ad2cee23fa794381f54a6678ec7d74e990ae081d9800b"},
-    {file = "django_json_widget-2.1.1.tar.gz", hash = "sha256:dc8102e2fa9accd0f661ea1988c9389f8fbbcb8a4bb9cbfb8fa0525b3c1265c1"},
+    {file = "django_json_widget-2.2.0-py2.py3-none-any.whl", hash = "sha256:0e8f54c1a18c3ac33720c2fd3a3a884fc5b881a87cc34c57f21a9beef5f42035"},
+    {file = "django_json_widget-2.2.0.tar.gz", hash = "sha256:2a98dd61264854de39870807d1f6a8cef20e483b7f387f20d65852ca33a7cf74"},
 ]
 
 [[package]]
@@ -3588,4 +3588,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "8d68be664e9ac4b97a5d6bca4555ef88577879ba7173eb20900bad9f690a5544"
+content-hash = "2ab45d5d2fef741e651fa4c31b99efd81de7e3649158a1fcbf526f3e53c55562"
