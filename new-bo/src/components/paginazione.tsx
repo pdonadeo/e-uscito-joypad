@@ -36,7 +36,7 @@ function SelettoreRighe({
 }) {
   return (
     <Select value={String(righe)} onValueChange={(v) => onRighe(Number(v))}>
-      <SelectTrigger variant="xs" aria-label="Righe per pagina">
+      <SelectTrigger variant="xs" aria-label="Righe per pagina" className="max-[390px]:shrink-0">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

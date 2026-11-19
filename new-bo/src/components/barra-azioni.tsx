@@ -34,11 +34,11 @@ export function BarraAzioni({
 }) {
   const bottoneAnnulla =
     'to' in annulla ? (
-      <Button asChild variant="secondary" size="lg">
+      <Button asChild variant="secondary" size="lg" className="max-[390px]:px-12">
         <Link to={annulla.to}>Annulla</Link>
       </Button>
     ) : (
-      <Button type="button" variant="secondary" size="lg" onClick={annulla.onClick}>
+      <Button type="button" variant="secondary" size="lg" className="max-[390px]:px-12" onClick={annulla.onClick}>
         Annulla
       </Button>
     )
@@ -65,7 +65,7 @@ export function BarraAzioni({
         variant="default-su-scuro"
         size="lg"
         aria-busy={invio}
-        className="gap-14 aria-busy:cursor-wait max-lg:flex-1 lg:min-w-200"
+        className="gap-14 aria-busy:cursor-wait max-lg:flex-1 max-[390px]:gap-8 max-[390px]:px-10 max-[390px]:tracking-wide lg:min-w-200"
       >
         <GlifoPlay misura="medio" /> {invio && inCorso === 'salva' ? 'Attendi…' : etichettaSalva}
       </Button>

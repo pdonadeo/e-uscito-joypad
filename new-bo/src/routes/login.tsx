@@ -89,7 +89,11 @@ function PaginaLogin() {
       <main className="relative h-fit w-full max-w-500 bg-inchiostro p-8 shadow-pixel-3xl shadow-inchiostro/30">
         <div className="bg-bianco p-6">
           <div className="flex flex-col bg-crema px-10 pt-27 pb-36 lg:px-24 lg:pt-31 lg:pb-18">
-            <h1 className="text-center font-titolo text-7xl font-bold text-inchiostro">RETROBOTTEGA</h1>
+            {/* sotto 390 (proposta, 3.6c.4c): il titolo scala con la viewport, da 32 px fino a 22 px;
+                100vw - 80 px è la larghezza del riquadro, 8.6 il rapporto larghezza/corpo del titolo */}
+            <h1 className="text-center font-titolo text-7xl font-bold text-inchiostro max-[390px]:text-[length:clamp(22px,calc((100vw_-_80px)/8.6),32px)]">
+              RETROBOTTEGA
+            </h1>
             <p className="mt-8 text-center font-testo lg:mt-10 text-base text-inchiostro-600">di «È uscito Joypad?»</p>
 
             <p className="mt-24 text-lg leading-ariosa lg:mt-28 text-inchiostro">

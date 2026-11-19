@@ -41,7 +41,7 @@ export function IntestazionePagina({
           </Link>
         )}
         <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:gap-18">
-          <h1 className="font-titolo text-5xl font-bold text-inchiostro lg:text-6xl">{titolo}</h1>
+          <h1 className="font-titolo text-5xl font-bold text-inchiostro wrap-anywhere lg:text-6xl">{titolo}</h1>
           {stato}
         </div>
       </div>

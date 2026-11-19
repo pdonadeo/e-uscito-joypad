@@ -37,7 +37,7 @@ export function ConfermaEliminazione({
       <AlertDialogContent>
         <AlertDialogOcchiello>Game over?</AlertDialogOcchiello>
         <AlertDialogTitle>{titolo}</AlertDialogTitle>
-        <AlertDialogDescription>{children}</AlertDialogDescription>
+        <AlertDialogDescription className="wrap-anywhere">{children}</AlertDialogDescription>
         <AlertDialogIrreversibile />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={inCorso}>Annulla</AlertDialogCancel>

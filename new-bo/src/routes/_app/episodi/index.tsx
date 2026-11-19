@@ -221,7 +221,7 @@ function ElencoEpisodi() {
             ))}
           </SelectConEtichetta>
         )}
-        <div className="flex items-center gap-8 lg:gap-14">
+        <div className="flex items-center gap-8 max-[390px]:flex-wrap lg:gap-14">
           {ricerca.pubblicato && filtroPubblicato}
           <Button
             variant="dashed"
