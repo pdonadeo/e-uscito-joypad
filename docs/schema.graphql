@@ -85,7 +85,7 @@ type Query {
   episodio(id: Int!): Episodio!
 
   # F-VG-01 F-VG-02 F-VG-03
-  "Elenco dei videogame. Default: TITOLO, ASC. Con ordinamento indicato e direzione assente: ASC. Serve anche a scegliere il videogame di un'associazione (F-EP-09)."
+  "Elenco dei videogame. Default: TITOLO, ASC. Con ordinamento indicato e direzione assente: ASC. La scelta del videogame di un'associazione (F-EP-09) usa cercaVideogame."
   elencoVideogame(
     offset: Int
     limit: Int
@@ -94,6 +94,23 @@ type Query {
     ordinamento: OrdinamentoVideogame
     direzione: Direzione
   ): PaginaVideogame!
+
+  # F-EP-09 (3.6c.4b)
+  """
+  Scelta del videogame di un'associazione: cerca solo nel titolo, con le regole della ricerca del
+  sito pubblico. Il testo si ripulisce dagli spazi ai bordi, poi:
+  - vuoto: i primi `limite` videogame per titolo crescente (i titoli null in fondo);
+  - meno di 6 caratteri (punti di codice UTF-8, spazi interni compresi; il sito pubblico conta
+    i byte: scostamento voluto): le parole unite da % e racchiuse fra % («zel d» → «%zel%d%»), con
+    unaccent(titolo) ILIKE unaccent(testo), cioè senza distinguere maiuscole, minuscole e accenti;
+    ordine per titolo crescente;
+  - 6 caratteri o più: word_similarity(unaccent(testo), unaccent(titolo)) > 0.25, così si trova
+    anche un titolo scritto con un errore di battitura; ordine per similarità decrescente, poi per
+    titolo.
+  A parità decide l'id. Descrizione e slug RAWG non contano. 1 ≤ limite ≤ 50, altrimenti
+  BAD_USER_INPUT «Parametro «limite»: deve essere tra 1 e 50».
+  """
+  cercaVideogame(testo: String!, limite: Int = 20): [VideogameInElenco!]!
 
   # F-VG-04
   "Dettaglio di un videogame. NOT_FOUND se non esiste."

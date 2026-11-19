@@ -425,22 +425,24 @@ test.describe('modifica a 1440', () => {
     await page.goto(`/new-bo/episodi/${e.id}`);
     const campo = page.getByRole('combobox', { name: 'Videogame, riga 1' });
     // una prima ricerca lascia a schermo i suoi risultati (keepPreviousData)
+    // cercaVideogame (3.6c.4b) cerca solo nel titolo: si scrive il titolo completo, che ha
+    // similarità 1 e viene per primo; gli altri giochi e2e-nbep seguono, più in basso
     await campo.click();
-    await campo.fill(giochi[1].rawg_slug);
-    await expect(page.getByRole('option')).toHaveCount(1);
-    await expect(page.getByRole('option')).toContainText(giochi[1].rawg_slug);
-    // si scrive un'altra ricerca e si preme subito INVIO: nessuna voce è scelta
-    await campo.fill(giochi[2].rawg_slug);
-    await campo.press('Enter');
-    await expect(campo).toHaveValue(giochi[2].rawg_slug);
-    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
-    // arrivano i risultati giusti: la voce è evidenziata e INVIO la sceglie
-    await expect(page.getByRole('option')).toHaveCount(1);
-    await expect(page.getByRole('option')).toContainText(giochi[2].rawg_slug);
-    await expect(page.getByRole('option')).toHaveAttribute('aria-selected', 'true');
+    await campo.fill(giochi[1].titolo);
     await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toHaveCount(0);
-    await expect(campo).toHaveValue(giochi[2].rawg_slug);
+    await expect(page.getByRole('option').first()).toContainText(giochi[1].titolo);
+    // si scrive un'altra ricerca e si preme subito INVIO: nessuna voce è scelta e l'elenco resta aperto
+    await campo.fill(giochi[2].titolo);
     await campo.press('Enter');
+    await expect(page.locator('[data-slot=command-list]')).toBeVisible();
+    await expect(campo).toHaveValue(giochi[2].titolo);
+    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
+    // arrivano i risultati giusti: la prima voce è quel gioco, evidenziata, e INVIO la sceglie
+    await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toHaveCount(0);
+    await expect(page.getByRole('option').first()).toContainText(giochi[2].titolo);
+    await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
+    await campo.press('Enter');
+    await expect(page.locator('[data-slot=command-list]')).toHaveCount(0);
     await expect(campo).toHaveValue(giochi[2].titolo);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(page).toHaveURL(/\/new-bo\/episodi$/);
@@ -490,9 +492,11 @@ test.describe('modifica a 1180', () => {
     await expect(page.getByRole('columnheader', { name: /Istante/ })).toBeVisible();
     await page.getByLabel('Numero').fill('118');
     await page.getByRole('combobox', { name: 'Videogame, riga 1' }).click();
-    await page.getByRole('combobox', { name: 'Videogame, riga 1' }).fill(giochi[1].rawg_slug);
-    await expect(page.getByRole('option')).toHaveCount(1);
-    await expect(page.getByRole('option')).toContainText(giochi[1].rawg_slug);
+    // cercaVideogame (3.6c.4b): titolo completo, similarità 1, prima voce
+    await page.getByRole('combobox', { name: 'Videogame, riga 1' }).fill(giochi[1].titolo);
+    await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toHaveCount(0);
+    await expect(page.getByRole('option').first()).toContainText(giochi[1].titolo);
+    await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
     await page.getByRole('combobox', { name: 'Videogame, riga 1' }).press('Enter');
     await expect(page.getByRole('combobox', { name: 'Videogame, riga 1' })).toHaveValue(giochi[1].titolo);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();

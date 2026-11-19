@@ -467,6 +467,10 @@ let queries =
           run staff info (fun req _ ->
               Dati.elenco_videogame req ~offset ~limit ~ricerca
                 ~order:(order ~default:(["titolo"], Admin.Ra_codec.Asc) ordinamento direzione)));
+      io_field "cercaVideogame"
+        ~typ:(non_null (list (non_null videogame_in_elenco)))
+        ~args:Arg.[arg "testo" ~typ:(non_null string); arg' "limite" ~typ:int ~default:(`Int 20)]
+        ~resolve:(fun info () testo limite -> run staff info (fun req _ -> Dati.cerca_videogame req ~testo ~limite));
       io_field "videogame" ~typ:(non_null videogame) ~args:Arg.[id_arg] ~resolve:(fun info () id ->
           run staff info (fun req _ -> Dati.videogame req id));
       io_field "elencoAssociazioni" ~typ:(non_null pagina_associazioni)

@@ -489,8 +489,12 @@ override del layout legato ai token `spacing`. A 390 le schede sono cliccabili c
   «Il gioco non c'è?» seguito dal Button `dashed` · `xs` «+ CREALO QUI», che apre il Dialog
   «Nuovo videogame» ([Nuovo videogame dal form dell'episodio](#nuovo-videogame-dal-form-dellepisodio)).
 
-Il trigger è l'Input `ricerca` `sm`: la ricerca è quella di F-VG-03, con le opzioni ordinate
-per titolo (F-EP-09).
+Il trigger è l'Input `ricerca` `sm`. In /new-bo la ricerca è la query `cercaVideogame`
+(3.6c.4b), non quella di F-VG-03: cerca solo nel titolo, con le regole della ricerca del sito
+pubblico. Sotto i 6 caratteri trova i titoli che contengono le parole scritte, nell'ordine, senza
+maiuscole né accenti, ordinati per titolo; dai 6 caratteri in su ordina per somiglianza
+(`word_similarity` > 0.25) e trova anche un titolo scritto con un errore di battitura. Al massimo
+20 opzioni (F-EP-09).
 
 ### Avatar → `avatar`
 

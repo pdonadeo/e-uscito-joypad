@@ -272,18 +272,16 @@ export async function rimuoviCover(id: number) {
   await rest('DELETE', id)
 }
 
-// --- Scelta del videogame (F-EP-09 con la ricerca di F-VG-03) --------------------------------
+// --- Scelta del videogame (F-EP-09 con cercaVideogame, 3.6c.4b) -----------------------------
+// Ricerca sul solo titolo con le regole del sito pubblico (docs/schema.graphql): i primi 20.
 
 const documentoVideogame = graphql(`
-  query SceltaVideogame($ricerca: String) {
-    elencoVideogame(ricerca: $ricerca, ordinamento: TITOLO, direzione: ASC, limit: 20) {
-      totale
-      elementi {
-        id
-        titolo
-        rawg_slug
-        cover
-      }
+  query SceltaVideogame($testo: String!) {
+    cercaVideogame(testo: $testo, limite: 20) {
+      id
+      titolo
+      rawg_slug
+      cover
     }
   }
 `)
@@ -291,8 +289,7 @@ const documentoVideogame = graphql(`
 export const sceltaVideogame = (ricerca: string) =>
   queryOptions({
     queryKey: ['videogame', 'scelta', ricerca],
-    queryFn: async () =>
-      (await esegui(documentoVideogame, { ricerca: ricerca.trim() === '' ? null : ricerca })).elencoVideogame,
+    queryFn: async () => (await esegui(documentoVideogame, { testo: ricerca })).cercaVideogame,
     placeholderData: keepPreviousData,
     staleTime: 30_000,
   })

@@ -66,11 +66,24 @@ const formModificato = (page) => page.locator('main form');
 // «+ CREALO QUI» nel piede del Combobox
 const creaQui = (page) => page.locator('[data-slot=command-footer]').getByRole('button', { name: '+ Crealo qui' });
 
-// Scrive nel campo videogame della riga un testo che non c'è e aspetta «Nessun videogame trovato.».
+// Scrive nel campo videogame della riga un testo che non c'è e aspetta i risultati di
+// cercaVideogame per quel testo, poi che «Cerco…» sparisca. Con la ricerca per somiglianza
+// (3.6c.4b) un testo che non c'è può comunque dare opzioni: «Nessun videogame trovato.» non è
+// garantito (lo verifica «un testo senza trigrammi in comune…»).
 async function cercaInesistente(page, riga, testo) {
+  const risposta = page.waitForResponse((r) => {
+    if (new URL(r.url()).pathname !== '/api/graphql') return false;
+    try {
+      const d = r.request().postDataJSON();
+      return d?.query?.includes('cercaVideogame') && d.variables?.testo === testo;
+    } catch {
+      return false;
+    }
+  });
   await campo(page, riga).click();
   await campo(page, riga).fill(testo);
-  await expect(page.getByText('Nessun videogame trovato.')).toBeVisible();
+  await risposta;
+  await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toBeHidden();
 }
 
 // Fotografia dello schermo, a animazioni finite.
@@ -95,7 +108,7 @@ test.describe('dialog a 1440', () => {
     const cercato = `E2E dlg Zèlda: Ünica ${t}`;
     const slug = `e2e-dlg-zelda-unica-${t}`;
     await cercaInesistente(page, 2, cercato);
-    // il bottone c'è solo nel piede, anche con «Nessun videogame trovato.»
+    // il bottone c'è solo nel piede («Nessun videogame trovato.» lo verifica «un testo senza trigrammi in comune…»)
     await expect(page.getByText("Il gioco non c'è?")).toBeVisible();
     await expect(page.getByRole('button', { name: '+ Crealo qui' })).toHaveCount(1);
     await creaQui(page).click();
@@ -240,9 +253,12 @@ test.describe('dialog a 1440', () => {
     // ESC torna al campo, con l'elenco chiuso
     await page.keyboard.press('Escape');
     await expect(campo(page, 1)).toBeFocused();
-    await expect(page.getByText('Nessun videogame trovato.')).toHaveCount(0);
+    await expect(page.getByRole('listbox')).toHaveCount(0);
     await campo(page, 1).fill(`E2E dlg tastiera ${t}`);
-    await expect(page.getByText('Nessun videogame trovato.')).toBeVisible();
+    // stesso testo, riscritto entro il debounce: la ricerca resta quella di prima e «Cerco…» può
+    // non comparire; si aspetta l'elenco riaperto con i risultati di questo testo
+    await expect(page.getByRole('listbox')).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toBeHidden();
     await page.keyboard.press('Tab');
     await page.keyboard.press('Enter');
     await expect(dialogo(page)).toBeVisible();
@@ -376,3 +392,76 @@ for (const formato of [390, 1180]) {
     });
   });
 }
+
+// --- Ricerca del Combobox con cercaVideogame (3.6c.4b) ----------------------------------------
+
+// Videogame con il titolo e la descrizione voluti: creato dal finto RAWG, poi aggiornato (con
+// rawg_json presente l'aggiornamento non richiama RAWG e tiene i campi del body).
+async function videogameConTitolo(slug, titolo, descrizione_raw) {
+  const res = await api.post('/api/bo/videogame', { data: { rawg_slug: slug } });
+  expect(res.status(), await res.text()).toBe(201);
+  const { id } = await res.json();
+  const put = await api.put(`/api/bo/videogame/${id}`, { data: { rawg_slug: slug, titolo, descrizione_raw } });
+  expect(put.status(), await put.text()).toBe(200);
+  return put.json();
+}
+
+test.describe('ricerca del Combobox a 1440', () => {
+  test.use({ viewport: VIEWPORT[1440] });
+
+  test('un testo senza trigrammi in comune con i titoli: «Nessun videogame trovato.» e un solo «+ CREALO QUI», nel piede', async ({ page }) => {
+    // solo lettere casuali: niente prefisso dell'ora, che i token degli altri titoli e2e hanno in comune
+    const testo = Array.from({ length: 16 }, () => String.fromCharCode(97 + randomInt(26))).join('');
+    // prima si verifica che nessun titolo abbia similarità > 0.25 con il testo
+    const res = await api.post('/api/graphql', {
+      data: { query: 'query($t: String!) { cercaVideogame(testo: $t, limite: 50) { id } }', variables: { t: testo } },
+    });
+    expect(await res.json()).toEqual({ data: { cercaVideogame: [] } });
+    const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    await cercaInesistente(page, 1, testo);
+    await expect(page.getByText('Nessun videogame trovato.')).toBeVisible();
+    await expect(page.getByRole('option')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '+ Crealo qui' })).toHaveCount(1);
+    await expect(creaQui(page)).toBeVisible();
+  });
+
+  test('un titolo scritto con un errore di battitura si trova e INVIO lo sceglie', async ({ page }) => {
+    const t = token();
+    const cercato = await videogameConTitolo(`e2e-dlg-refuso-${t}`, `Quondramix Selvatica ${t}`, 'Descrizione');
+    const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    await campo(page, 1).click();
+    // «Quondramx» al posto di «Quondramix»: 6 caratteri o più, ricerca per somiglianza
+    await campo(page, 1).fill(`Quondramx Selvatica ${t}`);
+    await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toHaveCount(0);
+    await expect(page.getByRole('option').first()).toContainText(cercato.titolo);
+    await expect(page.getByRole('option').first()).toHaveAttribute('aria-selected', 'true');
+    await campo(page, 1).press('Enter');
+    await expect(campo(page, 1)).toHaveValue(cercato.titolo);
+    await page.getByRole('button', { name: 'Salva', exact: true }).click();
+    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    expect((await leggiEpisodio(e.id)).associazioni.map((a) => a.videogame_id)).toEqual([cercato.id]);
+  });
+
+  test('il testo che sta solo nella descrizione non trova più il videogame', async ({ page }) => {
+    const t = token();
+    const parola = `Wombifrax${t}`;
+    // il titolo non contiene il token: con la somiglianza lo troverebbe per quello
+    const nascosto = await videogameConTitolo(`e2e-dlg-descr-${t}`, 'Gioco con la descrizione nascosta', `Parla di ${parola}`);
+    // elencoVideogame (F-VG-03) lo trova dalla descrizione
+    const elenco = await (await api.get(`/api/bo/videogame${listQuery({ filter: { q: parola } })}`)).json();
+    expect(elenco.map((v) => v.id)).toContain(nascosto.id);
+    const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
+    await entra(page);
+    await page.goto(`/new-bo/episodi/${e.id}`);
+    await cercaInesistente(page, 1, parola);
+    await expect(page.getByRole('option', { name: new RegExp(nascosto.titolo) })).toHaveCount(0);
+    // e neppure con meno di 6 caratteri presi dalla descrizione: «Parla»
+    await campo(page, 1).fill('Parla');
+    await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toHaveCount(0);
+    await expect(page.getByRole('option', { name: new RegExp(nascosto.titolo) })).toHaveCount(0);
+  });
+});

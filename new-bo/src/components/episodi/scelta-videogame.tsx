@@ -9,8 +9,9 @@ import { nomeVideogame } from '@/lib/videogame'
 import { cn } from '@/lib/utils'
 
 // Scelta del videogame di un'associazione (F-EP-09): Input `ricerca` · `sm` che apre il Combobox
-// (docs/ui.md, «Combobox → command dentro popover»). La ricerca è quella di F-VG-03, fatta dal
-// server, con le opzioni ordinate per titolo.
+// (docs/ui.md, «Combobox → command dentro popover»). La ricerca è `cercaVideogame` (3.6c.4b),
+// fatta dal server sul solo titolo con le regole del sito pubblico: per titolo sotto i 6
+// caratteri, per somiglianza dai 6 in su (trova anche i titoli scritti con un errore di battitura).
 // Comportamento (proposta): il campo mostra il titolo scelto; scrivendo si apre l'elenco (anche con
 // ↓); INVIO o un clic scelgono, ESC o l'uscita dal campo rimettono il titolo di prima.
 // Finché i risultati non sono quelli del testo scritto (attesa della ricerca, o dati della
@@ -61,7 +62,7 @@ export function SceltaVideogame({
   }, [apriSubito])
 
   const { data, isPlaceholderData } = useQuery({ ...sceltaVideogame(cerca), enabled: aperto })
-  const elementi = data?.elementi ?? []
+  const elementi = data ?? []
   const aggiornati = data !== undefined && !isPlaceholderData && cerca === daCercare
 
   // Voce evidenziata, tenuta qui: quando arrivano risultati nuovi si riparte dalla prima

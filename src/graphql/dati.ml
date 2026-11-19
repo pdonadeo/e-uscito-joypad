@@ -112,6 +112,59 @@ let videogame_sql =
 let elenco_videogame req ~offset ~limit ~ricerca ~order =
   run_list req ~select_sql:videogame_sql ~order ~offset ~limit ~filter:[("q", q ricerca)]
 
+(* Scelta del videogame di un'associazione (F-EP-09, 3.6c.4b): le regole di
+   Django__episodio.search_episodes_by_game_title (sito pubblico), applicate
+   ai videogame e solo al titolo. La SELECT interna ordina e taglia, quella
+   esterna rimette l'ordine sulle righe restituite. *)
+let cerca_videogame_max = 50
+
+let cerca_sql ~where ~order =
+  Printf.sprintf
+    {|SELECT (to_jsonb(r) - '_sim')::text
+      FROM (SELECT %s, word_similarity(unaccent($1), unaccent(v.titolo)) AS _sim
+            FROM backoffice_videogame v
+            %s
+            ORDER BY %s LIMIT $2) r
+      ORDER BY %s|}
+    Videogame.list_columns where order order
+
+let cerca_req sql = Caqti_request.Infix.(Caqti_type.(t2 string int) ->* Caqti_type.string) sql
+
+(* [order] usa i nomi delle colonne della SELECT interna: vale dentro e fuori. *)
+let per_titolo = "titolo ASC NULLS LAST, id ASC"
+
+(* Testo vuoto: i primi per titolo; $1 vale sempre '' (serve un tipo al parametro). *)
+let cerca_tutti_req = cerca_req (cerca_sql ~where:"WHERE $1::text = ''" ~order:per_titolo)
+
+let cerca_corto_req = cerca_req (cerca_sql ~where:"WHERE unaccent(v.titolo) ILIKE unaccent($1)" ~order:per_titolo)
+
+let cerca_simile_req =
+  cerca_req
+    (cerca_sql ~where:"WHERE word_similarity(unaccent($1), unaccent(v.titolo)) > 0.25"
+       ~order:"_sim DESC, titolo ASC, id ASC")
+
+(* Lunghezza in caratteri (punti di codice UTF-8), non in byte. *)
+let caratteri s =
+  let n = ref 0 in
+  String.iter (fun c -> if Char.code c land 0xC0 <> 0x80 then incr n) s;
+  !n
+
+let cerca_videogame req ~testo ~limite =
+  if limite < 1 || limite > cerca_videogame_max
+  then bad_request (Printf.sprintf "Parametro «limite»: deve essere tra 1 e %d" cerca_videogame_max);
+  let testo = String.trim testo in
+  let richiesta, parametro =
+    if testo = ""
+    then (cerca_tutti_req, "")
+    else if caratteri testo < 6
+    then
+      ( cerca_corto_req,
+        testo |> String.split_on_char ' ' |> List.map String.trim |> String.concat "%" |> Printf.sprintf "%%%s%%" )
+    else (cerca_simile_req, testo)
+  in
+  let%lwt righe = db req (fun (module DB : DB) -> DB.collect_list richiesta (parametro, limite)) in
+  Lwt.return (List.map parse righe)
+
 let associazioni_sql =
   Printf.sprintf
     {|SELECT %s %s
