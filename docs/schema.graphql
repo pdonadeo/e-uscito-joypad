@@ -156,6 +156,10 @@ type Mutation {
   "Logout: invalida la sessione. Risponde sempre true."
   logout: Boolean!
 
+  # F-AU-06
+  "Cambio della propria password, per ogni utente staff (non solo superuser). La nuova deve avere almeno 8 caratteri e riceve l'hash di F-UT-04. La sessione corrente resta valida, le altre sessioni dello stesso utente si chiudono (F-AU-05). Un solo cambio per richiesta. Errori: BAD_USER_INPUT (password attuale non corretta, nuova troppo corta, secondo cambio nella stessa richiesta), UNAUTHENTICATED (senza sessione), RATE_LIMITED (calcoli di hash già in coda)."
+  cambiaPassword(attuale: String!, nuova: String!): UtenteCorrente!
+
   # F-EP-06 F-EP-09 F-AS-03
   "Crea un episodio con le sue associazioni, in un'unica transazione. La cover si carica dopo, via REST (F-EP-10)."
   creaEpisodio(dati: EpisodioInput!): Episodio!

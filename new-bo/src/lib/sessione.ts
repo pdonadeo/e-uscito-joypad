@@ -3,7 +3,8 @@ import { graphql } from '@/gql'
 import type { UtenteCorrenteQuery } from '@/gql/graphql'
 import { esegui } from '@/lib/graphql'
 
-// Sessione: login (F-AU-01), logout (F-AU-02), utente corrente (F-AU-03, F-AU-04, F-AU-05).
+// Sessione: login (F-AU-01), logout (F-AU-02), utente corrente (F-AU-03, F-AU-04, F-AU-05),
+// cambio della propria password (F-AU-06).
 
 const documentoMe = graphql(`
   query UtenteCorrente {
@@ -33,6 +34,17 @@ const documentoLogout = graphql(`
   }
 `)
 
+const documentoCambiaPassword = graphql(`
+  mutation CambiaPassword($attuale: String!, $nuova: String!) {
+    cambiaPassword(attuale: $attuale, nuova: $nuova) {
+      id
+      username
+      fullName
+      is_superuser
+    }
+  }
+`)
+
 export type UtenteCorrente = UtenteCorrenteQuery['me']
 
 export const utenteCorrente = queryOptions({
@@ -47,4 +59,12 @@ export async function login(username: string, password: string) {
 
 export async function logout() {
   return (await esegui(documentoLogout)).logout
+}
+
+// F-AU-06: la sessione corrente resta valida, le altre dello stesso utente si chiudono.
+// Password attuale sbagliata → BAD_USER_INPUT con MESSAGGIO_ATTUALE_ERRATA (non UNAUTHENTICATED).
+export const MESSAGGIO_ATTUALE_ERRATA = 'La password attuale non è corretta'
+
+export async function cambiaPassword(attuale: string, nuova: string) {
+  return (await esegui(documentoCambiaPassword, { attuale, nuova })).cambiaPassword
 }

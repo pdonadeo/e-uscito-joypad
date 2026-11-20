@@ -518,6 +518,10 @@ let mutations =
           Errori.guard (fun () -> Dati.login info.ctx ~username ~password));
       io_field "logout" ~typ:(non_null bool) ~args:Arg.[] ~resolve:(fun info () ->
           Errori.guard (fun () -> Dati.logout info.ctx));
+      io_field "cambiaPassword" ~typ:(non_null utente_corrente)
+        ~args:Arg.[arg "attuale" ~typ:(non_null string); arg "nuova" ~typ:(non_null string)]
+        ~resolve:(fun info () attuale nuova ->
+          run staff info (fun req me -> Dati.cambia_password req me ~attuale ~nuova));
       io_field "creaEpisodio" ~typ:(non_null episodio)
         ~args:Arg.[arg "dati" ~typ:(non_null episodio_input)]
         ~resolve:(fun info () dati -> run ~input:episodio_shape staff info (fun req _ -> Dati.crea_episodio req dati));

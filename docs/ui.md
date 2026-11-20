@@ -515,13 +515,17 @@ Le voci sono EPISODI ▶, VIDEOGAME ◆ e UTENTI ★. UTENTI c'è solo per i sup
   `shadow-pixel-2xl shadow-viola`.
 - Testata `bg-inchiostro` con «RETROBOTTEGA» e «✕».
 - Utente: Avatar, nome, «★ superuser».
-- Voci come la Sidebar espansa; ESCI (Button `outline` `default`) in fondo.
+- Voci come la Sidebar espansa; in fondo PAROLA D'ORDINE (Button `outline` `default` come ESCI: il
+  `secondary` crema non si vedrebbe sul fondo dello Sheet; porta a «Cambia parola d'ordine»,
+  F-AU-06) e sotto ESCI (Button `outline` `default`).
 
 ### Barra app (nessun equivalente shadcn)
 
 - **`desktop`:** alta 64 px, `bg-inchiostro px-24`. A sinistra il marchio «RETROBOTTEGA»
   (`font-titolo text-3xl text-crema`) e «di «È uscito Joypad?»» (`font-testo`). A destra
-  Avatar, `fullName` (F-AU-03) ed ESCI (F-AU-02).
+  Avatar, `fullName` (F-AU-03), PAROLA D'ORDINE (Button `secondary` `sm` con `px-12 py-7 text-sm`
+  e bordo `border-2 border-crema`, alto come ESCI; porta a «Cambia parola d'ordine», F-AU-06) ed
+  ESCI (F-AU-02). Vale anche a 1180.
 - **`mobile`:** alta 56 px, `px-16`: «≡», il marchio e l'Avatar.
 
 ## Adattare i componenti shadcn
@@ -819,6 +823,47 @@ Stessa schermata di «Modifica utente», con queste differenze:
 - niente pannello «REGISTRO» (ultimo accesso, iscritto dal) e niente «✕ ELIMINA UTENTE»;
 - barra delle azioni: ANNULLA e «▶ CREA». Dopo il salvataggio si apre la modifica. Un
   username già usato dà nel Toast «Esiste già un utente con questo username».
+
+### Cambia parola d'ordine (F-AU-06)
+
+Indirizzo `/new-bo/password`, per ogni utente staff (anche non superuser). Si apre da
+PAROLA D'ORDINE nella [Barra app](#barra-app-nessun-equivalente-shadcn) `desktop` (prima di ESCI)
+e nello Sheet (sopra ESCI). Stessa griglia e stessa barra delle azioni di «Modifica utente», con
+queste differenze:
+
+- occhiello «▶ IL TUO ACCOUNT» al posto di «◀ UTENTI», titolo «Cambia parola d'ordine»;
+- colonna sinistra: un solo pannello, «PAROLA D'ORDINE», con tre Input `password` obbligatori,
+  in colonna: PAROLA D'ORDINE ATTUALE * (`autocomplete=current-password`), NUOVA PAROLA
+  D'ORDINE * (`new-password`, placeholder «Almeno 8 caratteri») e RIPETI LA NUOVA *
+  (`new-password`);
+- colonna destra: «★ REGOLE DEL GIOCO» con «La nuova parola d'ordine deve avere almeno 8
+  caratteri.» e «Qui resti dentro. Le altre sessioni aperte con il tuo account si chiudono: lì
+  dovrai rientrare con la nuova.»; niente «REGISTRO» e niente «✕ ELIMINA»;
+- a 390 (e sotto, con le regole di «Sotto 390»): pannello, regole, barra delle azioni;
+- barra delle azioni: ANNULLA e «▶ SALVA», senza SALVA E CONTINUA. ANNULLA torna alla pagina
+  precedente dell'app; se l'indirizzo è stato aperto direttamente, agli episodi.
+
+Errori nel campo: Input `errore` (bordo rosso con `aria-invalid`) e sotto il messaggio in
+`text-sm font-bold text-rosso`, collegato con `aria-describedby`. Il messaggio sparisce appena si
+modifica il campo.
+
+Prima della richiesta si controlla la nuova, nell'ordine:
+
+- meno di 8 caratteri, contati come punti di codice: «Almeno 8 caratteri» sotto NUOVA PAROLA
+  D'ORDINE, e nessuna richiesta. Il server conta i byte, quindi il controllo del client è sempre
+  più severo (per esempio «àààà», 4 caratteri e 8 byte, si ferma qui);
+- la nuova e la ripetuta non coincidono: «Non coincide con la nuova parola d'ordine» sotto
+  RIPETI LA NUOVA, e nessuna richiesta.
+
+Dopo la richiesta:
+
+- password attuale sbagliata, riconosciuta dal messaggio del server («La password attuale non è
+  corretta», BAD_USER_INPUT): sotto PAROLA D'ORDINE ATTUALE il testo dell'interfaccia «La parola
+  d'ordine attuale non è corretta», con il focus sul campo. La sessione resta aperta;
+- gli altri errori del server (per esempio RATE_LIMITED, o «Campo «password»: almeno 8
+  caratteri», di riserva) nel Toast `destructive`.
+- A successo: Toast `success` «CHECKPOINT» «Parola d'ordine cambiata», i tre campi tornano vuoti e
+  si resta sulla pagina.
 
 ### Conferme di eliminazione
 

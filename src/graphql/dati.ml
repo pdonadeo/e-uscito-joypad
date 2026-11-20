@@ -51,6 +51,32 @@ let login req ~username ~password =
     | Some u -> Lwt.return (Auth.me_json u)
     | None -> fail `Internal_Server_Error "Sessione non impostata dopo il login"
 
+(* Cambio della propria password (F-AU-06), per ogni utente staff. Stessi
+   passi di aggiornaUtente sul proprio account: regola degli 8 caratteri e hash
+   di F-UT-04, sessione corrente tenuta valida, le altre chiuse (F-AU-05).
+   La password attuale sbagliata è BAD_USER_INPUT, non UNAUTHENTICATED: il
+   client su UNAUTHENTICATED torna al login. Come per il login, un solo cambio
+   per richiesta: con gli alias una POST chiederebbe molti calcoli di hash. *)
+let cambio_attempted : unit Dream.field = Dream.new_field ~name:"gql.cambia_password" ()
+
+let cambia_password req (me : Auth.user) ~attuale ~nuova =
+  if Dream.field req cambio_attempted <> None then bad_request "È ammesso un solo cambio di password per richiesta";
+  Dream.set_field req cambio_attempted ();
+  if String.length nuova < Utenti.min_password_length
+  then Input.invalid "password" (Printf.sprintf "almeno %d caratteri" Utenti.min_password_length);
+  let%lwt iterations = Auth.iterations_for_new_hash req in
+  let%lwt ok = Password.verify ~dummy_iterations:iterations ~password:attuale me.password in
+  if not ok
+  then begin
+    log.warning (fun m -> m ~request:req "Cambio password rifiutato per «%s»: password attuale errata" me.username);
+    bad_request "La password attuale non è corretta"
+  end;
+  let%lwt hash = Password.make ~password:nuova ~iterations in
+  let%lwt () = db req (fun (module DB : DB) -> DB.exec Auth.set_password_req (me.id, hash)) in
+  let%lwt () = Auth.set_session_password req hash in
+  log.info (fun m -> m ~request:req "Password cambiata da «%s»" me.username);
+  Lwt.return (Auth.me_json { me with password = hash })
+
 let logout req =
   let%lwt () = Dream.invalidate_session req in
   Lwt.return true

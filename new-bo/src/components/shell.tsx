@@ -152,6 +152,13 @@ function MenuMobile({ me, esci }: { me: UtenteCorrente; esci: () => void }) {
           <VociMenu me={me} onScelta={() => setAperto(false)} />
         </Sidebar>
         <SheetFooter>
+          {/* F-AU-06: cambio della propria password, sopra ESCI; `outline` come ESCI (il `secondary`
+              crema sparirebbe sul fondo crema dello Sheet) */}
+          <Button asChild variant="outline">
+            <Link to="/password" onClick={() => setAperto(false)}>
+              Parola d'ordine
+            </Link>
+          </Button>
           <Button variant="outline" className="gap-12" onClick={esci}>
             Esci <GlifoEspelli />
           </Button>
@@ -184,7 +191,11 @@ export function Shell() {
           <span className="text-md font-bold text-crema" data-testid="nome-utente">
             {me.fullName}
           </span>
-          <Button variant="outline-su-scuro" size="sm" className="ml-2 gap-10" onClick={esci}>
+          {/* F-AU-06: bottone secondario prima di ESCI, con il bordo crema di 2 px per essere alto come ESCI */}
+          <Button asChild variant="secondary" size="sm" className="ml-2 border-2 border-crema px-12 py-7 text-sm">
+            <Link to="/password">Parola d'ordine</Link>
+          </Button>
+          <Button variant="outline-su-scuro" size="sm" className="gap-10" onClick={esci}>
             Esci <GlifoEspelli />
           </Button>
         </div>
