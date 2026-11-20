@@ -77,7 +77,7 @@ export const Route = createFileRoute('/_app/episodi/')({
       righe: (RIGHE as readonly number[]).includes(righe) && righe !== RIGHE_DEFAULT ? righe : undefined,
       ricerca: typeof s.ricerca === 'string' && s.ricerca !== '' ? s.ricerca : undefined,
       pubblicato: s.pubblicato === 'tutti' || s.pubblicato === 'si' || s.pubblicato === 'no' ? s.pubblicato : undefined,
-      ordina: typeof s.ordina === 'string' && s.ordina in COLONNE ? (s.ordina as Colonna) : undefined,
+      ordina: typeof s.ordina === 'string' && Object.hasOwn(COLONNE, s.ordina) ? (s.ordina as Colonna) : undefined,
       verso: s.verso === 'asc' || s.verso === 'desc' ? s.verso : undefined,
     }
   },

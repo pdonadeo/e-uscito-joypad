@@ -814,3 +814,26 @@ for (const formato of [390, 1180, 1440]) {
       });
   });
 }
+
+// Revisione finale (Fase 3.7): `ordina` nell'indirizzo con il nome di una proprietà ereditata da
+// Object (constructor, toString) non è una colonna: l'elenco usa il default di F-VG-02.
+test.describe('elenco videogame: ordina con proprietà di Object', () => {
+  test.use({ viewport: VIEWPORT[1440] });
+
+  for (const ordina of ['constructor', 'toString']) {
+    test(`F-VG-02: ?ordina=${ordina} → ordinamento di default, nessun errore`, async ({ page }) => {
+      const errori = [];
+      page.on('pageerror', (e) => errori.push(e.message));
+      const t = token();
+      await nuovoVideogame(`e2e-${t}-a`, { titolo: `Zeta ${t}` });
+      await nuovoVideogame(`e2e-${t}-b`, { titolo: `Alfa ${t}` });
+      await entra(page);
+      await elenco(page, t, `&ordina=${ordina}`);
+      await expect(righe(page).locator('td:nth-child(3)')).toHaveText([`Alfa ${t}`, `Zeta ${t}`]);
+      await expect(page.getByRole('columnheader', { name: /Titolo/ })).toHaveAttribute('aria-sort', 'ascending');
+      await expect(page.getByText('Non è stato possibile leggere i videogame.')).toHaveCount(0);
+      await expect(toast(page)).toHaveCount(0);
+      expect(errori).toEqual([]);
+    });
+  }
+});

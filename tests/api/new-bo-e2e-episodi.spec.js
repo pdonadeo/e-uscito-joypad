@@ -867,3 +867,28 @@ test.describe('elenco episodi: righe pari', () => {
     await expect(righe(page).nth(3)).toHaveCSS('background-color', 'rgb(243, 241, 255)'); // viola-50
   });
 });
+
+// Revisione finale (Fase 3.7): `ordina` nell'indirizzo con il nome di una proprietà ereditata da
+// Object (constructor, toString) non è una colonna: l'elenco usa il default di F-EP-02.
+test.describe('elenco episodi: ordina con proprietà di Object', () => {
+  test.use({ viewport: VIEWPORT[1440] });
+
+  for (const ordina of ['constructor', 'toString']) {
+    test(`F-EP-02: ?ordina=${ordina} → ordinamento di default, nessun errore`, async ({ page }) => {
+      const errori = [];
+      page.on('pageerror', (e) => errori.push(e.message));
+      const token = uniq();
+      await nuovoEpisodio({ titolo: `[E2E] new-bo ${token} B`, data_uscita: '2001-01-01' });
+      await nuovoEpisodio({ titolo: `[E2E] new-bo ${token} A`, data_uscita: '2001-01-03' });
+      await nuovoEpisodio({ titolo: `[E2E] new-bo ${token} C`, data_uscita: '2001-01-02' });
+      await entra(page);
+      await elenco(page, token, `&ordina=${ordina}`);
+      await expect(righe(page)).toHaveCount(3);
+      await expect(righe(page).locator('td:nth-child(3)')).toHaveText([/A$/, /C$/, /B$/]);
+      await expect(page.getByRole('columnheader', { name: /Data uscita/ })).toHaveAttribute('aria-sort', 'descending');
+      await expect(page.getByText('Non è stato possibile leggere gli episodi.')).toHaveCount(0);
+      await expect(toast(page)).toHaveCount(0);
+      expect(errori).toEqual([]);
+    });
+  }
+});
