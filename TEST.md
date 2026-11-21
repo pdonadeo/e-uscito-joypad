@@ -10,17 +10,17 @@ su `/bo`. Configurazione: `playwright.api.config.js`. Test: `tests/api/*.spec.js
 
 ```fish
 cd ~/Programmazione/e-uscito-joypad
-docker compose up -d postgresql backoffice
+docker compose up -d postgresql
 yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune build @install; and npx playwright test -c playwright.api.config.js
 ```
 
 - **Cosa fa da sola:** avvia il binario compilato da dune e un finto RAWG (`tests/api/mock-rawg.js`), poi li spegne
   alla fine. Non serve lanciare nessun server a mano.
-- **Cosa le serve acceso:** il PostgreSQL del compose di sviluppo e il container Django `euj-backoffice`, che crea gli
-  utenti di test.
+- **Cosa le serve acceso:** il PostgreSQL del compose di sviluppo (`euj-postgresql`). Gli utenti di test li crea la
+  suite stessa, in SQL con `psql` dentro quel container.
 - **Perché i build prima:** i test girano sul binario in `_build/`, non sul container `euj-app`. Se il codice OCaml
   cambia e non si ricompila, si prova il binario vecchio.
-- **Durata:** circa 3 minuti. I test girano uno alla volta, perché condividono il database.
+- **Durata:** circa 9 minuti. I test girano uno alla volta, perché condividono il database.
 - **Una sola esecuzione per volta:** due suite in parallelo usano lo stesso database e la stessa porta, e si disturbano.
 
 ## Suite visual

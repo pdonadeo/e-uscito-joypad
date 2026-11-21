@@ -1,14 +1,18 @@
 // Rimuove i dati creati dai test: episodi "[E2E]…", videogame "e2e-…", utenti "e2e_…".
-const { django } = require('./env');
+// Le righe che puntano agli utenti (django_admin_log, gruppi e permessi) vanno tolte prima,
+// come faceva il delete di Django.
+const { sql } = require('./env');
 
 module.exports = async () => {
-  django(`
-from django.contrib.auth.models import User
-from backoffice.models import Episodio, Videogame, AssociazioneEpisodioVideogame
-AssociazioneEpisodioVideogame.objects.filter(episodio__titolo__startswith="[E2E]").delete()
-AssociazioneEpisodioVideogame.objects.filter(videogame__rawg_slug__startswith="e2e-").delete()
-Episodio.objects.filter(titolo__startswith="[E2E]").delete()
-Videogame.objects.filter(rawg_slug__startswith="e2e-").delete()
-User.objects.filter(username__startswith="e2e_").delete()
-`);
+  sql(`BEGIN;
+DELETE FROM backoffice_associazioneepisodiovideogame
+WHERE episodio_id IN (SELECT id FROM backoffice_episodio WHERE titolo LIKE '[E2E]%')
+   OR videogame_id IN (SELECT id FROM backoffice_videogame WHERE rawg_slug LIKE 'e2e-%');
+DELETE FROM backoffice_episodio WHERE titolo LIKE '[E2E]%';
+DELETE FROM backoffice_videogame WHERE rawg_slug LIKE 'e2e-%';
+DELETE FROM django_admin_log WHERE user_id IN (SELECT id FROM auth_user WHERE username LIKE 'e2e\\_%');
+DELETE FROM auth_user_groups WHERE user_id IN (SELECT id FROM auth_user WHERE username LIKE 'e2e\\_%');
+DELETE FROM auth_user_user_permissions WHERE user_id IN (SELECT id FROM auth_user WHERE username LIKE 'e2e\\_%');
+DELETE FROM auth_user WHERE username LIKE 'e2e\\_%';
+COMMIT;`);
 };

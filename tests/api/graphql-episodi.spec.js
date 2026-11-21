@@ -2,7 +2,7 @@
 // Ogni test ha le sue fixture, così è indipendente (niente modalità serial).
 // La cover passa dalla REST /api/bo/episodi/:id/cover, l'unica rimasta.
 const { test, expect } = require('@playwright/test');
-const { USERS, django } = require('./env');
+const { USERS, sql } = require('./env');
 const { loggedIn, uniq, PNG_1x1 } = require('./helpers');
 const { F, gql, expectOk, expectCode, creaVideogame, creaEpisodio } = require('./gql-helpers');
 
@@ -116,7 +116,7 @@ test('episodio: dettaglio con le associazioni ordinate per istante; id inesisten
 });
 
 test('elencoEpisodi: default data_uscita decrescente, totale, offset e limit', async () => {
-  const total = Number(django('from backoffice.models import Episodio\nprint(Episodio.objects.count())').split('\n').pop());
+  const total = Number(sql('SELECT count(*) FROM backoffice_episodio'));
   const page = expectOk(await gql(api, ELENCO, { o: 0, l: 20 })).elencoEpisodi;
   expect(page.totale).toBe(total);
   expect(page.elementi).toHaveLength(Math.min(20, total));

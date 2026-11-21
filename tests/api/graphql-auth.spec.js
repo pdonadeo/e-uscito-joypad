@@ -2,9 +2,10 @@
 // trasporto HTTP di /api/graphql (Fase 3.5.2), avvio con DEBUG=False. Contratto: docs/schema.graphql.
 const { test, expect } = require('@playwright/test');
 const { spawn, spawnSync } = require('child_process');
-const { API_URL, USERS, BINARY, dreamEnv, django } = require('./env');
+const { API_URL, USERS, BINARY, dreamEnv, sql, hashDjango, verificaHashDjango, salvaUtente } = require('./env');
 const { newContext, loggedIn, PNG_1x1 } = require('./helpers');
 const { ENDPOINT, F, gql, expectOk, expectCode, gqlLoggedIn } = require('./gql-helpers');
+const { vettori: VETTORI } = require('./vettori-hash.json');
 
 const LOGIN = `mutation($c: CredenzialiInput!) { login(credenziali: $c) { ${F.me} } }`;
 const ME = `{ me { ${F.me} } }`;
@@ -79,10 +80,8 @@ test.describe('accesso', () => {
     expect(Date.now() - t0).toBeLessThan(1500);
     expect(login).toMatchObject({ username: USERS.staff.username, fullName: USERS.staff.username, is_superuser: false });
     expect(expectOk(await gql(ctx, ME)).me).toEqual(login);
-    const lastLogin = django(
-      `from django.contrib.auth.models import User\nprint(User.objects.get(username="${USERS.staff.username}").last_login is not None)`,
-    );
-    expect(lastLogin.split('\n').pop()).toBe('True');
+    const lastLogin = sql(`SELECT last_login IS NOT NULL FROM auth_user WHERE username = :'u'`, { u: USERS.staff.username });
+    expect(lastLogin).toBe('t');
     await ctx.dispose();
   });
 
@@ -193,15 +192,15 @@ test.describe('sessione condivisa con la cover di /api/bo', () => {
     await ctx.dispose();
   });
 
-  test('il cambio password (da Django) chiude la sessione GraphQL', async ({ playwright }) => {
+  test('il cambio password scritto nel DB chiude la sessione GraphQL', async ({ playwright }) => {
     const victim = { username: 'e2e_gql_pwchange', password: 'e2e-password-old' };
-    django(`from django.contrib.auth.models import User
-u, _ = User.objects.get_or_create(username="${victim.username}")
-u.set_password("${victim.password}"); u.is_staff = True; u.is_active = True; u.save()`);
+    salvaUtente(victim);
     const ctx = await gqlLoggedIn(playwright, victim);
     expectOk(await gql(ctx, ME));
-    django(`from django.contrib.auth.models import User
-u = User.objects.get(username="${victim.username}"); u.set_password("e2e-password-new"); u.save()`);
+    sql(`UPDATE auth_user SET password = :'hash' WHERE username = :'u'`, {
+      hash: hashDjango('e2e-password-new'),
+      u: victim.username,
+    });
     expectCode(await gql(ctx, ME), 'UNAUTHENTICATED');
     expect(await coverStatus(ctx)).toBe(401);
     await ctx.dispose();
@@ -209,16 +208,12 @@ u = User.objects.get(username="${victim.username}"); u.set_password("e2e-passwor
 
   test('il cambio password con aggiornaUtente chiude le sessioni di quell\'utente', async ({ playwright }) => {
     const victim = { username: 'e2e_gql_pwchange2', password: 'e2e-password-old' };
-    const id = django(`from django.contrib.auth.models import User
-u, _ = User.objects.get_or_create(username="${victim.username}")
-u.set_password("${victim.password}"); u.is_staff = True; u.is_active = True; u.save(); print(u.id)`)
-      .split('\n')
-      .pop();
+    const id = salvaUtente(victim);
     const vctx = await gqlLoggedIn(playwright, victim);
     const su = await gqlLoggedIn(playwright, USERS.superuser);
     expectOk(
       await gql(su, `mutation($id: Int!, $d: UtenteInput!) { aggiornaUtente(id: $id, dati: $d) { id } }`, {
-        id: Number(id),
+        id,
         d: { username: victim.username, password: 'e2e-password-new', is_staff: true, is_active: true, is_superuser: false },
       }),
     );
@@ -230,12 +225,9 @@ u.set_password("${victim.password}"); u.is_staff = True; u.is_active = True; u.s
 
   test('un utente disattivato perde subito l\'accesso anche su GraphQL', async ({ playwright }) => {
     const u = { username: 'e2e_gql_deact', password: 'e2e-password-deact' };
-    django(`from django.contrib.auth.models import User
-x, _ = User.objects.get_or_create(username="${u.username}")
-x.set_password("${u.password}"); x.is_staff = True; x.is_active = True; x.save()`);
+    salvaUtente(u);
     const ctx = await gqlLoggedIn(playwright, u);
-    django(`from django.contrib.auth.models import User
-User.objects.filter(username="${u.username}").update(is_active=False)`);
+    sql(`UPDATE auth_user SET is_active = false WHERE username = :'u'`, { u: u.username });
     expectCode(await gql(ctx, '{ elencoEpisodi { totale } }'), 'UNAUTHENTICATED');
     expect(await coverStatus(ctx)).toBe(401);
     await ctx.dispose();
@@ -366,21 +358,14 @@ test.describe('DEBUG=False', () => {
 });
 
 test('login di un hash Django con meno iterazioni: ricalcolato come fa Django', async ({ playwright }) => {
-  const u = { username: 'e2e_oldhash', password: 'e2e-password-old-hash' };
-  django(`from django.contrib.auth.models import User
-from django.contrib.auth.hashers import PBKDF2PasswordHasher
-h = PBKDF2PasswordHasher()
-x, _ = User.objects.get_or_create(username="${u.username}")
-x.password = h.encode("${u.password}", h.salt(), iterations=320000)
-x.is_staff = True; x.is_active = True; x.save()`);
+  // vettore generato con Django (vettori-hash.json) a 320.000 iterazioni
+  const v = VETTORI.find((x) => x.iterazioni === 320_000);
+  const u = { username: 'e2e_oldhash', password: v.password };
+  salvaUtente({ ...u, hash: v.hash });
   const ctx = await gqlLoggedIn(playwright, u);
   expect(expectOk(await gql(ctx, ME)).me.username).toBe(u.username);
-  const out = django(`from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-x = User.objects.get(username="${u.username}")
-print(x.password.split("$")[1], authenticate(username="${u.username}", password="${u.password}") is not None)`);
-  const [iterations, ok] = out.split('\n').pop().split(' ');
-  expect(Number(iterations)).toBeGreaterThanOrEqual(1500000);
-  expect(ok).toBe('True');
+  const nuovo = sql(`SELECT password FROM auth_user WHERE username = :'u'`, { u: u.username });
+  expect(Number(nuovo.split('$')[1])).toBeGreaterThanOrEqual(1500000);
+  expect(verificaHashDjango(u.password, nuovo)).toBe(true);
   await ctx.dispose();
 });

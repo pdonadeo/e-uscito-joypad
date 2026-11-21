@@ -2,7 +2,7 @@
 // Test d'integrazione del backoffice: GraphQL (/api/graphql), cover (/api/bo/episodi/:id/cover)
 // ed e2e di new-bo su /bo (tests/api/*.spec.js).
 // Avvia un Dream locale (build di dune) e un finto RAWG; usa il PostgreSQL del
-// compose di sviluppo e il container Django per creare gli utenti di test.
+// compose di sviluppo, dove crea gli utenti di test in SQL (tests/api/global-setup.js).
 //
 //   yarn --cwd frontend build && bun run --cwd new-bo build && opam exec -- dune build @install && npx playwright test -c playwright.api.config.js
 const { defineConfig } = require('@playwright/test');

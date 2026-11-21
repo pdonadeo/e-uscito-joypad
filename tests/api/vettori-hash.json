@@ -1,0 +1,61 @@
+{
+  "generato_con": "Django 6.1.3, PBKDF2PasswordHasher, 2026-11-21",
+  "vettori": [
+    {
+      "password": "Joypad-2026!",
+      "salt": "yhLnIquxfBdDv6NmpbyUCT",
+      "iterazioni": 1500000,
+      "hash": "pbkdf2_sha256$1500000$yhLnIquxfBdDv6NmpbyUCT$8ySOWfSIkaL0KDYDduuiKxNqWXEpwRuKSxu0LJ+dUzI=",
+      "nota": "ASCII, iterazioni di default di Django"
+    },
+    {
+      "password": "Joypad-2026!",
+      "salt": "oYLQvs2NvQ9YfeUHpJjomF",
+      "iterazioni": 320000,
+      "hash": "pbkdf2_sha256$320000$oYLQvs2NvQ9YfeUHpJjomF$t5BovlerW3vR2boZWDOUV/VpIYIf+xFJevysBzrDKi0=",
+      "nota": "ASCII, iterazioni basse come in produzione"
+    },
+    {
+      "password": "vecchia-password-260k",
+      "salt": "xMFt5U3BY9hkAhecR0eNoC",
+      "iterazioni": 260000,
+      "hash": "pbkdf2_sha256$260000$xMFt5U3BY9hkAhecR0eNoC$4J2zIGy5PApuvJs9lPQxJV3mYhpetN72ajVebbfF3pU=",
+      "nota": "ASCII, iterazioni basse come in produzione"
+    },
+    {
+      "password": "Perché è già così? Ñandú 🎮👾",
+      "salt": "zHVjWr2AMbzj922dyM9QY9",
+      "iterazioni": 1500000,
+      "hash": "pbkdf2_sha256$1500000$zHVjWr2AMbzj922dyM9QY9$DDCZeE0gDp5IIlEvpcBZv+FeowF32a3ChHgWJsjh2Kw=",
+      "nota": "UTF-8: lettere accentate ed emoji"
+    },
+    {
+      "password": "perché-già-260k-🎮",
+      "salt": "UwAb8AHU5bnmumT6U6E5w3",
+      "iterazioni": 260000,
+      "hash": "pbkdf2_sha256$260000$UwAb8AHU5bnmumT6U6E5w3$Z0qs1DKjE4QRq55YqD0kD3K7TZqpCWxymq98ReSeFwY=",
+      "nota": "UTF-8, iterazioni basse"
+    },
+    {
+      "password": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-password-più-lunga-di-64-byte-yyyyyyyyyyyyyyyyyyyy",
+      "salt": "aJaA7aA8bp3EQuBi8wznBj",
+      "iterazioni": 1500000,
+      "hash": "pbkdf2_sha256$1500000$aJaA7aA8bp3EQuBi8wznBj$CkFaEk1jIg6HmCp2dAhl3zGPKGVLWDMZgA2PKMmCCbc=",
+      "nota": "più di 64 byte: la chiave HMAC è lo SHA-256 della password"
+    },
+    {
+      "password": "🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮🎮",
+      "salt": "T2DXCeHfZLVG372i3kKJeu",
+      "iterazioni": 1500000,
+      "hash": "pbkdf2_sha256$1500000$T2DXCeHfZLVG372i3kKJeu$hskJRBIFN35VG5gQ+5+sQXCp4nMXsiZweab5jG7yuak=",
+      "nota": "80 byte ma 20 caratteri: conta la lunghezza in byte"
+    },
+    {
+      "password": "CHANGE_ME_IN_PRODUCTION",
+      "salt": "c6kQtA6t6r3fadLCM6pyf6",
+      "iterazioni": 1500000,
+      "hash": "pbkdf2_sha256$1500000$c6kQtA6t6r3fadLCM6pyf6$QCKvpNc4VRnmSHiDMOfEeETKiWIvVt3vExd8+VRCzO4=",
+      "nota": "admin del seed di sviluppo (Fase 3)"
+    }
+  ]
+}

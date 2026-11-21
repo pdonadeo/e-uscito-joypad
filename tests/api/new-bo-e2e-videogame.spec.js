@@ -6,7 +6,7 @@
 // unico per test. Elenco e modifica si provano a 390, 1180 e 1440.
 const zlib = require('node:zlib');
 const { test, expect } = require('@playwright/test');
-const { API_URL, USERS, django } = require('./env');
+const { API_URL, USERS, sql } = require('./env');
 const { loggedIn, uniq, rawgCalls } = require('./helpers');
 const {
   parseRawg,
@@ -428,9 +428,10 @@ test.describe('modifica a 1440', () => {
     // rawg_json lungo, con una stringa senza spazi, scritto direttamente nel DB
     const lungo = Object.fromEntries(Array.from({ length: 60 }, (_, i) => [`campo_${i}`, `valore ${i}`]));
     lungo.senza_spazi = 'x'.repeat(600);
-    django(
-      `import json\nfrom backoffice.models import Videogame\nVideogame.objects.filter(id=${v.id}).update(rawg_json=json.loads(${JSON.stringify(JSON.stringify(lungo))}))\n`,
-    );
+    sql(`UPDATE backoffice_videogame SET rawg_json = :'json'::jsonb WHERE id = :'id'::int`, {
+      json: JSON.stringify(lungo),
+      id: v.id,
+    });
     await entra(page);
     await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(v.titolo);
@@ -476,7 +477,7 @@ test.describe('modifica a 1440', () => {
 
   test('F-VG-06: senza rawg_json il salvataggio interroga RAWG, che sovrascrive titolo, descrizioni e cover', async ({ page }) => {
     const v = await nuovoVideogame(`e2e-${token()}-senza`);
-    django(`from backoffice.models import Videogame\nVideogame.objects.filter(id=${v.id}).update(rawg_json=None)\n`);
+    sql(`UPDATE backoffice_videogame SET rawg_json = NULL WHERE id = :'id'::int`, { id: v.id });
     await entra(page);
     await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByTestId('stato-rawg')).toContainText('Dati RAWG assenti');
@@ -636,7 +637,7 @@ test.describe('modifica a 1440', () => {
 
   test('SALVA E CONTINUA senza rawg_json: il form mostra i dati arrivati da RAWG', async ({ page }) => {
     const v = await nuovoVideogame(`e2e-${token()}-sec-rawg`, { titolo: 'Scritto a mano' });
-    django(`from backoffice.models import Videogame\nVideogame.objects.filter(id=${v.id}).update(rawg_json=None)\n`);
+    sql(`UPDATE backoffice_videogame SET rawg_json = NULL WHERE id = :'id'::int`, { id: v.id });
     await entra(page);
     await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByTestId('stato-rawg')).toContainText('Dati RAWG assenti');

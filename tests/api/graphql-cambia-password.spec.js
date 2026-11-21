@@ -3,7 +3,7 @@
 // env.js non cambiano mai password.
 const { randomInt } = require('node:crypto');
 const { test, expect } = require('@playwright/test');
-const { USERS, django } = require('./env');
+const { USERS, sql, verificaHashDjango } = require('./env');
 const { loggedIn, newContext } = require('./helpers');
 const { F, gql, expectOk, expectCode, gqlLoggedIn, creaUtente } = require('./gql-helpers');
 
@@ -45,12 +45,8 @@ async function puoEntrare(playwright, username, password) {
   return true;
 }
 
-// L'hash salvato in auth_user (letto da Django).
-const hash = (username) =>
-  django(`from django.contrib.auth.models import User
-print(User.objects.get(username="${username}").password)`)
-    .split('\n')
-    .pop();
+// L'hash salvato in auth_user.
+const hash = (username) => sql(`SELECT password FROM auth_user WHERE username = :'u'`, { u: username });
 
 for (const superuser of [false, true]) {
   const chi = superuser ? 'superuser' : 'staff non superuser';
@@ -76,22 +72,22 @@ for (const superuser of [false, true]) {
   });
 }
 
-test('l\'hash nuovo è pbkdf2_sha256 con le iterazioni di F-UT-04 e Django lo accetta', async ({ playwright }) => {
+test('l\'hash nuovo è pbkdf2_sha256 con le iterazioni di F-UT-04 ed è valido per la nuova password', async ({ playwright }) => {
   const u = await nuovoUtente();
   const ctx = await gqlLoggedIn(playwright, u);
   const prima = hash(u.username);
   expectOk(await gql(ctx, CAMBIA, { a: VECCHIA, n: NUOVA }));
-  const out = django(`from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-u = User.objects.get(username="${u.username}")
-hashes = [x.password for x in User.objects.exclude(username="${u.username}") if x.password.startswith("pbkdf2_sha256$")]
-massimo = max([int(h.split("$")[1]) for h in hashes] or [0])
-print(u.password.split("$")[0], u.password.split("$")[1], massimo, authenticate(username="${u.username}", password="${NUOVA}") is not None)`);
-  const [alg, iterazioni, massimo, ok] = out.split('\n').pop().split(' ');
+  const nuovo = hash(u.username);
+  const massimo = sql(
+    `SELECT coalesce(max(split_part(password, '$', 2)::int), 0) FROM auth_user
+WHERE username <> :'u' AND password LIKE 'pbkdf2\\_sha256$%'`,
+    { u: u.username },
+  );
+  const [alg, iterazioni] = nuovo.split('$');
   expect(alg).toBe('pbkdf2_sha256');
   // F-UT-04: le iterazioni del più robusto tra gli hash esistenti, con un minimo di 1.500.000
   expect(Number(iterazioni)).toBe(Math.max(Number(massimo), 1500000));
-  expect(ok).toBe('True');
+  expect(verificaHashDjango(NUOVA, nuovo)).toBe(true);
   expect(hash(u.username)).not.toBe(prima);
   await ctx.dispose();
 });

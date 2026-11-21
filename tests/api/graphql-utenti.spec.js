@@ -1,6 +1,6 @@
 // GraphQL: gestione utenti, solo superuser (F-UT-01 … F-UT-06).
 const { test, expect } = require('@playwright/test');
-const { USERS, django } = require('./env');
+const { USERS, sql, verificaHashDjango, salvaUtente } = require('./env');
 const { loggedIn, newContext, uniq } = require('./helpers');
 const { F, gql, expectOk, expectCode, gqlLoggedIn, me: utenteCorrente } = require('./gql-helpers');
 
@@ -77,14 +77,11 @@ test('creaUtente: hash Django valido, login GraphQL; aggiornaUtente senza passwo
     is_superuser: false,
     last_login: null,
   });
-  const out = django(`from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
-u = User.objects.get(username="${user.username}")
-print(u.password.split("$")[0], u.password.split("$")[1], authenticate(username="${user.username}", password="${user.password}") is not None)`);
-  const [alg, iterations, ok] = out.split('\n').pop().split(' ');
+  const salvato = sql(`SELECT password FROM auth_user WHERE username = :'u'`, { u: user.username });
+  const [alg, iterations] = salvato.split('$');
   expect(alg).toBe('pbkdf2_sha256');
   expect(Number(iterations)).toBeGreaterThanOrEqual(1500000);
-  expect(ok).toBe('True');
+  expect(verificaHashDjango(user.password, salvato)).toBe(true);
 
   const ctx = await gqlLoggedIn(playwright, user);
   await ctx.dispose();
@@ -123,14 +120,15 @@ test('creaUtente: validazioni → BAD_USER_INPUT', async () => {
 
 test('eliminaUtente: un utente con righe in django_admin_log si cancella', async () => {
   const username = `e2e_gql_log_${uniq()}`.slice(0, 30);
-  const id = django(`from django.contrib.auth.models import User
-from django.contrib.admin.models import LogEntry, ADDITION
-u = User.objects.create_user(username="${username}", password="e2e-password-log", is_staff=True)
-LogEntry.objects.create(user=u, action_flag=ADDITION, object_repr="e2e", change_message="e2e")
-print(u.id)`)
-    .split('\n')
-    .pop();
-  expect(expectOk(await gql(su, ELIMINA, { id: Number(id) })).eliminaUtente.username).toBe(username);
+  const id = salvaUtente({ username, password: 'e2e-password-log' });
+  // una riga come quelle che scriveva l'admin di Django (action_flag 1 = ADDITION)
+  sql(
+    `INSERT INTO django_admin_log (action_time, object_repr, action_flag, change_message, user_id)
+VALUES (now(), 'e2e', 1, 'e2e', :'id'::int)`,
+    { id },
+  );
+  expect(expectOk(await gql(su, ELIMINA, { id })).eliminaUtente.username).toBe(username);
+  expect(sql(`SELECT count(*) FROM django_admin_log WHERE user_id = :'id'::int`, { id })).toBe('0');
   expectCode(await gql(su, ELIMINA, { id: 999999999 }), 'NOT_FOUND', 'Risorsa non trovata');
 });
 
@@ -149,8 +147,7 @@ test('un superuser non può cancellarsi né togliersi i privilegi', async () => 
 
 test('un superuser che cambia la propria password con aggiornaUtente resta loggato', async ({ playwright }) => {
   const u = { username: `e2e_gql_selfpw_${uniq()}`.slice(0, 30), password: 'e2e-password-self-1' };
-  django(`from django.contrib.auth.models import User
-User.objects.create_user(username="${u.username}", password="${u.password}", is_staff=True, is_superuser=True)`);
+  salvaUtente({ ...u, is_superuser: true });
   const ctx = await gqlLoggedIn(playwright, u);
   const self = expectOk(await gql(ctx, `{ me { id } }`)).me;
   const rec = expectOk(await gql(ctx, DETTAGLIO, { id: self.id })).utente;
