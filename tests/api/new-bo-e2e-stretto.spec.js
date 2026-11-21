@@ -1,4 +1,4 @@
-// Test e2e di /new-bo sotto 390 px (Fase 3.6c.4c): a 306 (OnePlus Nord2 con Firefox Android) e a
+// Test e2e di /bo sotto 390 px (Fase 3.6c.4c): a 306 (OnePlus Nord2 con Firefox Android) e a
 // 320 nessuna schermata scorre in orizzontale (document.documentElement.scrollWidth ≤
 // window.innerWidth), e nel login il titolo RETROBOTTEGA sta dentro il riquadro.
 // Le fixture hanno testi lunghi (titolo, slug, username, email) come i casi peggiori dei dati veri.
@@ -8,6 +8,7 @@
 const { test, expect } = require('@playwright/test');
 const { USERS } = require('./env');
 const { loggedIn, uniq } = require('./helpers');
+const { creaVideogame, aggiornaVideogame, creaEpisodio, creaUtente } = require('./gql-helpers');
 
 test.use({ extraHTTPHeaders: {} });
 
@@ -18,43 +19,33 @@ test.beforeAll(async ({ playwright }) => {
   api = await loggedIn(playwright, USERS.superuser);
   const u = uniq();
   const slug = `e2e-stretto-un-gioco-con-uno-slug-davvero-molto-lungo-${u}`;
-  let r = await api.post('/api/bo/videogame', { data: { rawg_slug: slug } });
-  expect(r.status(), await r.text()).toBe(201);
-  const { id } = await r.json();
-  r = await api.put(`/api/bo/videogame/${id}`, {
-    data: { rawg_slug: slug, titolo: `The Legend of Zelda: Tears of the Kingdom ${u}`, descrizione_raw: 'Descrizione' },
+  const { id } = await creaVideogame(api, { rawg_slug: slug });
+  f.gioco = await aggiornaVideogame(api, id, {
+    rawg_slug: slug,
+    titolo: `The Legend of Zelda: Tears of the Kingdom ${u}`,
+    descrizione_raw: 'Descrizione',
   });
-  expect(r.status(), await r.text()).toBe(200);
-  f.gioco = await r.json();
-  r = await api.post('/api/bo/episodi', {
-    data: {
-      titolo: `[E2E] Stretto: un episodio con un titolo lungo come quelli veri ${u}`,
-      episodio_numero: '999',
-      data_uscita: '2001-01-01',
-      durata: '1:23:45',
-      url: 'https://www.example.com/un/indirizzo/molto/lungo/per/vedere/se/esce/dal/riquadro.mp3',
-      associazioni: [
-        { videogame_id: f.gioco.id, istante: '0:01:00', speaker: 'FOSS', tipologia: 'RECE' },
-        { videogame_id: f.gioco.id, istante: '1:02:03', speaker: 'ZAMP', tipologia: 'STAR' },
-      ],
-    },
+  f.episodio = await creaEpisodio(api, {
+    titolo: `[E2E] Stretto: un episodio con un titolo lungo come quelli veri ${u}`,
+    episodio_numero: '999',
+    data_uscita: '2001-01-01',
+    durata: '1:23:45',
+    url: 'https://www.example.com/un/indirizzo/molto/lungo/per/vedere/se/esce/dal/riquadro.mp3',
+    associazioni: [
+      { videogame_id: f.gioco.id, istante: '0:01:00', speaker: 'FOSS', tipologia: 'RECE' },
+      { videogame_id: f.gioco.id, istante: '1:02:03', speaker: 'ZAMP', tipologia: 'STAR' },
+    ],
   });
-  expect(r.status(), await r.text()).toBe(201);
-  f.episodio = await r.json();
-  r = await api.post('/api/bo/utenti', {
-    data: {
-      username: `e2e_stretto_${u.replace('-', '_')}_con_un_nome_molto_lungo`,
-      password: 'e2e-password-lunga',
-      first_name: 'Massimiliano',
-      last_name: 'Bartolomei-Castelfranchi',
-      email: `massimiliano.bartolomei-castelfranchi.${u}@example.com`,
-      is_staff: true,
-      is_active: true,
-      is_superuser: false,
-    },
+  f.utente = await creaUtente(api, {
+    username: `e2e_stretto_${u.replace('-', '_')}_con_un_nome_molto_lungo`,
+    password: 'e2e-password-lunga',
+    first_name: 'Massimiliano',
+    last_name: 'Bartolomei-Castelfranchi',
+    email: `massimiliano.bartolomei-castelfranchi.${u}@example.com`,
+    is_staff: true,
+    is_active: true,
+    is_superuser: false,
   });
-  expect(r.status(), await r.text()).toBe(201);
-  f.utente = await r.json();
 });
 
 test.afterAll(async () => {
@@ -74,11 +65,11 @@ async function senzaScorrimento(page, schermata) {
 }
 
 async function entra(page, user = USERS.superuser) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(user.username);
   await page.getByLabel("Parola d'ordine").fill(user.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 }
 
 const dialogo = (page) => page.getByRole('alertdialog');
@@ -102,7 +93,7 @@ for (const w of [306, 320]) {
     test.use({ viewport: { width: w, height: 700 } });
 
     test('login, normale e in errore: niente scorrimento, RETROBOTTEGA dentro il riquadro', async ({ page }) => {
-      await page.goto('/new-bo/login');
+      await page.goto('/bo/login');
       await expect(page.getByRole('heading', { name: 'RETROBOTTEGA' })).toBeVisible();
       await senzaScorrimento(page, 'login');
       await titoloDentroIlRiquadro(page);
@@ -141,7 +132,7 @@ for (const w of [306, 320]) {
       const righe = page.getByRole('combobox', { name: 'Righe per pagina' }).locator('[data-slot=select-value]');
       expect(await righe.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
 
-      await page.goto('/new-bo/videogame');
+      await page.goto('/bo/videogame');
       await expect(page.getByRole('heading', { name: 'Videogame' })).toBeVisible();
       await senzaScorrimento(page, 'elenco videogame');
       await page.getByRole('checkbox', { name: /^Seleziona il videogame/ }).first().check();
@@ -150,7 +141,7 @@ for (const w of [306, 320]) {
       await senzaScorrimento(page, 'conferma in blocco dei videogame');
       await dialogo(page).getByRole('button', { name: 'Annulla' }).click();
 
-      await page.goto(`/new-bo/utenti?ricerca=${encodeURIComponent('e2e_stretto_')}`);
+      await page.goto(`/bo/utenti?ricerca=${encodeURIComponent('e2e_stretto_')}`);
       await expect(page.getByRole('heading', { name: 'Utenti' })).toBeVisible();
       await senzaScorrimento(page, 'elenco utenti');
       await page.getByRole('checkbox', { name: /^Seleziona l'utente/ }).first().check();
@@ -162,7 +153,7 @@ for (const w of [306, 320]) {
 
     test('episodio: modifica, barra su due righe, Combobox, Dialog nuovo videogame, conferma, Toast, nuovo', async ({ page }) => {
       await entra(page);
-      await page.goto(`/new-bo/episodi/${f.episodio.id}`);
+      await page.goto(`/bo/episodi/${f.episodio.id}`);
       await expect(page.getByLabel('Titolo')).toHaveValue(f.episodio.titolo);
       await expect(page.getByRole('button', { name: 'Salva e continua' })).toBeVisible();
       await senzaScorrimento(page, 'modifica episodio');
@@ -189,21 +180,21 @@ for (const w of [306, 320]) {
       await page.getByRole('button', { name: 'Salva e continua' }).click();
       await expect(page.locator('[data-sonner-toast]')).toBeVisible();
       await senzaScorrimento(page, 'Toast');
-      await page.goto('/new-bo/episodi/nuovo');
+      await page.goto('/bo/episodi/nuovo');
       await expect(page.getByLabel('Titolo')).toBeVisible();
       await senzaScorrimento(page, 'nuovo episodio');
     });
 
     test('videogame: modifica, conferma, nuovo ed errore di RAWG', async ({ page }) => {
       await entra(page);
-      await page.goto(`/new-bo/videogame/${f.gioco.id}`);
+      await page.goto(`/bo/videogame/${f.gioco.id}`);
       await expect(page.getByLabel('Titolo')).toHaveValue(f.gioco.titolo);
       await senzaScorrimento(page, 'modifica videogame');
       await page.getByRole('button', { name: 'Elimina videogame' }).click();
       await expect(dialogo(page)).toBeVisible();
       await senzaScorrimento(page, 'conferma eliminazione videogame');
       await dialogo(page).getByRole('button', { name: 'Annulla' }).click();
-      await page.goto('/new-bo/videogame/nuovo');
+      await page.goto('/bo/videogame/nuovo');
       await expect(page.getByLabel('RAWG slug')).toBeVisible();
       await senzaScorrimento(page, 'nuovo videogame');
       await page.getByLabel('RAWG slug').fill(`e2e-missing-un-gioco-che-rawg-non-conosce-${uniq()}`);
@@ -214,7 +205,7 @@ for (const w of [306, 320]) {
 
     test('utente: modifica con uno username lungo, conferma, nuovo', async ({ page }) => {
       await entra(page);
-      await page.goto(`/new-bo/utenti/${f.utente.id}`);
+      await page.goto(`/bo/utenti/${f.utente.id}`);
       await expect(page.getByLabel('Username')).toHaveValue(f.utente.username);
       await senzaScorrimento(page, 'modifica utente');
       await page.getByRole('button', { name: 'Elimina utente' }).click();
@@ -226,7 +217,7 @@ for (const w of [306, 320]) {
       expect(testo).toBe(true);
       expect(box.x + box.width).toBeLessThanOrEqual(w);
       await dialogo(page).getByRole('button', { name: 'Annulla' }).click();
-      await page.goto('/new-bo/utenti/nuovo');
+      await page.goto('/bo/utenti/nuovo');
       await expect(page.getByLabel('Username')).toBeVisible();
       await senzaScorrimento(page, 'nuovo utente');
     });
@@ -241,13 +232,15 @@ test.describe('a 1440 px', () => {
     // 140 caratteri senza spazi (Django ne ammette 150): più largo dell'area principale a 1440
     const base = `e2e_stretto_1440_${uniq().replace('-', '_')}_`;
     const username = base + 'x'.repeat(140 - base.length);
-    const r = await api.post('/api/bo/utenti', {
-      data: { username, password: 'e2e-password-lunga', is_staff: true, is_active: true, is_superuser: false },
+    const utente = await creaUtente(api, {
+      username,
+      password: 'e2e-password-lunga',
+      is_staff: true,
+      is_active: true,
+      is_superuser: false,
     });
-    expect(r.status(), await r.text()).toBe(201);
-    const utente = await r.json();
     await entra(page);
-    await page.goto(`/new-bo/utenti/${utente.id}`);
+    await page.goto(`/bo/utenti/${utente.id}`);
     await expect(page.getByLabel('Username')).toHaveValue(username);
     await expect(page.getByRole('heading', { name: username })).toBeVisible();
     await senzaScorrimento(page, 'modifica utente a 1440');

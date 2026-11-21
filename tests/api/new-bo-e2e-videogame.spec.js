@@ -1,6 +1,6 @@
-// Test e2e dei videogame di /new-bo (Fase 3.6c.3a): F-VG-01 … F-VG-08 e F-AS-01 («Episodi in
+// Test e2e dei videogame di /bo (Fase 3.6c.3a): F-VG-01 … F-VG-08 e F-AS-01 («Episodi in
 // cui è citato»), SALVA E CONTINUA. Girano con playwright.api.config.js, come le altre spec
-// new-bo-e2e*. I videogame si creano via REST con il finto RAWG della suite
+// new-bo-e2e*. I videogame si creano via GraphQL con il finto RAWG della suite
 // (tests/api/mock-rawg.js: titolo «E2E Game <slug>», cover https://media.example.com/<slug>.jpg;
 // gli slug «e2e-missing…» danno 404, «e2e-broken…» un JSON non valido) e si cercano con un token
 // unico per test. Elenco e modifica si provano a 390, 1180 e 1440.
@@ -8,6 +8,14 @@ const zlib = require('node:zlib');
 const { test, expect } = require('@playwright/test');
 const { API_URL, USERS, django } = require('./env');
 const { loggedIn, uniq, rawgCalls } = require('./helpers');
+const {
+  parseRawg,
+  creaVideogame,
+  aggiornaVideogame,
+  leggiVideogame,
+  creaEpisodio,
+  leggiEpisodio,
+} = require('./gql-helpers');
 
 // Il browser manda la sua Origin vera; le chiamate di page.request la mettono a mano (V-01).
 test.use({ extraHTTPHeaders: {} });
@@ -19,7 +27,7 @@ const VIEWPORT = {
   1440: { width: 1440, height: 900 },
 };
 
-let api; // sessione REST dello staff per fixture e verifiche
+let api; // sessione dello staff per fixture e verifiche (GraphQL)
 
 test.beforeAll(async ({ playwright }) => {
   api = await loggedIn(playwright, USERS.staff);
@@ -72,36 +80,29 @@ test.beforeEach(async ({ page }) => {
 // --- aiuti ------------------------------------------------------------------------------------
 
 async function entra(page, user = USERS.staff) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(user.username);
   await page.getByLabel("Parola d'ordine").fill(user.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 }
 
-// Un videogame creato via REST dal finto RAWG; `modifiche` (titolo, cover, …) con un PUT dopo.
+// Un videogame creato via GraphQL dal finto RAWG; `modifiche` (titolo, cover, …) con
+// aggiornaVideogame dopo. rawg_json torna oggetto (in GraphQL è JSON serializzato).
 async function nuovoVideogame(slug, modifiche) {
-  const res = await api.post('/api/bo/videogame', { data: { rawg_slug: slug } });
-  expect(res.status(), await res.text()).toBe(201);
-  const v = await res.json();
-  if (!modifiche) return v;
-  const put = await api.put(`/api/bo/videogame/${v.id}`, { data: { ...v, ...modifiche } });
-  expect(put.status(), await put.text()).toBe(200);
-  return put.json();
+  const v = await creaVideogame(api, { rawg_slug: slug });
+  if (!modifiche) return parseRawg(v);
+  return parseRawg(await aggiornaVideogame(api, v.id, { ...v, ...modifiche }));
 }
 
+// { status: 200, body } se il videogame c'è, { status: 404, body: null } se non c'è.
 async function leggi(id) {
-  const res = await api.get(`/api/bo/videogame/${id}`);
-  return { status: res.status(), body: res.status() === 200 ? await res.json() : null };
+  const v = await leggiVideogame(api, id);
+  return v ? { status: 200, body: parseRawg(v) } : { status: 404, body: null };
 }
 
-async function nuovoEpisodio(extra = {}) {
-  const res = await api.post('/api/bo/episodi', {
-    data: { titolo: `[E2E] vg ${uniq()}`, data_uscita: '2001-01-01', durata: '1:00:00', ...extra },
-  });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
+const nuovoEpisodio = (extra = {}) =>
+  creaEpisodio(api, { titolo: `[E2E] vg ${uniq()}`, data_uscita: '2001-01-01', durata: '1:00:00', ...extra });
 
 async function gqlSessione(page, query, variables) {
   const res = await page.request.post('/api/graphql', { data: { query, variables }, headers: ORIGIN });
@@ -110,7 +111,7 @@ async function gqlSessione(page, query, variables) {
 }
 
 const token = () => `nbvg${uniq().replace(/-/g, '')}`;
-const elenco = (page, t, extra = '') => page.goto(`/new-bo/videogame?ricerca=${encodeURIComponent(t)}${extra}`);
+const elenco = (page, t, extra = '') => page.goto(`/bo/videogame?ricerca=${encodeURIComponent(t)}${extra}`);
 const righe = (page) => page.locator('tbody tr[data-cliccabile]');
 const schede = (page) => page.locator('main section[data-slot=card]');
 // il Toast visibile: quello sostituito resta nel DOM durante l'uscita, con data-removed
@@ -163,7 +164,7 @@ test.describe('elenco a 1440', () => {
     await expect(page.getByRole('columnheader', { name: 'Cover' })).toBeVisible();
     await expect(page.getByText('1–2 di 2')).toBeVisible();
     await righe(page).nth(1).click();
-    await expect(page).toHaveURL(new RegExp(`/new-bo/videogame/${b.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/videogame/${b.id}$`));
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(b.titolo);
   });
 
@@ -208,7 +209,7 @@ test.describe('elenco a 1440', () => {
     const a = await nuovoVideogame(`e2e-${t}-a`, { titolo: `Gioco Titolato ${t}`, descrizione_raw: 'niente' });
     const b = await nuovoVideogame(`e2e-${t}-b`, { titolo: `Altro ${t}`, descrizione_raw: `parola${t}magica` });
     await entra(page);
-    await page.goto('/new-bo/videogame');
+    await page.goto('/bo/videogame');
     const cerca = page.getByRole('searchbox', { name: 'Cerca per titolo, descrizione o slug' });
     await cerca.fill(`titolato ${t}`.toUpperCase());
     await expect(righe(page)).toHaveCount(1);
@@ -266,7 +267,7 @@ test.describe('elenco a 1440', () => {
     expect((await leggi(a.id)).status).toBe(404);
     expect((await leggi(b.id)).status).toBe(404);
     // l'episodio resta, senza l'associazione
-    const ep = await (await api.get(`/api/bo/episodi/${e.id}`)).json();
+    const ep = await leggiEpisodio(api, e.id);
     expect(ep.associazioni).toEqual([]);
   });
 });
@@ -307,7 +308,7 @@ test.describe('elenco a 390', () => {
     await expect(schede(page).first()).toContainText(`Zeta ${t}`);
     await expect(page.getByRole('link', { name: '+ Nuovo' })).toBeVisible();
     await schede(page).nth(1).click();
-    await expect(page).toHaveURL(new RegExp(`/new-bo/videogame/${b.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/videogame/${b.id}$`));
   });
 
   test('F-VG-07: in blocco a 390, con il singolare', async ({ page }) => {
@@ -338,9 +339,9 @@ test.describe('nuovo videogame a 1440', () => {
   test('F-VG-05: solo lo slug; CREA DA RAWG prende i dati da RAWG e apre la modifica', async ({ page }) => {
     const slug = `e2e-${token()}-nuovo`;
     await entra(page);
-    await page.goto('/new-bo/videogame');
+    await page.goto('/bo/videogame');
     await page.getByRole('link', { name: '+ Nuovo videogame' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame\/nuovo$/);
+    await expect(page).toHaveURL(/\/bo\/videogame\/nuovo$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Nuovo videogame');
     for (const nome of ['Titolo', 'Descrizione (TXT)', 'Descrizione (HTML)', 'Cover (URL)']) {
       await expect(page.getByLabel(nome)).toBeDisabled();
@@ -353,7 +354,7 @@ test.describe('nuovo videogame a 1440', () => {
     await page.getByLabel('RAWG slug').fill(slug);
     const prima = await rawgCalls(page.request);
     await page.getByRole('button', { name: 'Crea da RAWG' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame\/\d+$/);
+    await expect(page).toHaveURL(/\/bo\/videogame\/\d+$/);
     expect(await rawgCalls(page.request)).toBe(prima + 1);
     const id = Number(page.url().split('/').pop());
     const { body } = await leggi(id);
@@ -371,7 +372,7 @@ test.describe('nuovo videogame a 1440', () => {
   test('F-VG-05: gli errori di RAWG e lo slug già usato vanno nel Toast, lo slug diventa rosso', async ({ page }) => {
     const esistente = await nuovoVideogame(`e2e-${token()}-dup`);
     await entra(page);
-    await page.goto('/new-bo/videogame/nuovo');
+    await page.goto('/bo/videogame/nuovo');
     const slug = page.getByLabel('RAWG slug');
     const crea = page.getByRole('button', { name: 'Crea da RAWG' });
     const mancante = `e2e-missing-${token()}`;
@@ -395,7 +396,7 @@ test.describe('nuovo videogame a 1440', () => {
     await expect(slug).toHaveAttribute('aria-invalid', 'true');
     // ANNULLA torna all'elenco
     await barra(page).getByRole('button', { name: 'Annulla' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
   });
 });
 
@@ -404,7 +405,7 @@ test.describe('nuovo videogame nei tre formati', () => {
     test(`F-VG-05 a ${formato}: prima dell'invio e Toast d'errore di RAWG`, async ({ page }) => {
       await page.setViewportSize(VIEWPORT[formato]);
       await entra(page);
-      await page.goto('/new-bo/videogame/nuovo');
+      await page.goto('/bo/videogame/nuovo');
       const mancante = `e2e-missing-${formato}`;
       await page.getByLabel('RAWG slug').fill(mancante);
       if (formato === 390) await expect(page.getByText('rawg.io/games/')).toHaveCount(0);
@@ -431,7 +432,7 @@ test.describe('modifica a 1440', () => {
       `import json\nfrom backoffice.models import Videogame\nVideogame.objects.filter(id=${v.id}).update(rawg_json=json.loads(${JSON.stringify(JSON.stringify(lungo))}))\n`,
     );
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(v.titolo);
     await expect(page.getByLabel('RAWG slug')).toHaveValue(v.rawg_slug);
     await expect(page.getByLabel('Titolo')).toHaveValue(v.titolo);
@@ -453,7 +454,7 @@ test.describe('modifica a 1440', () => {
   test('F-VG-06: con rawg_json presente salva i campi senza interrogare RAWG, poi torna all\'elenco', async ({ page }) => {
     const v = await nuovoVideogame(`e2e-${token()}-mod`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     const nuovoSlug = `${v.rawg_slug}-bis`;
     await page.getByLabel('RAWG slug').fill(nuovoSlug);
     await page.getByLabel('Titolo').fill('Titolo scritto a mano');
@@ -461,7 +462,7 @@ test.describe('modifica a 1440', () => {
     await page.getByLabel('Cover (URL)').fill('https://media.example.com/altra.png');
     const prima = await rawgCalls(page.request);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
     expect(await rawgCalls(page.request)).toBe(prima);
     const { body } = await leggi(v.id);
     expect(body).toMatchObject({
@@ -477,13 +478,13 @@ test.describe('modifica a 1440', () => {
     const v = await nuovoVideogame(`e2e-${token()}-senza`);
     django(`from backoffice.models import Videogame\nVideogame.objects.filter(id=${v.id}).update(rawg_json=None)\n`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByTestId('stato-rawg')).toContainText('Dati RAWG assenti');
     await expect(page.getByTestId('rawg-json')).toHaveCount(0);
     await page.getByLabel('Titolo').fill('Verrà sovrascritto');
     const prima = await rawgCalls(page.request);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
     expect(await rawgCalls(page.request)).toBe(prima + 1);
     const { body } = await leggi(v.id);
     expect(body.titolo).toBe(`E2E Game ${v.rawg_slug}`);
@@ -494,7 +495,7 @@ test.describe('modifica a 1440', () => {
     const altro = await nuovoVideogame(`e2e-${token()}-occupato`);
     const v = await nuovoVideogame(`e2e-${token()}-err`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await page.getByLabel('RAWG slug').fill(altro.rawg_slug);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(toast(page)).toContainText('Esiste già un videogame con questo slug RAWG');
@@ -507,7 +508,7 @@ test.describe('modifica a 1440', () => {
     const e1 = await nuovoEpisodio({ associazioni: [{ videogame_id: v.id }] });
     await nuovoEpisodio({ associazioni: [{ videogame_id: v.id }] });
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByText('Episodi in cui è citato · 2')).toBeVisible();
     await barra(page).getByRole('button', { name: 'Elimina videogame' }).click();
     await expect(dialogo(page)).toContainText('Eliminare il videogame?');
@@ -521,16 +522,16 @@ test.describe('modifica a 1440', () => {
     expect((await leggi(v.id)).status).toBe(200);
     await barra(page).getByRole('button', { name: 'Elimina videogame' }).click();
     await dialogo(page).getByRole('button', { name: 'Elimina' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
     expect((await leggi(v.id)).status).toBe(404);
-    const ep = await (await api.get(`/api/bo/episodi/${e1.id}`)).json();
+    const ep = await leggiEpisodio(api, e1.id);
     expect(ep.associazioni).toEqual([]);
   });
 
   test('F-VG-07: con 0 collegamenti la frase finisce dopo il titolo', async ({ page }) => {
     const v = await nuovoVideogame(`e2e-${token()}-zero`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByText('Episodi in cui è citato · 0')).toBeVisible();
     await expect(page.getByText('Nessun episodio cita questo videogame.')).toBeVisible();
     await barra(page).getByRole('button', { name: 'Elimina videogame' }).click();
@@ -542,7 +543,7 @@ test.describe('modifica a 1440', () => {
     const vecchio = await nuovoEpisodio({ episodio_numero: '198', data_uscita: '2024-09-05', associazioni: [{ videogame_id: v.id, istante: '0:08:45', tipologia: 'CONS' }] });
     const nuovo = await nuovoEpisodio({ episodio_numero: '312', data_uscita: '2026-11-12', associazioni: [{ videogame_id: v.id, istante: '0:12:30', tipologia: 'RECE' }] });
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     const tabella = page.getByTestId('episodi-citati');
     await expect(tabella).toContainText('Episodi in cui è citato · 2');
     await expect(tabella).toContainText("Sola lettura: i collegamenti si modificano dall'episodio");
@@ -555,7 +556,7 @@ test.describe('modifica a 1440', () => {
     await expect(tabella.locator('input, select, textarea')).toHaveCount(0);
     await expect(tabella).toContainText('1–2 di 2 · 25 per pagina');
     await r.nth(1).click();
-    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${vecchio.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/episodi/${vecchio.id}$`));
   });
 
   test('F-VG-08: 25 righe per pagina', async ({ page }) => {
@@ -565,7 +566,7 @@ test.describe('modifica a 1440', () => {
       associazioni: Array.from({ length: 26 }, (_, i) => ({ videogame_id: v.id, istante: `0:${String(i).padStart(2, '0')}:00` })),
     });
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     const tabella = page.getByTestId('episodi-citati');
     await expect(tabella.locator('tbody tr')).toHaveCount(25);
     await expect(tabella).toContainText('1–25 di 26 · 25 per pagina');
@@ -583,7 +584,7 @@ test.describe('modifica a 1440', () => {
     await nuovoEpisodio({ data_uscita: '2020-01-01', associazioni: [{ videogame_id: v.id, istante: '0:01:00', tipologia: 'STAR' }, { videogame_id: altro.id }] });
     await nuovoEpisodio({ data_uscita: '2021-01-01', associazioni: [{ videogame_id: v.id, istante: '0:02:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     const r = await gqlSessione(
       page,
       `query($v: Int) { elencoAssociazioni(videogame_id: $v, ordinamento: DATA_USCITA, direzione: DESC) {
@@ -603,7 +604,7 @@ test.describe('modifica a 1440', () => {
   test('SALVA E CONTINUA: resta sulla modifica, mostra il Toast e il form riparte dai dati salvati', async ({ page }) => {
     const v = await nuovoVideogame(`e2e-${token()}-sec`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     const form = page.locator('form');
     await expect(form).toHaveAttribute('data-modificato', 'false');
     await page.getByLabel('Titolo').fill(`${v.titolo} bis`);
@@ -616,7 +617,7 @@ test.describe('modifica a 1440', () => {
     await expect(toast(page)).toHaveAttribute('data-variant', 'success');
     await expect(toast(page)).toContainText('Checkpoint');
     await expect(toast(page)).toContainText('Modifiche salvate');
-    await expect(page).toHaveURL(new RegExp(`/new-bo/videogame/${v.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/videogame/${v.id}$`));
     await expect(form).toHaveAttribute('data-modificato', 'false');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(`${v.titolo} bis`);
     await expect(page.getByLabel('Titolo')).toHaveValue(`${v.titolo} bis`);
@@ -637,14 +638,14 @@ test.describe('modifica a 1440', () => {
     const v = await nuovoVideogame(`e2e-${token()}-sec-rawg`, { titolo: 'Scritto a mano' });
     django(`from backoffice.models import Videogame\nVideogame.objects.filter(id=${v.id}).update(rawg_json=None)\n`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByTestId('stato-rawg')).toContainText('Dati RAWG assenti');
     await expect(page.getByLabel('Titolo')).toHaveValue('Scritto a mano');
     const risposta = aggiornato(page);
     await salvaEContinua(page).click();
     await risposta;
     await expect(toast(page)).toContainText('Modifiche salvate');
-    await expect(page).toHaveURL(new RegExp(`/new-bo/videogame/${v.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/videogame/${v.id}$`));
     await expect(page.getByLabel('Titolo')).toHaveValue(`E2E Game ${v.rawg_slug}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(`E2E Game ${v.rawg_slug}`);
     await expect(page.getByTestId('stato-rawg')).toContainText('Dati RAWG già presenti');
@@ -655,7 +656,7 @@ test.describe('modifica a 1440', () => {
   test('SALVA E CONTINUA: le modifiche fatte durante l\'invio restano nel form', async ({ page }) => {
     const v = await nuovoVideogame(`e2e-${token()}-sec-durante`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     // trattiene la risposta di aggiornaVideogame finché il test non scrive nel campo
     let rilascia;
     const trattenuta = new Promise((ok) => (rilascia = ok));
@@ -684,7 +685,7 @@ test.describe('modifica a 1440', () => {
     const altro = await nuovoVideogame(`e2e-${token()}-sec-occ`);
     const v = await nuovoVideogame(`e2e-${token()}-sec-err`);
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await page.getByLabel('RAWG slug').fill(altro.rawg_slug);
     await salvaEContinua(page).click();
     await expect(toast(page)).toHaveAttribute('data-variant', 'destructive');
@@ -702,13 +703,13 @@ test.describe('modifica a 1180', () => {
     const v = await nuovoVideogame(`e2e-${token()}-1180`);
     await nuovoEpisodio({ episodio_numero: '7', associazioni: [{ videogame_id: v.id, istante: '0:07:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByTestId('episodi-citati').locator('table')).toBeVisible();
     await expect(page.getByTestId('rawg-json')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1180);
     await page.getByLabel('Titolo').fill('Titolo 1180');
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
     expect((await leggi(v.id)).body.titolo).toBe('Titolo 1180');
   });
 });
@@ -720,7 +721,7 @@ test.describe('modifica a 390', () => {
     const v = await nuovoVideogame(`e2e-${token()}-390`);
     const e = await nuovoEpisodio({ episodio_numero: '240', data_uscita: '2025-06-26', associazioni: [{ videogame_id: v.id, istante: '1:02:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/videogame/${v.id}`);
+    await page.goto(`/bo/videogame/${v.id}`);
     await expect(page.getByTestId('episodi-citati')).toContainText('· 1');
     const titoli = await page.locator('main [data-slot=card-title]').allTextContents();
     expect(titoli).toEqual(['Cover', 'Dati RAWG già presenti', 'Dati del gioco', 'RAWG JSON · sola lettura', 'Episodi in cui è citato · 1']);
@@ -739,7 +740,7 @@ test.describe('modifica a 390', () => {
     await foto(page, 'modifica-videogame-conferma-390');
     await dialogo(page).getByRole('button', { name: 'Annulla' }).click();
     await scheda.click();
-    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/episodi/${e.id}$`));
   });
 });
 
@@ -753,7 +754,7 @@ for (const formato of [390, 1180, 1440]) {
       const v = await nuovoVideogame(`e2e-${token()}-barra`);
       await nuovoEpisodio({ episodio_numero: '312', associazioni: [{ videogame_id: v.id, istante: '0:12:30', tipologia: 'RECE' }] });
       await entra(page);
-      await page.goto(`/new-bo/videogame/${v.id}`);
+      await page.goto(`/bo/videogame/${v.id}`);
       await expect(page.getByTestId('episodi-citati')).toContainText('· 1');
       const b = barra(page);
       const annulla = b.getByRole('link', { name: 'Annulla' });
@@ -776,7 +777,7 @@ for (const formato of [390, 1180, 1440]) {
         expect(rs.x + rs.width).toBeCloseTo(rb.x + rb.width - 16, 0);
       }
       await foto(page, `modifica-videogame-${formato}`);
-      await page.goto('/new-bo/videogame/nuovo');
+      await page.goto('/bo/videogame/nuovo');
       await expect(barra(page).getByRole('button', { name: 'Crea da RAWG' })).toBeVisible();
       await expect(salvaEContinua(page)).toHaveCount(0);
       await foto(page, `nuovo-videogame-vuoto-${formato}`);
@@ -806,7 +807,7 @@ for (const formato of [390, 1180, 1440]) {
         await nuovoEpisodio({ associazioni: [{ videogame_id: v.id }] });
         await nuovoEpisodio({ associazioni: [{ videogame_id: v.id }] });
         await entra(page);
-        await page.goto(`/new-bo/videogame/${v.id}`);
+        await page.goto(`/bo/videogame/${v.id}`);
         await expect(page.getByTestId('episodi-citati')).toContainText('· 2');
         await barra(page).getByRole('button', { name: 'Elimina videogame' }).click();
         await expect(dialogo(page)).toContainText('i suoi 2 collegamenti');

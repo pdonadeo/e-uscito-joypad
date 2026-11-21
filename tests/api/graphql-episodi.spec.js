@@ -1,11 +1,10 @@
 // GraphQL: episodi e associazioni dell'episodio (F-EP-01 … F-EP-11, F-AS-03).
-// Le fixture si creano via REST, che funziona già, e ogni test ha le sue: così
-// ogni test è indipendente e, finché manca l'endpoint, fallisce sulla sua
-// chiamata GraphQL (niente modalità serial, che salterebbe i test successivi).
+// Ogni test ha le sue fixture, così è indipendente (niente modalità serial).
+// La cover passa dalla REST /api/bo/episodi/:id/cover, l'unica rimasta.
 const { test, expect } = require('@playwright/test');
 const { USERS, django } = require('./env');
 const { loggedIn, uniq, PNG_1x1 } = require('./helpers');
-const { F, gql, expectOk, expectCode } = require('./gql-helpers');
+const { F, gql, expectOk, expectCode, creaVideogame, creaEpisodio } = require('./gql-helpers');
 
 const CREA = `mutation($d: EpisodioInput!) { creaEpisodio(dati: $d) { ${F.episodio} } }`;
 const AGGIORNA = `mutation($id: Int!, $d: EpisodioInput!) { aggiornaEpisodio(id: $id, dati: $d) { ${F.episodio} } }`;
@@ -15,29 +14,24 @@ const ELENCO = `query($o: Int, $l: Int, $r: String, $p: Boolean, $ord: Ordinamen
   elencoEpisodi(offset: $o, limit: $l, ricerca: $r, pubblicato: $p, ordinamento: $ord, direzione: $dir) {
     totale elementi { ${F.episodioInElenco} } } }`;
 
-let api; // sessione staff (login REST: la sessione è la stessa)
+let api; // sessione staff
 const games = [];
-let fixture; // episodio di riferimento per gli elenchi, creato via REST
+let fixture; // episodio di riferimento per gli elenchi
 
-// Episodio nuovo creato via REST, con due associazioni (la seconda senza istante).
-async function nuovoEpisodio(extra = {}) {
-  const res = await api.post('/api/bo/episodi', {
-    data: {
-      titolo: `[E2E] GraphQL ${uniq()}`,
-      episodio_numero: 'E2E-G1',
-      data_uscita: '2001-01-01',
-      durata: '1:02:03',
-      url: 'https://example.com/audio.mp3',
-      associazioni: [
-        { videogame_id: games[0].id, istante: '00:01:00', speaker: 'BORD', tipologia: 'RECE' },
-        { videogame_id: games[1].id, istante: null },
-      ],
-      ...extra,
-    },
+// Episodio nuovo, con due associazioni (la seconda senza istante).
+const nuovoEpisodio = (extra = {}) =>
+  creaEpisodio(api, {
+    titolo: `[E2E] GraphQL ${uniq()}`,
+    episodio_numero: 'E2E-G1',
+    data_uscita: '2001-01-01',
+    durata: '1:02:03',
+    url: 'https://example.com/audio.mp3',
+    associazioni: [
+      { videogame_id: games[0].id, istante: '00:01:00', speaker: 'BORD', tipologia: 'RECE' },
+      { videogame_id: games[1].id, istante: null },
+    ],
+    ...extra,
   });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
 
 // Campi di EpisodioInput a partire da un Episodio (per la sostituzione completa).
 const input = (e, patch = {}) => ({
@@ -57,11 +51,7 @@ const input = (e, patch = {}) => ({
 
 test.beforeAll(async ({ playwright }) => {
   api = await loggedIn(playwright, USERS.staff);
-  for (let i = 0; i < 3; i++) {
-    const res = await api.post('/api/bo/videogame', { data: { rawg_slug: `e2e-gqlep-${i}-${uniq()}` } });
-    expect(res.status(), await res.text()).toBe(201);
-    games.push(await res.json());
-  }
+  for (let i = 0; i < 3; i++) games.push(await creaVideogame(api, { rawg_slug: `e2e-gqlep-${i}-${uniq()}` }));
   fixture = await nuovoEpisodio();
 });
 

@@ -1,9 +1,14 @@
-(* Rotte dell'API admin sotto /api/bo (ra-data-simple-rest + authProvider).
+(* Scope /api/bo: dopo la rimozione della REST di react-admin restano solo
+   l'upload e la rimozione della cover di un episodio (multipart, fuori da
+   GraphQL). Tutto il resto passa da /api/graphql.
 
    Middleware dello scope, dall'esterno:
    - controllo Origin/Referer, sempre attivo (anche con DEBUG=True);
    - attributo Secure sul cookie fuori da DEBUG;
-   - segreto per cifrare i cookie (DREAM_SECRET) e sessioni su cookie. *)
+   - segreto per cifrare i cookie (DREAM_SECRET) e sessioni su cookie.
+
+   [secret] e [session_lifetime] li usa anche GraphQL, così la sessione è
+   condivisa. *)
 
 let session_lifetime = 14. *. 24. *. 3600. (* come SESSION_COOKIE_AGE di Django *)
 
@@ -14,38 +19,15 @@ let secret =
 
 let h = Resp.handle
 let staff handler = Auth.require_staff (h handler)
-let superuser handler = Auth.require_staff (Auth.require_superuser (h handler))
-
-let crud ~path ~list ~get ?create ?update ?delete wrap =
-  List.concat
-    [
-      [Dream.get path (wrap list); Dream.get (path ^ "/:id") (wrap get)];
-      Option.fold ~none:[] ~some:(fun f -> [Dream.post path (wrap f)]) create;
-      Option.fold ~none:[] ~some:(fun f -> [Dream.put (path ^ "/:id") (wrap f)]) update;
-      Option.fold ~none:[] ~some:(fun f -> [Dream.delete (path ^ "/:id") (wrap f)]) delete;
-    ]
 
 let routes =
   Dream.scope "/api/bo"
     [Auth.origin_check; Auth.secure_cookie; secret; Dream.cookie_sessions ~lifetime:session_lifetime]
-    (List.concat
-       [
-         [
-           Dream.post "/login" (h Auth.login);
-           Dream.post "/logout" (h Auth.logout);
-           Dream.get "/me" (staff Auth.me);
-           Dream.post "/episodi/:id/cover" (staff Episodi.upload_cover);
-           Dream.delete "/episodi/:id/cover" (staff Episodi.delete_cover);
-         ];
-         crud ~path:"/episodi" ~list:Episodi.list ~get:Episodi.get ~create:Episodi.create ~update:Episodi.update
-           ~delete:Episodi.delete staff;
-         crud ~path:"/videogame" ~list:Videogame.list ~get:Videogame.get ~create:Videogame.create
-           ~update:Videogame.update ~delete:Videogame.delete staff;
-         crud ~path:"/associazioni" ~list:Associazioni.list ~get:Associazioni.get staff;
-         crud ~path:"/utenti" ~list:Utenti.list ~get:Utenti.get ~create:Utenti.create ~update:Utenti.update
-           ~delete:Utenti.delete superuser;
-         [Dream.any "/**" (fun _ -> Resp.error_json `Not_Found "Endpoint inesistente")];
-       ])
+    [
+      Dream.post "/episodi/:id/cover" (staff Episodi.upload_cover);
+      Dream.delete "/episodi/:id/cover" (staff Episodi.delete_cover);
+      Dream.any "/**" (fun _ -> Resp.error_json `Not_Found "Endpoint inesistente");
+    ]
 
 (* Error handler: per /api/bo la risposta dell'handler (JSON {"message": ...})
    passa invariata; se è vuota (eccezione non gestita) diventa un JSON

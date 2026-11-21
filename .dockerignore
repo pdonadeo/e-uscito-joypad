@@ -9,3 +9,6 @@ new-bo/node_modules
 new-bo/dist
 docker-compose.yml
 **/.omc
+REAL_PROD
+dump-prod
+compose_env_prod

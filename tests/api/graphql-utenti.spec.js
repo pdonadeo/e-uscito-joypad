@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { USERS, django } = require('./env');
 const { loggedIn, newContext, uniq } = require('./helpers');
-const { F, gql, expectOk, expectCode, gqlLoggedIn } = require('./gql-helpers');
+const { F, gql, expectOk, expectCode, gqlLoggedIn, me: utenteCorrente } = require('./gql-helpers');
 
 const CREA = `mutation($d: UtenteInput!) { creaUtente(dati: $d) { ${F.utente} } }`;
 const AGGIORNA = `mutation($id: Int!, $d: UtenteInput!) { aggiornaUtente(id: $id, dati: $d) { ${F.utente} } }`;
@@ -29,7 +29,7 @@ const input = (u, patch = {}) => ({
 
 test.beforeAll(async ({ playwright }) => {
   su = await loggedIn(playwright, USERS.superuser);
-  me = await (await su.get('/api/bo/me')).json();
+  me = await utenteCorrente(su);
 });
 
 test.afterAll(async () => {

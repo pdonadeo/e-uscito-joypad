@@ -1,13 +1,14 @@
-// Test e2e del cambio della propria password in /new-bo (F-AU-06, Fase 3.6c.4d), a 306, 390,
+// Test e2e del cambio della propria password in /bo (F-AU-06, Fase 3.6c.4d), a 306, 390,
 // 1180 e 1440: percorso completo da utente staff non superuser, conferma diversa (nessuna
 // richiesta), password attuale sbagliata (errore nel campo, si resta loggati), accesso dalla Barra
 // app desktop e dallo Sheet. A 1440: nuova corta, anche «àààà» (errore nel campo, nessuna
 // richiesta), e un errore del server simulato con page.route (nel Toast). Girano con playwright.api.config.js, come le altre spec new-bo-e2e*.
-// Ogni test crea il suo utente «e2e_…» via REST (il teardown lo cancella).
+// Ogni test crea il suo utente «e2e_…» via GraphQL (il teardown lo cancella).
 const { randomInt } = require('node:crypto');
 const { test, expect } = require('@playwright/test');
 const { USERS } = require('./env');
 const { loggedIn, newContext } = require('./helpers');
+const { gql, creaUtente } = require('./gql-helpers');
 
 // Il browser manda la sua Origin vera (V-01).
 test.use({ extraHTTPHeaders: {} });
@@ -38,26 +39,31 @@ const token = () => `nbp${Date.now().toString(36)}${randomInt(1e6).toString(36)}
 
 // Un utente staff, non superuser, con password VECCHIA.
 async function nuovoUtente() {
-  const res = await su.post('/api/bo/utenti', {
-    data: { username: `e2e_${token()}`, password: VECCHIA, is_staff: true, is_active: true, is_superuser: false },
+  const u = await creaUtente(su, {
+    username: `e2e_${token()}`,
+    password: VECCHIA,
+    is_staff: true,
+    is_active: true,
+    is_superuser: false,
   });
-  expect(res.status(), await res.text()).toBe(201);
-  return { ...(await res.json()), password: VECCHIA };
+  return { ...u, password: VECCHIA };
 }
 
 async function entra(page, user) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(user.username);
   await page.getByLabel("Parola d'ordine").fill(user.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 }
 
 async function puoEntrare(playwright, username, password) {
   const ctx = await newContext(playwright);
-  const res = await ctx.post('/api/bo/login', { data: { username, password } });
+  const r = await gql(ctx, 'mutation($c: CredenzialiInput!) { login(credenziali: $c) { id } }', {
+    c: { username, password },
+  });
   await ctx.dispose();
-  return res.status() === 200;
+  return !r.errors;
 }
 
 const attuale = (page) => page.getByLabel("Parola d'ordine attuale");
@@ -114,7 +120,7 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
     test(`F-AU-06: percorso completo da utente non superuser (${formato})`, async ({ page, playwright }) => {
       const u = await nuovoUtente();
       await entra(page, u);
-      await page.goto('/new-bo/password');
+      await page.goto('/bo/password');
       await expect(page.getByRole('heading', { level: 1 })).toHaveText("Cambia parola d'ordine");
       await expect(attuale(page)).toHaveAttribute('autocomplete', 'current-password');
       await expect(nuova(page)).toHaveAttribute('autocomplete', 'new-password');
@@ -132,15 +138,15 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
       await expect(toast(page)).toContainText("Parola d'ordine cambiata");
       // form vuoto, si resta sulla pagina
       for (const campo of [attuale, nuova, ripeti]) await expect(campo(page)).toHaveValue('');
-      await expect(page).toHaveURL(/\/new-bo\/password$/);
+      await expect(page).toHaveURL(/\/bo\/password$/);
       await senzaScrollOrizzontale(page);
       await foto(page, `password-${formato}-checkpoint`);
 
       // la sessione corrente resta valida
-      await page.goto('/new-bo/episodi');
-      await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+      await page.goto('/bo/episodi');
+      await expect(page).toHaveURL(/\/bo\/episodi$/);
       await page.reload();
-      await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+      await expect(page).toHaveURL(/\/bo\/episodi$/);
       expect(await puoEntrare(playwright, u.username, NUOVA)).toBe(true);
       expect(await puoEntrare(playwright, u.username, VECCHIA)).toBe(false);
     });
@@ -148,7 +154,7 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
     test(`F-AU-06: conferma diversa → errore nel campo, nessuna richiesta (${formato})`, async ({ page, playwright }) => {
       const u = await nuovoUtente();
       await entra(page, u);
-      await page.goto('/new-bo/password');
+      await page.goto('/bo/password');
       const viste = richiesteCambio(page);
       await compila(page, VECCHIA, NUOVA, `${NUOVA}x`);
       await salva(page).click();
@@ -178,7 +184,7 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
     }) => {
       const u = await nuovoUtente();
       await entra(page, u);
-      await page.goto('/new-bo/password');
+      await page.goto('/bo/password');
       await compila(page, 'password-sbagliata', NUOVA);
       const risposta = cambiata(page);
       await salva(page).click();
@@ -188,13 +194,13 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
       await expect(attuale(page)).toHaveAccessibleDescription("La parola d'ordine attuale non è corretta");
       await expect(attuale(page)).toBeFocused();
       await expect(toast(page)).toHaveCount(0);
-      await expect(page).toHaveURL(/\/new-bo\/password$/);
+      await expect(page).toHaveURL(/\/bo\/password$/);
       await senzaScrollOrizzontale(page);
       await foto(page, `password-${formato}-attuale-errata`);
 
       // si resta loggati: la pagina si ricarica senza passare dal login
       await page.reload();
-      await expect(page).toHaveURL(/\/new-bo\/password$/);
+      await expect(page).toHaveURL(/\/bo\/password$/);
       await expect(attuale(page)).toBeVisible();
       expect(await puoEntrare(playwright, u.username, VECCHIA)).toBe(true);
       expect(await puoEntrare(playwright, u.username, NUOVA)).toBe(false);
@@ -205,7 +211,7 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
         const u = await nuovoUtente();
         await entra(page, u);
         await page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Videogame' }).click();
-        await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+        await expect(page).toHaveURL(/\/bo\/videogame$/);
         const barra = page.getByRole('banner');
         const bottoni = barra.locator('a, button');
         await expect(bottoni).toHaveText(["Parola d'ordine", 'Esci']);
@@ -215,9 +221,9 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
         expect(a.y).toBe(b.y);
         expect(a.x + a.width).toBeLessThan(b.x);
         await barra.getByRole('link', { name: "Parola d'ordine" }).click();
-        await expect(page).toHaveURL(/\/new-bo\/password$/);
+        await expect(page).toHaveURL(/\/bo\/password$/);
         await page.getByTestId('barra-azioni').getByRole('button', { name: 'Annulla' }).click();
-        await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+        await expect(page).toHaveURL(/\/bo\/videogame$/);
       });
     } else {
       test(`F-AU-06: accesso dallo Sheet, voce sopra ESCI (${formato})`, async ({ page }) => {
@@ -234,7 +240,7 @@ for (const [formato, viewport] of Object.entries(VIEWPORT)) {
         await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running'));
         await page.screenshot({ path: test.info().outputPath(`sheet-${formato}.png`) });
         await voce.click();
-        await expect(page).toHaveURL(/\/new-bo\/password$/);
+        await expect(page).toHaveURL(/\/bo\/password$/);
         await expect(sheet).toHaveCount(0);
         await senzaScrollOrizzontale(page);
       });
@@ -252,7 +258,7 @@ for (const [caso, corta] of [
     await page.setViewportSize(VIEWPORT[1440]);
     const u = await nuovoUtente();
     await entra(page, u);
-    await page.goto('/new-bo/password');
+    await page.goto('/bo/password');
     const viste = richiesteCambio(page);
     // anche la ripetuta è diversa: conta prima la lunghezza
     await compila(page, VECCHIA, corta, `${corta}x`);
@@ -280,7 +286,7 @@ test('F-AU-06: gli altri errori del server vanno nel Toast, non nel campo (1440)
   await page.setViewportSize(VIEWPORT[1440]);
   const u = await nuovoUtente();
   await entra(page, u);
-  await page.goto('/new-bo/password');
+  await page.goto('/bo/password');
   // errore simulato: RATE_LIMITED sulla sola mutation, le altre richieste passano
   await page.route('**/api/graphql', (route) =>
     (route.request().postData() ?? '').includes('CambiaPassword')
@@ -303,17 +309,17 @@ test('F-AU-06: gli altri errori del server vanno nel Toast, non nel campo (1440)
   for (const campo of [attuale, nuova, ripeti]) await expect(campo(page)).not.toHaveAttribute('aria-invalid');
   // i campi restano compilati, si resta sulla pagina e loggati
   await expect(nuova(page)).toHaveValue(NUOVA);
-  await expect(page).toHaveURL(/\/new-bo\/password$/);
+  await expect(page).toHaveURL(/\/bo\/password$/);
   await page.unroute('**/api/graphql');
   await page.reload();
-  await expect(page).toHaveURL(/\/new-bo\/password$/);
+  await expect(page).toHaveURL(/\/bo\/password$/);
   expect(await puoEntrare(playwright, u.username, VECCHIA)).toBe(true);
 });
 
 test('F-AU-06: ANNULLA su una pagina aperta direttamente porta agli episodi', async ({ page }) => {
   const u = await nuovoUtente();
   await entra(page, u);
-  await page.goto('/new-bo/password');
+  await page.goto('/bo/password');
   await page.getByTestId('barra-azioni').getByRole('button', { name: 'Annulla' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 });

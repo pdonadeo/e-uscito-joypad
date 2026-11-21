@@ -33,7 +33,7 @@ const queryClient: QueryClient = new QueryClient({
 
 const router = createRouter({
   routeTree,
-  basepath: '/new-bo',
+  basepath: '/bo',
   context: { queryClient },
   defaultPreload: false,
   scrollRestoration: true,

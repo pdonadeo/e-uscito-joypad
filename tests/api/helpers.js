@@ -2,26 +2,21 @@ const { expect } = require('@playwright/test');
 const { randomInt } = require('node:crypto');
 const { API_URL, RAWG_PORT } = require('./env');
 
-const enc = (v) => encodeURIComponent(JSON.stringify(v));
-
-// Query string ra-data-simple-rest: sort, range, filter.
-function listQuery({ sort, range, filter } = {}) {
-  const parts = [];
-  if (sort) parts.push(`sort=${enc(sort)}`);
-  if (range) parts.push(`range=${enc(range)}`);
-  if (filter) parts.push(`filter=${enc(filter)}`);
-  return parts.length ? `?${parts.join('&')}` : '';
-}
-
 async function newContext(playwright, headers = { Origin: API_URL }) {
   return playwright.request.newContext({ baseURL: API_URL, extraHTTPHeaders: headers });
 }
 
-// Contesto con sessione dell'utente indicato.
+// Contesto con sessione dell'utente indicato, aperta con la mutation login di GraphQL.
 async function loggedIn(playwright, user) {
   const ctx = await newContext(playwright);
-  const res = await ctx.post('/api/bo/login', { data: { username: user.username, password: user.password } });
-  expect(res.status(), await res.text()).toBe(200);
+  const res = await ctx.post('/api/graphql', {
+    data: {
+      query: 'mutation($c: CredenzialiInput!) { login(credenziali: $c) { id } }',
+      variables: { c: { username: user.username, password: user.password } },
+    },
+  });
+  const body = await res.json();
+  expect(body.errors, JSON.stringify(body)).toBeUndefined();
   return ctx;
 }
 
@@ -40,4 +35,4 @@ const PNG_1x1 = Buffer.from(
 );
 const JPEG = Buffer.from('ffd8ffe000104a46494600010100000100010000ffd9', 'hex');
 
-module.exports = { listQuery, newContext, loggedIn, rawgCalls, uniq, PNG_1x1, JPEG };
+module.exports = { newContext, loggedIn, rawgCalls, uniq, PNG_1x1, JPEG };

@@ -1,4 +1,4 @@
-// Test e2e di /new-bo (Fase 3.6c). Girano con playwright.api.config.js: Dream locale
+// Test e2e di /bo (Fase 3.6c). Girano con playwright.api.config.js: Dream locale
 // con il bundle di new-bo nel crunch, DB del compose di sviluppo.
 //
 //   (cd new-bo && bun run build) && opam exec -- dune build @install
@@ -7,10 +7,19 @@
 // Prima metà di 3.6c: login (F-AU-01), logout (F-AU-02), utente corrente nella shell
 // (F-AU-03), menu secondo i permessi (F-AU-04), shell nei tre formati 390/1180/1440.
 const { test, expect } = require('@playwright/test');
-const { USERS } = require('./env');
+const { API_URL, USERS } = require('./env');
 
 // Il browser deve mandare la sua Origin vera, non quella forzata dalla config per l'API.
 test.use({ extraHTTPHeaders: {} });
+
+// query me con la sessione del browser (page.request); l'Origin va messa a mano
+async function meDellaPagina(page) {
+  const res = await page.request.post('/api/graphql', {
+    data: { query: '{ me { username } }' },
+    headers: { Origin: API_URL },
+  });
+  return res.json();
+}
 
 const VIEWPORT = {
   390: { width: 390, height: 844 },
@@ -19,11 +28,11 @@ const VIEWPORT = {
 };
 
 async function entra(page, user) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(user.username);
   await page.getByLabel("Parola d'ordine").fill(user.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
   await expect(page.getByRole('heading', { name: 'Episodi' })).toBeVisible();
 }
 
@@ -31,30 +40,30 @@ test.describe('login', () => {
   test.use({ viewport: VIEWPORT[1440] });
 
   test('senza sessione ogni pagina porta al login, con il titolo della Retrobottega', async ({ page }) => {
-    await page.goto('/new-bo/episodi');
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await page.goto('/bo/episodi');
+    await expect(page).toHaveURL(/\/bo\/login$/);
     await expect(page).toHaveTitle('Retrobottega di «È uscito Joypad?»');
     await expect(page.getByRole('heading', { name: 'RETROBOTTEGA' })).toBeVisible();
     await expect(page.getByText('Un JOYPAD selvatico appare!')).toBeVisible();
     await expect(page.getByText('Premi INVIO per continuare')).toBeVisible();
-    await page.goto('/new-bo');
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await page.goto('/bo');
+    await expect(page).toHaveURL(/\/bo\/login$/);
   });
 
   test('credenziali sbagliate: messaggio del server nell\'Alert e un cuore in meno', async ({ page }) => {
-    await page.goto('/new-bo/login');
+    await page.goto('/bo/login');
     await page.getByLabel('Nome utente').fill(USERS.staff.username);
     await page.getByLabel("Parola d'ordine").fill('password-sbagliata');
     await page.getByRole('button', { name: 'Entra' }).click();
     await expect(page.getByRole('alert')).toHaveText(/Credenziali non valide o utente non abilitato/);
     await expect(page.getByText('Ouch! Il JOYPAD ha resistito.')).toBeVisible();
     await expect(page.getByText('2 su 3')).toBeAttached();
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await expect(page).toHaveURL(/\/bo\/login$/);
   });
 
   test('un utente non staff o non attivo non entra, con lo stesso messaggio', async ({ page }) => {
     for (const user of [USERS.nonstaff, USERS.inactive]) {
-      await page.goto('/new-bo/login');
+      await page.goto('/bo/login');
       await page.getByLabel('Nome utente').fill(user.username);
       await page.getByLabel("Parola d'ordine").fill(user.password);
       await page.keyboard.press('Enter');
@@ -63,7 +72,7 @@ test.describe('login', () => {
   });
 
   test('la richiesta GraphQL ha Content-Type application/json esatto', async ({ page }) => {
-    await page.goto('/new-bo/login');
+    await page.goto('/bo/login');
     const richiesta = page.waitForRequest((r) => r.url().endsWith('/api/graphql') && r.method() === 'POST');
     await page.getByLabel('Nome utente').fill(USERS.staff.username);
     await page.getByLabel("Parola d'ordine").fill(USERS.staff.password);
@@ -72,13 +81,13 @@ test.describe('login', () => {
     expect(r.headers()['content-type']).toBe('application/json');
   });
 
-  test('la sessione è quella di /api/bo, e con la sessione il login porta agli episodi', async ({ page }) => {
+  test('la sessione è quella della query me, e con la sessione il login porta agli episodi', async ({ page }) => {
     await entra(page, USERS.staff);
-    const me = await page.request.get('/api/bo/me');
-    expect(me.status()).toBe(200);
-    expect((await me.json()).username).toBe(USERS.staff.username);
-    await page.goto('/new-bo/login');
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    const me = await meDellaPagina(page);
+    expect(me.errors).toBeUndefined();
+    expect(me.data.me.username).toBe(USERS.staff.username);
+    await page.goto('/bo/login');
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
   });
 });
 
@@ -95,22 +104,22 @@ test.describe('shell a 1440', () => {
     await expect(page.getByRole('button', { name: 'Apri il menu' })).toBeHidden();
 
     await menu.getByRole('link', { name: 'Videogame' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
     await expect(page.getByRole('heading', { name: 'Videogame' })).toBeVisible();
     await expect(menu.getByRole('link', { name: 'Videogame' })).toHaveAttribute('aria-current', 'page');
 
     // l'indirizzo degli utenti, scritto a mano, riporta agli episodi
-    await page.goto('/new-bo/utenti');
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await page.goto('/bo/utenti');
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
   });
 
-  test('ESCI chiude la sessione, anche per /api/bo', async ({ page }) => {
+  test('ESCI chiude la sessione, anche per la query me', async ({ page }) => {
     await entra(page, USERS.staff);
     await page.getByRole('button', { name: 'Esci' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
-    expect((await page.request.get('/api/bo/me')).status()).toBe(401);
-    await page.goto('/new-bo/videogame');
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await expect(page).toHaveURL(/\/bo\/login$/);
+    expect((await meDellaPagina(page)).errors[0].extensions.code).toBe('UNAUTHENTICATED');
+    await page.goto('/bo/videogame');
+    await expect(page).toHaveURL(/\/bo\/login$/);
   });
 });
 
@@ -124,7 +133,7 @@ test.describe('shell a 1180', () => {
     expect((await menu.boundingBox()).width).toBe(88);
     await expect(menu.getByText('Seleziona livello')).toBeHidden();
     await menu.getByRole('link', { name: 'Utenti' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti$/);
+    await expect(page).toHaveURL(/\/bo\/utenti$/);
     await expect(page.getByRole('heading', { name: 'Utenti' })).toBeVisible();
     await expect(page.getByText('Livello segreto · solo superuser')).toBeVisible();
   });
@@ -134,7 +143,7 @@ test.describe('shell a 390', () => {
   test.use({ viewport: VIEWPORT[390] });
 
   test('il login dice di toccare ENTRA', async ({ page }) => {
-    await page.goto('/new-bo/login');
+    await page.goto('/bo/login');
     await expect(page.getByText('Tocca ENTRA per continuare')).toBeVisible();
     await expect(page.getByText('Premi INVIO per continuare')).toBeHidden();
   });
@@ -153,7 +162,7 @@ test.describe('shell a 390', () => {
 
     await sheet.getByRole('link', { name: 'Videogame' }).click();
     await expect(sheet).toBeHidden();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
 
     await page.getByRole('button', { name: 'Apri il menu' }).click();
     await page.getByRole('button', { name: 'Chiudi il menu' }).click();
@@ -161,7 +170,7 @@ test.describe('shell a 390', () => {
 
     await page.getByRole('button', { name: 'Apri il menu' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Esci' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await expect(page).toHaveURL(/\/bo\/login$/);
   });
 
   test('staff: nello Sheet non c\'è UTENTI né «superuser»', async ({ page }) => {

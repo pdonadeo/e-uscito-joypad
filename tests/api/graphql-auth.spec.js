@@ -1,8 +1,9 @@
-// GraphQL: autenticazione, permessi, sessione condivisa con /api/bo, Origin e
-// trasporto HTTP di /api/graphql (Fase 3.5.2). Contratto: docs/schema.graphql.
+// GraphQL: autenticazione, permessi, sessione condivisa con la cover di /api/bo, Origin e
+// trasporto HTTP di /api/graphql (Fase 3.5.2), avvio con DEBUG=False. Contratto: docs/schema.graphql.
 const { test, expect } = require('@playwright/test');
-const { API_URL, USERS, django } = require('./env');
-const { newContext, loggedIn } = require('./helpers');
+const { spawn, spawnSync } = require('child_process');
+const { API_URL, USERS, BINARY, dreamEnv, django } = require('./env');
+const { newContext, loggedIn, PNG_1x1 } = require('./helpers');
 const { ENDPOINT, F, gql, expectOk, expectCode, gqlLoggedIn } = require('./gql-helpers');
 
 const LOGIN = `mutation($c: CredenzialiInput!) { login(credenziali: $c) { ${F.me} } }`;
@@ -36,6 +37,15 @@ const OPERAZIONI = {
 };
 const SOLO_SUPERUSER = ['elencoUtenti', 'utente', 'creaUtente', 'aggiornaUtente', 'eliminaUtente'];
 
+// La sessione vale anche per la cover, l'unica rotta rimasta in /api/bo (stessi middleware):
+// con una sessione staff l'upload su un episodio inesistente dà 404, senza sessione 401.
+async function coverStatus(ctx) {
+  const res = await ctx.post(`/api/bo/episodi/${NO_ID}/cover`, {
+    multipart: { file: { name: 'x.png', mimeType: 'image/png', buffer: PNG_1x1 } },
+  });
+  return res.status();
+}
+
 test.describe('accesso', () => {
   test('anonimo: ogni query e mutation tranne login e logout → UNAUTHENTICATED', async ({ playwright }) => {
     const ctx = await newContext(playwright);
@@ -61,11 +71,18 @@ test.describe('accesso', () => {
     await ctx.dispose();
   });
 
-  test('login di un utente staff → UtenteCorrente, poi me', async ({ playwright }) => {
+  test('login di un utente staff → UtenteCorrente, poi me; last_login aggiornato', async ({ playwright }) => {
     const ctx = await newContext(playwright);
+    const t0 = Date.now();
     const login = expectOk(await gql(ctx, LOGIN, { c: USERS.staff })).login;
+    // hash Django a 1.500.000 iterazioni: obiettivo < 1 s (margine per la CI)
+    expect(Date.now() - t0).toBeLessThan(1500);
     expect(login).toMatchObject({ username: USERS.staff.username, fullName: USERS.staff.username, is_superuser: false });
     expect(expectOk(await gql(ctx, ME)).me).toEqual(login);
+    const lastLogin = django(
+      `from django.contrib.auth.models import User\nprint(User.objects.get(username="${USERS.staff.username}").last_login is not None)`,
+    );
+    expect(lastLogin.split('\n').pop()).toBe('True');
     await ctx.dispose();
   });
 
@@ -81,7 +98,7 @@ test.describe('accesso', () => {
       expect(r.data).toBeNull();
       expectCode(r, 'UNAUTHENTICATED', 'Credenziali non valide o utente non abilitato');
       expectCode(await gql(ctx, ME), 'UNAUTHENTICATED');
-      expect((await ctx.get('/api/bo/me')).status()).toBe(401);
+      expect(await coverStatus(ctx)).toBe(401);
       await ctx.dispose();
     });
   }
@@ -114,7 +131,7 @@ test.describe('accesso', () => {
 
   test('raffica di login: oltre 2 in corso + 8 in coda → RATE_LIMITED, poi si torna normali', async ({ playwright }) => {
     // fetch di Node apre una connessione per richiesta: 16 login davvero concorrenti
-    const codes = await Promise.all(
+    const burst = Promise.all(
       Array.from({ length: 16 }, () =>
         fetch(`${API_URL}${ENDPOINT}`, {
           method: 'POST',
@@ -132,6 +149,14 @@ test.describe('accesso', () => {
         }),
       ),
     );
+    // intanto il sito pubblico deve restare reattivo (l'hashing gira in altri Domain)
+    await new Promise((r) => setTimeout(r, 300));
+    for (let i = 0; i < 5; i++) {
+      const t0 = Date.now();
+      expect((await fetch(`${API_URL}/api/ultima-puntata`)).status).toBe(200);
+      expect(Date.now() - t0).toBeLessThan(500);
+    }
+    const codes = await burst;
     expect(codes.filter((c) => c === 'RATE_LIMITED').length).toBeGreaterThanOrEqual(6);
     expect(codes.every((c) => c === 'UNAUTHENTICATED' || c === 'RATE_LIMITED')).toBe(true);
     const ctx = await newContext(playwright);
@@ -140,7 +165,7 @@ test.describe('accesso', () => {
   });
 });
 
-test.describe('sessione condivisa con /api/bo', () => {
+test.describe('sessione condivisa con la cover di /api/bo', () => {
   test('login GraphQL: Set-Cookie dream.session con Path=/', async ({ playwright }) => {
     const ctx = await newContext(playwright);
     const r = await gql(ctx, LOGIN, { c: USERS.staff });
@@ -152,35 +177,19 @@ test.describe('sessione condivisa con /api/bo', () => {
     await ctx.dispose();
   });
 
-  test('login su REST → me su GraphQL', async ({ playwright }) => {
-    const ctx = await loggedIn(playwright, USERS.staff);
-    const rest = await (await ctx.get('/api/bo/me')).json();
-    expect(expectOk(await gql(ctx, ME)).me).toEqual(rest);
-    await ctx.dispose();
-  });
-
-  test('login su GraphQL → /api/bo/me', async ({ playwright }) => {
+  test('login su GraphQL → la sessione vale per la cover', async ({ playwright }) => {
     const ctx = await newContext(playwright);
-    const login = expectOk(await gql(ctx, LOGIN, { c: USERS.superuser })).login;
-    const me = await ctx.get('/api/bo/me');
-    expect(me.status()).toBe(200);
-    expect(await me.json()).toEqual(login);
+    expect(await coverStatus(ctx)).toBe(401);
+    expectOk(await gql(ctx, LOGIN, { c: USERS.staff }));
+    expect(await coverStatus(ctx)).toBe(404);
     await ctx.dispose();
   });
 
-  test('logout su REST → anonimo su REST e su GraphQL', async ({ playwright }) => {
-    const ctx = await gqlLoggedIn(playwright, USERS.staff);
-    expect((await ctx.post('/api/bo/logout')).status()).toBe(200);
-    expect((await ctx.get('/api/bo/me')).status()).toBe(401);
-    expectCode(await gql(ctx, ME), 'UNAUTHENTICATED', 'Autenticazione richiesta');
-    await ctx.dispose();
-  });
-
-  test('logout su GraphQL → anonimo su GraphQL e su REST', async ({ playwright }) => {
+  test('logout su GraphQL → anonimo su GraphQL e sulla cover', async ({ playwright }) => {
     const ctx = await loggedIn(playwright, USERS.staff);
     expect(expectOk(await gql(ctx, LOGOUT)).logout).toBe(true);
-    expectCode(await gql(ctx, ME), 'UNAUTHENTICATED');
-    expect((await ctx.get('/api/bo/me')).status()).toBe(401);
+    expectCode(await gql(ctx, ME), 'UNAUTHENTICATED', 'Autenticazione richiesta');
+    expect(await coverStatus(ctx)).toBe(401);
     await ctx.dispose();
   });
 
@@ -194,7 +203,7 @@ u.set_password("${victim.password}"); u.is_staff = True; u.is_active = True; u.s
     django(`from django.contrib.auth.models import User
 u = User.objects.get(username="${victim.username}"); u.set_password("e2e-password-new"); u.save()`);
     expectCode(await gql(ctx, ME), 'UNAUTHENTICATED');
-    expect((await ctx.get('/api/bo/me')).status()).toBe(401);
+    expect(await coverStatus(ctx)).toBe(401);
     await ctx.dispose();
   });
 
@@ -228,11 +237,18 @@ x.set_password("${u.password}"); x.is_staff = True; x.is_active = True; x.save()
     django(`from django.contrib.auth.models import User
 User.objects.filter(username="${u.username}").update(is_active=False)`);
     expectCode(await gql(ctx, '{ elencoEpisodi { totale } }'), 'UNAUTHENTICATED');
+    expect(await coverStatus(ctx)).toBe(401);
     await ctx.dispose();
   });
 });
 
 test.describe('Origin e trasporto HTTP', () => {
+  test('stesso host con porta diversa (Host senza porta dietro nginx) → consentito', async ({ playwright }) => {
+    const ctx = await newContext(playwright, { Origin: 'http://127.0.0.1:5000' });
+    expectOk(await gql(ctx, LOGIN, { c: USERS.staff }));
+    await ctx.dispose();
+  });
+
   test('Origin estraneo o assente → 403 con il JSON REST {message}, non errors[]', async ({ playwright }) => {
     // controllo positivo: con l'Origin dello stesso host l'endpoint risponde
     const ok = await newContext(playwright);
@@ -304,4 +320,67 @@ test.describe('Origin e trasporto HTTP', () => {
     expectCode(await gql(ctx, '{ elencoEpisodi(ordinamento: ALTRO) { totale } }'), 'GRAPHQL_VALIDATION');
     await ctx.dispose();
   });
+});
+
+test.describe('DEBUG=False', () => {
+  test('senza DREAM_SECRET, o con il placeholder di sviluppo, il server non parte', () => {
+    for (const secret of [undefined, 'DREAM SECRET CHANGE ME IN PRODUCTION']) {
+      const env = { ...process.env, ...dreamEnv({ DEBUG: 'False', REST_LISTEN_PORT: '3999' }) };
+      if (secret === undefined) delete env.DREAM_SECRET;
+      else env.DREAM_SECRET = secret;
+      const r = spawnSync(BINARY, [], { env, timeout: 10000, encoding: 'utf8' });
+      expect(r.status, String(secret)).toBe(1);
+      expect(r.stderr).toContain('DREAM_SECRET');
+    }
+  });
+
+  test('il cookie di sessione ha l\'attributo Secure', async ({ playwright }) => {
+    const port = 3998;
+    const url = `http://127.0.0.1:${port}`;
+    const server = spawn(BINARY, [], {
+      env: { ...process.env, ...dreamEnv({ DEBUG: 'False', REST_LISTEN_PORT: String(port) }) },
+      stdio: 'ignore',
+    });
+    try {
+      const ctx = await playwright.request.newContext({ baseURL: url, extraHTTPHeaders: { Origin: url } });
+      let ready = false;
+      for (let i = 0; i < 50 && !ready; i++) {
+        try {
+          ready = (await ctx.get('/api/last-episodes/1/0')).status() === 200;
+        } catch {
+          await new Promise((r) => setTimeout(r, 200));
+        }
+      }
+      expect(ready).toBe(true);
+      const r = await gql(ctx, LOGIN, { c: USERS.staff });
+      expectOk(r);
+      const cookie = r.res.headers()['set-cookie'];
+      expect(cookie).toContain('dream.session=');
+      expect(cookie).toMatch(/;\s*Secure/i);
+      expect(cookie).toMatch(/HttpOnly/i);
+      await ctx.dispose();
+    } finally {
+      server.kill();
+    }
+  });
+});
+
+test('login di un hash Django con meno iterazioni: ricalcolato come fa Django', async ({ playwright }) => {
+  const u = { username: 'e2e_oldhash', password: 'e2e-password-old-hash' };
+  django(`from django.contrib.auth.models import User
+from django.contrib.auth.hashers import PBKDF2PasswordHasher
+h = PBKDF2PasswordHasher()
+x, _ = User.objects.get_or_create(username="${u.username}")
+x.password = h.encode("${u.password}", h.salt(), iterations=320000)
+x.is_staff = True; x.is_active = True; x.save()`);
+  const ctx = await gqlLoggedIn(playwright, u);
+  expect(expectOk(await gql(ctx, ME)).me.username).toBe(u.username);
+  const out = django(`from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+x = User.objects.get(username="${u.username}")
+print(x.password.split("$")[1], authenticate(username="${u.username}", password="${u.password}") is not None)`);
+  const [iterations, ok] = out.split('\n').pop().split(' ');
+  expect(Number(iterations)).toBeGreaterThanOrEqual(1500000);
+  expect(ok).toBe('True');
+  await ctx.dispose();
 });

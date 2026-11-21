@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/new-bo/',
+  base: '/bo/',
   plugins: [
     // il plugin del router va prima di react()
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),

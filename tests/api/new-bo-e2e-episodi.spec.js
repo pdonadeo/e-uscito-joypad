@@ -1,11 +1,12 @@
-// Test e2e degli episodi di /new-bo (Fase 3.6c.2): F-EP-01 … F-EP-11, F-AS-01 … F-AS-03.
+// Test e2e degli episodi di /bo (Fase 3.6c.2): F-EP-01 … F-EP-11, F-AS-01 … F-AS-03.
 // Girano con playwright.api.config.js, come new-bo-e2e.spec.js. Le fixture (videogame ed
-// episodi «[E2E] …») si creano via REST con un token unico per test e si cercano con la
+// episodi «[E2E] …») si creano via GraphQL con un token unico per test e si cercano con la
 // ricerca dell'elenco, così i test non dipendono dagli episodi del DB di sviluppo.
 // Elenco e modifica si provano a 390, 1180 e 1440.
 const { test, expect } = require('@playwright/test');
 const { API_URL, USERS } = require('./env');
 const { loggedIn, uniq, PNG_1x1, JPEG } = require('./helpers');
+const { creaVideogame, leggiVideogame, creaEpisodio, leggiEpisodio, elencoEpisodi } = require('./gql-helpers');
 
 // Il browser manda la sua Origin vera; le chiamate di page.request la mettono a mano (V-01).
 test.use({ extraHTTPHeaders: {} });
@@ -17,16 +18,12 @@ const VIEWPORT = {
   1440: { width: 1440, height: 900 },
 };
 
-let api; // sessione REST dello staff per fixture e verifiche
+let api; // sessione dello staff per fixture e verifiche (GraphQL; la cover su /api/bo)
 const giochi = [];
 
 test.beforeAll(async ({ playwright }) => {
   api = await loggedIn(playwright, USERS.staff);
-  for (let i = 0; i < 3; i++) {
-    const res = await api.post('/api/bo/videogame', { data: { rawg_slug: `e2e-nbep-${i}-${uniq()}` } });
-    expect(res.status(), await res.text()).toBe(201);
-    giochi.push(await res.json());
-  }
+  for (let i = 0; i < 3; i++) giochi.push(await creaVideogame(api, { rawg_slug: `e2e-nbep-${i}-${uniq()}` }));
 });
 
 test.afterAll(async () => {
@@ -36,30 +33,26 @@ test.afterAll(async () => {
 // --- aiuti ------------------------------------------------------------------------------------
 
 async function entra(page, user = USERS.staff) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(user.username);
   await page.getByLabel("Parola d'ordine").fill(user.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 }
 
-async function nuovoEpisodio(extra = {}) {
-  const res = await api.post('/api/bo/episodi', {
-    data: {
-      titolo: `[E2E] new-bo ${uniq()}`,
-      episodio_numero: 'E2E',
-      data_uscita: '2001-01-01',
-      durata: '1:02:03',
-      ...extra,
-    },
+const nuovoEpisodio = (extra = {}) =>
+  creaEpisodio(api, {
+    titolo: `[E2E] new-bo ${uniq()}`,
+    episodio_numero: 'E2E',
+    data_uscita: '2001-01-01',
+    durata: '1:02:03',
+    ...extra,
   });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
 
+// { status: 200, body } se l'episodio c'è, { status: 404, body: null } se non c'è.
 async function leggi(id) {
-  const res = await api.get(`/api/bo/episodi/${id}`);
-  return { status: res.status(), body: res.status() === 200 ? await res.json() : null };
+  const e = await leggiEpisodio(api, id);
+  return e ? { status: 200, body: e } : { status: 404, body: null };
 }
 
 async function conCover(id) {
@@ -70,7 +63,7 @@ async function conCover(id) {
 }
 
 const elenco = (page, token, extra = '') =>
-  page.goto(`/new-bo/episodi?ricerca=${encodeURIComponent(token)}${extra}`);
+  page.goto(`/bo/episodi?ricerca=${encodeURIComponent(token)}${extra}`);
 
 // Righe della tabella (desktop) o schede (390) dell'elenco.
 const righe = (page) => page.locator('tbody tr[data-cliccabile]');
@@ -126,7 +119,7 @@ test.describe('elenco a 1440', () => {
     await expect(page.getByRole('combobox', { name: 'Righe per pagina' })).toHaveText(/20/);
     await expect(page.getByText('1–2 di 2')).toBeVisible();
     await r.click();
-    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/episodi/${e.id}$`));
   });
 
   test('F-EP-01: righe per pagina e pagine', async ({ page }) => {
@@ -221,7 +214,7 @@ test.describe('elenco a 1440', () => {
     expect((await leggi(b.id)).status).toBe(404);
     expect((await leggi(c.id)).status).toBe(200);
     // i videogame restano
-    expect((await api.get(`/api/bo/videogame/${giochi[0].id}`)).status()).toBe(200);
+    expect(await leggiVideogame(api, giochi[0].id)).not.toBeNull();
   });
 });
 
@@ -265,7 +258,7 @@ test.describe('elenco a 390', () => {
     await expect(schede(page)).toHaveCount(2);
     await expect(schede(page).first().locator('[data-slot=badge]').first()).toHaveText(/Pubblicato/);
     await schede(page).first().click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi\/\d+$/);
+    await expect(page).toHaveURL(/\/bo\/episodi\/\d+$/);
   });
 
   test('F-EP-08: in blocco a 390, con il singolare', async ({ page }) => {
@@ -308,7 +301,7 @@ test.describe('modifica a 1440', () => {
     });
     await conCover(e.id);
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Ep. 777 · ${e.titolo}`);
     await expect(page.locator('[data-slot=badge]').first()).toHaveText(/Pubblicato/);
     await expect(page.getByLabel('Titolo')).toHaveValue(e.titolo);
@@ -333,7 +326,7 @@ test.describe('modifica a 1440', () => {
   test('F-EP-07: salva i campi e torna all\'elenco; un errore del server va nel Toast', async ({ page }) => {
     const e = await nuovoEpisodio({ url: 'https://example.com/a.mp3' });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByLabel('Titolo').fill('');
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(toast(page)).toContainText('titolo');
@@ -343,7 +336,7 @@ test.describe('modifica a 1440', () => {
     await page.getByLabel('URL audio').fill('');
     await page.getByRole('switch', { name: 'Pubblicato' }).click();
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     await expect(toast(page)).toHaveCount(0);
     const { body } = await leggi(e.id);
     expect(body).toMatchObject({ titolo: `${e.titolo} bis`, durata: '02:00:00', url: null, pubblicato: true });
@@ -356,7 +349,7 @@ test.describe('modifica a 1440', () => {
     });
     await conCover(e.id);
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: 'Elimina episodio' }).click();
     const dialogo = page.getByRole('alertdialog');
     await expect(dialogo).toContainText('Game over?');
@@ -370,9 +363,9 @@ test.describe('modifica a 1440', () => {
     expect((await leggi(e.id)).status).toBe(200);
     await page.getByRole('button', { name: 'Elimina episodio' }).click();
     await page.getByRole('alertdialog').getByRole('button', { name: 'Elimina' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     expect((await leggi(e.id)).status).toBe(404);
-    for (const g of giochi) expect((await api.get(`/api/bo/videogame/${g.id}`)).status()).toBe(200);
+    for (const g of giochi) expect(await leggiVideogame(api, g.id)).not.toBeNull();
   });
 
   test('F-EP-09, F-AS-03: aggiunge, modifica e toglie righe; etichette e non codici', async ({ page }) => {
@@ -383,7 +376,7 @@ test.describe('modifica a 1440', () => {
       ],
     });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     // F-AS-03: le scelte hanno solo le etichette
     await page.getByRole('combobox', { name: 'Speaker, riga 1' }).click();
     await expect(page.getByRole('option')).toHaveText([
@@ -411,7 +404,7 @@ test.describe('modifica a 1440', () => {
     await page.getByRole('button', { name: `Rimuovi ${giochi[1].titolo}` }).click();
     await expect(page.getByText('Videogiochi citati · 2')).toBeVisible();
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.associazioni.map((a) => [a.videogame_id, a.istante, a.speaker, a.tipologia])).toEqual([
       [giochi[0].id, '00:01:00', 'ZAMP', 'STAR'],
@@ -422,7 +415,7 @@ test.describe('modifica a 1440', () => {
   test('F-EP-09: nel Combobox INVIO prima dei risultati della ricerca non sceglie il gioco sbagliato', async ({ page }) => {
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: giochi[0].id, istante: '0:01:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     const campo = page.getByRole('combobox', { name: 'Videogame, riga 1' });
     // una prima ricerca lascia a schermo i suoi risultati (keepPreviousData)
     // cercaVideogame (3.6c.4b) cerca solo nel titolo: si scrive il titolo completo, che ha
@@ -436,7 +429,7 @@ test.describe('modifica a 1440', () => {
     await campo.press('Enter');
     await expect(page.locator('[data-slot=command-list]')).toBeVisible();
     await expect(campo).toHaveValue(giochi[2].titolo);
-    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/episodi/${e.id}$`));
     // arrivano i risultati giusti: la prima voce è quel gioco, evidenziata, e INVIO la sceglie
     await expect(page.getByRole('status').filter({ hasText: 'Cerco' })).toHaveCount(0);
     await expect(page.getByRole('option').first()).toContainText(giochi[2].titolo);
@@ -445,7 +438,7 @@ test.describe('modifica a 1440', () => {
     await expect(page.locator('[data-slot=command-list]')).toHaveCount(0);
     await expect(campo).toHaveValue(giochi[2].titolo);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.associazioni.map((a) => a.videogame_id)).toEqual([giochi[2].id]);
   });
@@ -455,14 +448,14 @@ test.describe('modifica a 1440', () => {
     await conCover(e.id);
     const prima = (await leggi(e.id)).body.cover;
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByTestId('file-cover').setInputFiles({ name: 'nota.txt', mimeType: 'text/plain', buffer: Buffer.from('x') });
     await expect(toast(page)).toContainText("Il file deve essere un'immagine PNG");
     await page.getByTestId('file-cover').setInputFiles({ name: 'nuova.png', mimeType: 'image/png', buffer: PNG_1x1 });
     await expect(page.getByTestId('nome-cover')).toHaveText('nuova.png');
     expect((await leggi(e.id)).body.cover).toBe(prima);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     const dopo = (await leggi(e.id)).body.cover;
     expect(dopo).not.toBe(prima);
     expect(dopo).toMatch(/^covers\/episodi-555-nuova.*\.png$/);
@@ -472,12 +465,12 @@ test.describe('modifica a 1440', () => {
     const e = await nuovoEpisodio();
     await conCover(e.id);
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: 'Rimuovi', exact: true }).click();
     await expect(page.getByTestId('nome-cover')).toHaveText('Nessuna cover');
     expect((await leggi(e.id)).body.cover).not.toBeNull();
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     expect((await leggi(e.id)).body.cover).toBeNull();
   });
 });
@@ -488,7 +481,7 @@ test.describe('modifica a 1180', () => {
   test('F-EP-07, F-EP-09: tabella delle associazioni e salvataggio', async ({ page }) => {
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: giochi[0].id, istante: '0:10:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await expect(page.getByRole('columnheader', { name: /Istante/ })).toBeVisible();
     await page.getByLabel('Numero').fill('118');
     await page.getByRole('combobox', { name: 'Videogame, riga 1' }).click();
@@ -500,7 +493,7 @@ test.describe('modifica a 1180', () => {
     await page.getByRole('combobox', { name: 'Videogame, riga 1' }).press('Enter');
     await expect(page.getByRole('combobox', { name: 'Videogame, riga 1' })).toHaveValue(giochi[1].titolo);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.episodio_numero).toBe('118');
     expect(body.associazioni.map((a) => a.videogame_id)).toEqual([giochi[1].id]);
@@ -513,7 +506,7 @@ test.describe('modifica a 390', () => {
   test('F-EP-05, F-EP-07, F-EP-09: schede delle associazioni, barra fissa ed ELIMINA in fondo', async ({ page }) => {
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: giochi[0].id, istante: '0:05:00', speaker: 'BORD' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await expect(page.locator('table')).toHaveCount(0);
     await expect(page.getByTestId('scheda-associazione')).toHaveCount(1);
     await expect(page.getByRole('combobox', { name: 'Speaker' })).toHaveText(/Matteo Bordone/);
@@ -526,7 +519,7 @@ test.describe('modifica a 390', () => {
     // la barra delle azioni resta visibile in fondo allo schermo
     await expect(page.getByRole('button', { name: 'Salva', exact: true })).toBeInViewport();
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     const { body } = await leggi(e.id);
     expect(body.durata).toBe('00:45:00');
     expect(body.associazioni.map((a) => [a.videogame_id, a.istante])).toEqual([
@@ -557,7 +550,7 @@ test.describe('nuovo episodio a 1440', () => {
     await scegliGioco(page, 1, giochi[0]);
     await page.getByTestId('file-cover').setInputFiles({ name: 'nuovo.png', mimeType: 'image/png', buffer: PNG_1x1 });
     await page.getByRole('button', { name: 'Crea' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi\/\d+$/);
+    await expect(page).toHaveURL(/\/bo\/episodi\/\d+$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(`Ep. E2E-N · ${titolo}`);
     const id = Number(page.url().split('/').pop());
     const { body } = await leggi(id);
@@ -569,16 +562,15 @@ test.describe('nuovo episodio a 1440', () => {
   test('F-EP-10: se in creazione l\'upload fallisce, l\'episodio appena creato si cancella', async ({ page }) => {
     const titolo = `[E2E] new-bo upload ${uniq()}`;
     await entra(page);
-    await page.goto('/new-bo/episodi/nuovo');
+    await page.goto('/bo/episodi/nuovo');
     await page.getByLabel('Titolo').fill(titolo);
     await page.getByLabel('Data uscita').fill('2001-05-06');
     // nome .png ma contenuto JPEG: passa il controllo del browser, il server lo rifiuta
     await page.getByTestId('file-cover').setInputFiles({ name: 'finto.png', mimeType: 'image/png', buffer: JPEG });
     await page.getByRole('button', { name: 'Crea' }).click();
     await expect(toast(page)).toContainText("Il file deve essere un'immagine PNG");
-    await expect(page).toHaveURL(/\/new-bo\/episodi\/nuovo$/);
-    const res = await api.get(`/api/bo/episodi?filter=${encodeURIComponent(JSON.stringify({ q: titolo }))}`);
-    expect(await res.json()).toEqual([]);
+    await expect(page).toHaveURL(/\/bo\/episodi\/nuovo$/);
+    expect(await elencoEpisodi(api, titolo)).toEqual([]);
   });
 });
 
@@ -590,7 +582,7 @@ test.describe('associazioni', () => {
   async function salvaDueAssociazioni(page) {
     const e = await nuovoEpisodio({ episodio_numero: 'AS' });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
     await scegliGioco(page, 1, giochi[1]);
     await page.getByRole('textbox', { name: 'Istante, riga 1' }).fill('0:20:00');
@@ -599,7 +591,7 @@ test.describe('associazioni', () => {
     await page.getByRole('textbox', { name: 'Istante, riga 2' }).fill('0:10:00');
     await scegli(page, 'Tipologia, riga 2', 'Recensione');
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     return e;
   }
 
@@ -661,7 +653,7 @@ test.describe('salva e continua a 1440', () => {
     await conCover(e.id);
     const coverPrima = (await leggi(e.id)).body.cover;
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     const form = page.locator('form');
     await expect(form).toHaveAttribute('data-modificato', 'false');
     await page.getByLabel('Titolo').fill(`${e.titolo} ter`);
@@ -678,7 +670,7 @@ test.describe('salva e continua a 1440', () => {
     await expect(toast(page)).toContainText('Checkpoint');
     await expect(toast(page)).toContainText('Modifiche salvate');
     await expect(toast(page)).toHaveAttribute('role', 'status');
-    await expect(page).toHaveURL(new RegExp(`/new-bo/episodi/${e.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/episodi/${e.id}$`));
     await expect(form).toHaveAttribute('data-modificato', 'false');
     // sul server
     const { body } = await leggi(e.id);
@@ -712,7 +704,7 @@ test.describe('salva e continua a 1440', () => {
       if (r.method() === 'POST' && /\/api\/bo\/episodi\/\d+\/cover$/.test(r.url())) upload++;
     });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
     await scegliGioco(page, 1, giochi[2]);
     await page.getByTestId('file-cover').setInputFiles({ name: 'due-volte.png', mimeType: 'image/png', buffer: PNG_1x1 });
@@ -743,7 +735,7 @@ test.describe('salva e continua a 1440', () => {
   test('le modifiche fatte durante l\'invio restano nel form', async ({ page }) => {
     const e = await nuovoEpisodio();
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     // trattiene la risposta di aggiornaEpisodio finché il test non scrive nel campo
     let rilascia;
     const trattenuta = new Promise((ok) => (rilascia = ok));
@@ -771,7 +763,7 @@ test.describe('salva e continua a 1440', () => {
   test('un errore del server si comporta come SALVA: Toast d\'errore e form invariato', async ({ page }) => {
     const e = await nuovoEpisodio();
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByLabel('Titolo').fill('');
     await salvaEContinua(page).click();
     await expect(toast(page)).toHaveAttribute('data-variant', 'destructive');
@@ -785,7 +777,7 @@ test.describe('salva e continua a 1440', () => {
 
   test('«Nuovo episodio» non ha SALVA E CONTINUA', async ({ page }) => {
     await entra(page);
-    await page.goto('/new-bo/episodi/nuovo');
+    await page.goto('/bo/episodi/nuovo');
     await expect(page.getByRole('button', { name: 'Crea' })).toBeVisible();
     await expect(salvaEContinua(page)).toHaveCount(0);
   });
@@ -798,7 +790,7 @@ for (const formato of [390, 1180, 1440]) {
     test('ELIMINA, ANNULLA, SALVA E CONTINUA e SALVA al loro posto', async ({ page }) => {
       const e = await nuovoEpisodio({ associazioni: [{ videogame_id: giochi[0].id, istante: '0:01:00' }] });
       await entra(page);
-      await page.goto(`/new-bo/episodi/${e.id}`);
+      await page.goto(`/bo/episodi/${e.id}`);
       const b = barra(page);
       const annulla = b.getByRole('link', { name: 'Annulla' });
       const continua = b.getByRole('button', { name: 'Salva e continua' });

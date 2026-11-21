@@ -51,23 +51,12 @@ let get_joycord_json_tree _req =
   | None -> Dream.json "[]"
   | Some json -> Dream.json json
 
-(* Admin react-admin (Fase 3): SPA con HashRouter, una sola pagina. *)
+(* /bo: backoffice (new-bo), SPA con router a path: ogni rotta sotto /bo serve index.html. *)
 let bo_index _req =
   match Static_filesystem.read "/bo/index.html" with
   | None -> Dream.empty `Not_Found
   | Some page ->
-    (* come l'admin Django: niente framing (clickjacking) *)
-    Dream.html
-      ~headers:
-        [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
-      page
-
-(* /new-bo (Fase 3.6b): SPA con router a path, ogni rotta sotto /new-bo serve index.html. *)
-let new_bo_index _req =
-  match Static_filesystem.read "/new-bo/index.html" with
-  | None -> Dream.empty `Not_Found
-  | Some page ->
-    (* come /bo: niente framing (clickjacking) *)
+    (* niente framing (clickjacking) *)
     Dream.html
       ~headers:
         [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
@@ -139,11 +128,9 @@ let server =
          Gql.Routes.routes;
          Gql.Routes.graphiql;
          get "/bo/files/**" (fun _ -> Dream.empty `Not_Found) (* servito da nginx *);
+         get "/bo/assets/**" @@ static ~loader "/bo/assets";
          get "/bo" bo_index;
          get "/bo/**" bo_index;
-         get "/new-bo/assets/**" @@ static ~loader "/new-bo/assets";
-         get "/new-bo" new_bo_index;
-         get "/new-bo/**" new_bo_index;
          get "/" default_handler;
        ]
 

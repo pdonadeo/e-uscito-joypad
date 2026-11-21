@@ -40,3 +40,5 @@ compose_env_prod
 /node_modules/
 /screenshots/
 /test-results/
+/REAL_PROD/
+/dump-prod/

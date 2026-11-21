@@ -1,7 +1,6 @@
-(* Operazioni dei resolver. Validazione, richieste Caqti e messaggi sono quelli
-   di src/admin; qui si riscrivono solo le SELECT degli elenchi (in /api/bo
-   dipendono dalla query string di react-admin) e la sequenza dei passi degli
-   handler di scrittura, che leggono id e body dalla richiesta HTTP.
+(* Operazioni dei resolver. Validazione, richieste Caqti e messaggi vengono da
+   src/admin; qui ci sono le SELECT degli elenchi e la sequenza dei passi delle
+   scritture.
    Gli errori si sollevano con [Admin.Resp.Http_error], come in /api/bo. *)
 
 open Admin
@@ -83,8 +82,10 @@ let logout req =
 
 (* --- Elenchi ----------------------------------------------------------- *)
 
-(* Come Ra_codec.run_list, con offset e limit al posto di range. [select_sql]
-   usa $1::jsonb per i filtri; il risultato è (totale, righe). *)
+(* Elenco paginato con offset e limit. [select_sql] usa $1::jsonb per i filtri
+   ed espone almeno la colonna [id], che chiude l'ordinamento per renderlo
+   stabile; le colonne [hidden] servono solo a ordinare e si tolgono dal JSON.
+   Il risultato è (totale, righe). *)
 let run_list ?(hidden = []) ~select_sql ~order:(columns, dir) ~filter ~offset ~limit req =
   let offset = Option.value offset ~default:0 in
   if offset < 0 then bad_request "Parametro «offset»: deve essere ≥ 0";

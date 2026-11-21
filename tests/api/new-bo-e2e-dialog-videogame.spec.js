@@ -7,7 +7,8 @@
 const { randomInt } = require('node:crypto');
 const { test, expect } = require('@playwright/test');
 const { USERS } = require('./env');
-const { listQuery, loggedIn, uniq } = require('./helpers');
+const { loggedIn, uniq } = require('./helpers');
+const { creaVideogame, aggiornaVideogame, elencoVideogame, creaEpisodio, leggiEpisodio: leggiEpisodioGql } = require('./gql-helpers');
 
 test.use({ extraHTTPHeaders: {} });
 
@@ -22,9 +23,7 @@ let gioco; // un videogame già esistente, per le righe che ne hanno già uno
 
 test.beforeAll(async ({ playwright }) => {
   api = await loggedIn(playwright, USERS.staff);
-  const res = await api.post('/api/bo/videogame', { data: { rawg_slug: `e2e-dlg-esistente-${uniq()}` } });
-  expect(res.status(), await res.text()).toBe(201);
-  gioco = await res.json();
+  gioco = await creaVideogame(api, { rawg_slug: `e2e-dlg-esistente-${uniq()}` });
 });
 
 test.afterAll(async () => {
@@ -36,26 +35,21 @@ test.afterAll(async () => {
 const token = () => `${Date.now().toString(36)}${randomInt(1e6).toString(36)}`;
 
 async function entra(page) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(USERS.staff.username);
   await page.getByLabel("Parola d'ordine").fill(USERS.staff.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 }
 
-async function nuovoEpisodio(extra = {}) {
-  const res = await api.post('/api/bo/episodi', {
-    data: { titolo: `[E2E] dlg ${uniq()}`, data_uscita: '2001-01-01', durata: '1:00:00', ...extra },
-  });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
+const nuovoEpisodio = (extra = {}) =>
+  creaEpisodio(api, { titolo: `[E2E] dlg ${uniq()}`, data_uscita: '2001-01-01', durata: '1:00:00', ...extra });
 
-const leggiEpisodio = async (id) => (await api.get(`/api/bo/episodi/${id}`)).json();
+const leggiEpisodio = (id) => leggiEpisodioGql(api, id);
 
 // Videogame con questo slug, se c'è.
 async function videogameConSlug(slug) {
-  const righe = await (await api.get(`/api/bo/videogame${listQuery({ filter: { q: slug } })}`)).json();
+  const righe = await elencoVideogame(api, slug);
   return righe.find((v) => v.rawg_slug === slug) ?? null;
 }
 
@@ -101,7 +95,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     // modifiche fatte prima di aprire il Dialog
     await page.getByLabel('Titolo').fill(`${e.titolo} modificato`);
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
@@ -132,7 +126,7 @@ test.describe('dialog a 1440', () => {
     expect(creato).toMatchObject({ titolo: `E2E Game ${slug}` });
     // SALVA: ora l'associazione c'è
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     const salvato = await leggiEpisodio(e.id);
     expect(salvato.titolo).toBe(`${e.titolo} modificato`);
     expect(salvato.associazioni.map((a) => a.videogame_id)).toEqual(expect.arrayContaining([gioco.id, creato.id]));
@@ -142,7 +136,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const titolo = `[E2E] dlg nuovo ${t}`;
     await entra(page);
-    await page.goto('/new-bo/episodi/nuovo');
+    await page.goto('/bo/episodi/nuovo');
     await page.getByLabel('Titolo').fill(titolo);
     await page.getByLabel('Data uscita').fill('2001-02-03');
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
@@ -156,7 +150,7 @@ test.describe('dialog a 1440', () => {
     await expect(page.getByLabel('Titolo')).toHaveValue(titolo);
     await expect(page).toHaveURL(/\/episodi\/nuovo$/);
     await page.getByRole('button', { name: 'Crea', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi\/\d+$/);
+    await expect(page).toHaveURL(/\/bo\/episodi\/\d+$/);
     const id = Number(page.url().split('/').pop());
     const creato = await videogameConSlug(slug);
     expect((await leggiEpisodio(id)).associazioni).toMatchObject([{ videogame_id: creato.id }]);
@@ -166,7 +160,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const e = await nuovoEpisodio();
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
     const slug = `e2e-missing-dlg-${t}`;
     await cercaInesistente(page, 1, `E2E missing dlg ${t}`);
@@ -204,7 +198,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await expect(formModificato(page)).toHaveAttribute('data-modificato', 'false');
     await cercaInesistente(page, 1, `E2E dlg solo ${t}`);
     await creaQui(page).click();
@@ -218,7 +212,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const e = await nuovoEpisodio();
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     let rilascia;
     const trattenuta = new Promise((ok) => (rilascia = ok));
     await page.route('**/api/graphql', async (route) => {
@@ -245,7 +239,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const e = await nuovoEpisodio();
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
     await cercaInesistente(page, 1, `E2E dlg tastiera ${t}`);
     await page.keyboard.press('Tab');
@@ -271,7 +265,7 @@ test.describe('dialog a 1440', () => {
     const t = token();
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     const prova = async (n, chiudi) => {
       const cercato = `E2E dlg chiudi ${n} ${t}`;
       await cercaInesistente(page, 1, cercato);
@@ -296,7 +290,7 @@ test.describe('dialog a 1440', () => {
   test('il Dialog occupa la viewport meno 32 px per lato e il contenuto scorre dentro', async ({ page }) => {
     const e = await nuovoEpisodio();
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
     await cercaInesistente(page, 1, `E2E dlg misure ${token()}`);
     await creaQui(page).click();
@@ -317,7 +311,7 @@ for (const formato of [390, 1180, 1440]) {
       const t = token();
       const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
       await entra(page);
-      await page.goto(`/new-bo/episodi/${e.id}`);
+      await page.goto(`/bo/episodi/${e.id}`);
       await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
       const slug = `e2e-dlg-${formato}-${t}`;
       await cercaInesistente(page, 2, `E2E dlg ${formato} ${t}`);
@@ -372,7 +366,7 @@ for (const formato of [390, 1180]) {
       const t = token();
       const titolo = `[E2E] dlg nuovo ${formato} ${t}`;
       await entra(page);
-      await page.goto('/new-bo/episodi/nuovo');
+      await page.goto('/bo/episodi/nuovo');
       await page.getByLabel('Titolo').fill(titolo);
       await page.getByLabel('Data uscita').fill('2001-02-03');
       await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
@@ -385,7 +379,7 @@ for (const formato of [390, 1180]) {
       await expect(campo(page, 1)).toHaveValue(`E2E Game ${slug}`);
       await expect(page.getByLabel('Titolo')).toHaveValue(titolo);
       await page.getByRole('button', { name: 'Crea', exact: true }).click();
-      await expect(page).toHaveURL(/\/new-bo\/episodi\/\d+$/);
+      await expect(page).toHaveURL(/\/bo\/episodi\/\d+$/);
       const id = Number(page.url().split('/').pop());
       const creato = await videogameConSlug(slug);
       expect((await leggiEpisodio(id)).associazioni).toMatchObject([{ videogame_id: creato.id }]);
@@ -398,12 +392,8 @@ for (const formato of [390, 1180]) {
 // Videogame con il titolo e la descrizione voluti: creato dal finto RAWG, poi aggiornato (con
 // rawg_json presente l'aggiornamento non richiama RAWG e tiene i campi del body).
 async function videogameConTitolo(slug, titolo, descrizione_raw) {
-  const res = await api.post('/api/bo/videogame', { data: { rawg_slug: slug } });
-  expect(res.status(), await res.text()).toBe(201);
-  const { id } = await res.json();
-  const put = await api.put(`/api/bo/videogame/${id}`, { data: { rawg_slug: slug, titolo, descrizione_raw } });
-  expect(put.status(), await put.text()).toBe(200);
-  return put.json();
+  const { id } = await creaVideogame(api, { rawg_slug: slug });
+  return aggiornaVideogame(api, id, { rawg_slug: slug, titolo, descrizione_raw });
 }
 
 test.describe('ricerca del Combobox a 1440', () => {
@@ -419,7 +409,7 @@ test.describe('ricerca del Combobox a 1440', () => {
     expect(await res.json()).toEqual({ data: { cercaVideogame: [] } });
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await cercaInesistente(page, 1, testo);
     await expect(page.getByText('Nessun videogame trovato.')).toBeVisible();
     await expect(page.getByRole('option')).toHaveCount(0);
@@ -432,7 +422,7 @@ test.describe('ricerca del Combobox a 1440', () => {
     const cercato = await videogameConTitolo(`e2e-dlg-refuso-${t}`, `Quondramix Selvatica ${t}`, 'Descrizione');
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await campo(page, 1).click();
     // «Quondramx» al posto di «Quondramix»: 6 caratteri o più, ricerca per somiglianza
     await campo(page, 1).fill(`Quondramx Selvatica ${t}`);
@@ -442,7 +432,7 @@ test.describe('ricerca del Combobox a 1440', () => {
     await campo(page, 1).press('Enter');
     await expect(campo(page, 1)).toHaveValue(cercato.titolo);
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
     expect((await leggiEpisodio(e.id)).associazioni.map((a) => a.videogame_id)).toEqual([cercato.id]);
   });
 
@@ -452,11 +442,11 @@ test.describe('ricerca del Combobox a 1440', () => {
     // il titolo non contiene il token: con la somiglianza lo troverebbe per quello
     const nascosto = await videogameConTitolo(`e2e-dlg-descr-${t}`, 'Gioco con la descrizione nascosta', `Parla di ${parola}`);
     // elencoVideogame (F-VG-03) lo trova dalla descrizione
-    const elenco = await (await api.get(`/api/bo/videogame${listQuery({ filter: { q: parola } })}`)).json();
+    const elenco = await elencoVideogame(api, parola);
     expect(elenco.map((v) => v.id)).toContain(nascosto.id);
     const e = await nuovoEpisodio({ associazioni: [{ videogame_id: gioco.id, istante: '0:01:00' }] });
     await entra(page);
-    await page.goto(`/new-bo/episodi/${e.id}`);
+    await page.goto(`/bo/episodi/${e.id}`);
     await cercaInesistente(page, 1, parola);
     await expect(page.getByRole('option', { name: new RegExp(nascosto.titolo) })).toHaveCount(0);
     // e neppure con meno di 6 caratteri presi dalla descrizione: «Parla»

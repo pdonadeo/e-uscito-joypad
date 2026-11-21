@@ -21,24 +21,6 @@ let fetch_one req id =
   | Some j -> Lwt.return j
   | None -> not_found ()
 
-let list req =
-  Ra_codec.run_list req ~resource:"videogame"
-    ~select_sql:
-      (Printf.sprintf
-         {|SELECT %s FROM backoffice_videogame v
-           WHERE ($1::jsonb->>'q' IS NULL
-                  OR v.titolo ILIKE $1::jsonb->>'q'
-                  OR v.descrizione_raw ILIKE $1::jsonb->>'q'
-                  OR v.rawg_slug ILIKE $1::jsonb->>'q')
-             AND ($1::jsonb->'id' IS NULL
-                  OR v.id IN (SELECT jsonb_array_elements_text($1::jsonb->'id')::bigint))|}
-         list_columns)
-    ~whitelist:[("id", ["id"]); ("titolo", ["titolo"]); ("rawg_slug", ["rawg_slug"]); ("ts", ["ts"])]
-    ~default:("titolo", Ra_codec.Asc)
-    ~filter:(fun f -> [("q", Ra_codec.q_filter f); ("id", Ra_codec.id_list_filter f "id")])
-
-let get req = Lwt.bind (fetch_one req (int64_param req "id")) json
-
 type payload = {
   rawg_slug : string;
   titolo : string option;
@@ -99,15 +81,6 @@ let insert_req =
       FROM (SELECT $1::jsonb AS j) s
       RETURNING id|}
 
-let create req =
-  let%lwt body = json_body req in
-  let p = parse_payload body in
-  let%lwt game = Rawg.fetch p.rawg_slug in
-  let%lwt r = Dream.sql req (fun (module DB : Caqti_lwt.CONNECTION) -> DB.find insert_req (to_db_json p (Some game))) in
-  let%lwt id = or_fail ~unique_msg r in
-  let%lwt j = fetch_one req id in
-  json ~status:`Created j
-
 let has_rawg_json_req =
   Caqti_request.Infix.(Caqti_type.int64 ->? Caqti_type.bool)
     "SELECT rawg_json IS NOT NULL AND rawg_json <> 'null'::jsonb FROM backoffice_videogame WHERE id = $1"
@@ -128,40 +101,9 @@ let update_req =
       WHERE v.id = $1
       RETURNING v.id|}
 
-let update req =
-  let id = int64_param req "id" in
-  let%lwt body = json_body req in
-  let p = parse_payload body in
-  let%lwt r = Dream.sql req (fun (module DB : Caqti_lwt.CONNECTION) -> DB.find_opt has_rawg_json_req id) in
-  let%lwt has_json = or_fail r in
-  let%lwt game =
-    match has_json with
-    | None -> not_found ()
-    | Some true -> Lwt.return_none
-    | Some false -> Lwt.map Option.some (Rawg.fetch p.rawg_slug)
-  in
-  let%lwt r = Dream.sql req (fun (module DB : Caqti_lwt.CONNECTION) -> DB.find_opt update_req (id, to_db_json p game)) in
-  match%lwt or_fail ~unique_msg r with
-  | None -> not_found ()
-  | Some _ -> Lwt.bind (fetch_one req id) json
-
 let delete_assoc_req =
   Caqti_request.Infix.(Caqti_type.int64 ->. Caqti_type.unit)
     "DELETE FROM backoffice_associazioneepisodiovideogame WHERE videogame_id = $1"
 
 let delete_req =
   Caqti_request.Infix.(Caqti_type.int64 ->. Caqti_type.unit) "DELETE FROM backoffice_videogame WHERE id = $1"
-
-(* Come on_delete=CASCADE di Django: via anche le associazioni. *)
-let delete req =
-  let id = int64_param req "id" in
-  let%lwt j = fetch_one req id in
-  let%lwt r =
-    Dream.sql req (fun (module DB : Caqti_lwt.CONNECTION) ->
-        DB.with_transaction (fun () ->
-            let open Lwt_result.Syntax in
-            let* () = DB.exec delete_assoc_req id in
-            DB.exec delete_req id))
-  in
-  let%lwt () = or_fail r in
-  json j

@@ -1,12 +1,13 @@
-// Test e2e degli utenti di /new-bo (Fase 3.6c.3b): F-UT-01 … F-UT-06, le regole su sé stessi
+// Test e2e degli utenti di /bo (Fase 3.6c.3b): F-UT-01 … F-UT-06, le regole su sé stessi
 // (niente casella sulla propria riga, ELIMINA disattivato nel proprio account), SALVA E CONTINUA
 // e la rivalidazione della sessione (F-AU-05). Girano con playwright.api.config.js, come le altre
-// spec new-bo-e2e*. Gli utenti si creano via REST dal superuser di test con lo username
+// spec new-bo-e2e*. Gli utenti si creano via GraphQL dal superuser di test con lo username
 // «e2e_…» (il teardown li cancella) e un token unico per test.
 const { randomInt } = require('node:crypto');
 const { test, expect } = require('@playwright/test');
 const { USERS } = require('./env');
-const { loggedIn, newContext } = require('./helpers');
+const { loggedIn } = require('./helpers');
+const { creaUtente, aggiornaUtente, leggiUtente, puoEntrare, me } = require('./gql-helpers');
 
 // Il browser manda la sua Origin vera (V-01).
 test.use({ extraHTTPHeaders: {} });
@@ -17,12 +18,12 @@ const VIEWPORT = {
   1440: { width: 1440, height: 900 },
 };
 
-let su; // sessione REST del superuser di test
+let su; // sessione del superuser di test (GraphQL)
 let io; // il superuser di test, cioè «me» nel browser
 
 test.beforeAll(async ({ playwright }) => {
   su = await loggedIn(playwright, USERS.superuser);
-  io = await (await su.get('/api/bo/me')).json();
+  io = await me(su);
 });
 
 test.afterAll(async () => {
@@ -35,36 +36,24 @@ const token = () => `nbu${Date.now().toString(36)}${randomInt(1e6).toString(36)}
 const PASSWORD = 'e2e-password-utente';
 
 async function entra(page, user = USERS.superuser) {
-  await page.goto('/new-bo/login');
+  await page.goto('/bo/login');
   await page.getByLabel('Nome utente').fill(user.username);
   await page.getByLabel("Parola d'ordine").fill(user.password);
   await page.getByRole('button', { name: 'Entra' }).click();
-  await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+  await expect(page).toHaveURL(/\/bo\/episodi$/);
 }
 
-// Un utente creato via REST; di default staff e attivo, password PASSWORD.
-async function nuovoUtente(username, extra = {}) {
-  const res = await su.post('/api/bo/utenti', {
-    data: { username, password: PASSWORD, is_staff: true, is_active: true, is_superuser: false, ...extra },
-  });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
+// Un utente creato via GraphQL; di default staff e attivo, password PASSWORD.
+const nuovoUtente = (username, extra = {}) =>
+  creaUtente(su, { username, password: PASSWORD, is_staff: true, is_active: true, is_superuser: false, ...extra });
 
+// { status: 200, body } se l'utente c'è, { status: 404, body: null } se non c'è.
 async function leggi(id) {
-  const res = await su.get(`/api/bo/utenti/${id}`);
-  return { status: res.status(), body: res.status() === 200 ? await res.json() : null };
+  const u = await leggiUtente(su, id);
+  return u ? { status: 200, body: u } : { status: 404, body: null };
 }
 
-// Riesce il login REST con questa password?
-async function puoEntrare(playwright, username, password) {
-  const ctx = await newContext(playwright);
-  const res = await ctx.post('/api/bo/login', { data: { username, password } });
-  await ctx.dispose();
-  return res.status() === 200;
-}
-
-const elenco = (page, t) => page.goto(`/new-bo/utenti?ricerca=${encodeURIComponent(t)}`);
+const elenco = (page, t) => page.goto(`/bo/utenti?ricerca=${encodeURIComponent(t)}`);
 const righe = (page) => page.locator('tbody tr[data-cliccabile]');
 const schede = (page) => page.locator('main section[data-slot=card]');
 // il Toast visibile: quello sostituito resta nel DOM durante l'uscita, con data-removed
@@ -125,7 +114,7 @@ test.describe('elenco a 1440', () => {
     ]);
     await expect(righe(page).nth(1).locator('td')).toHaveText(['', b.username, '—', '—', '—', '·non staff', 'Attivo', 'Superuser', 'mai']);
     await righe(page).nth(1).click();
-    await expect(page).toHaveURL(new RegExp(`/new-bo/utenti/${b.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/utenti/${b.id}$`));
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(b.username);
   });
 
@@ -160,7 +149,7 @@ test.describe('elenco a 1440', () => {
     const a = await nuovoUtente(`e2e_${t}_a`, { email: `posta-${t}@example.org` });
     const b = await nuovoUtente(`e2e_${t}_b`, { first_name: `Nome${t}`, last_name: `Cognome${t}` });
     await entra(page);
-    await page.goto('/new-bo/utenti');
+    await page.goto('/bo/utenti');
     const cerca = page.getByRole('searchbox', { name: 'Cerca per username, email, nome o cognome' });
     await cerca.fill(`POSTA-${t}`.toUpperCase());
     await expect(righe(page)).toHaveCount(1);
@@ -308,35 +297,33 @@ test.describe('permessi e sessione', () => {
   test('F-AU-04: uno staff non vede UTENTI e l\'indirizzo lo riporta agli episodi', async ({ page }) => {
     await entra(page, USERS.staff);
     await expect(page.getByRole('link', { name: 'Utenti' })).toHaveCount(0);
-    await page.goto('/new-bo/utenti');
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
-    await page.goto(`/new-bo/utenti/${io.id}`);
-    await expect(page).toHaveURL(/\/new-bo\/episodi$/);
+    await page.goto('/bo/utenti');
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
+    await page.goto(`/bo/utenti/${io.id}`);
+    await expect(page).toHaveURL(/\/bo\/episodi$/);
   });
 
   test('F-AU-05: se l\'utente viene disattivato da un\'altra sessione, la richiesta dopo porta al login', async ({ page }) => {
     const u = await nuovoUtente(`e2e_${token()}_dis`);
     await entra(page, { username: u.username, password: PASSWORD });
-    const put = await su.put(`/api/bo/utenti/${u.id}`, { data: { ...u, is_active: false } });
-    expect(put.status(), await put.text()).toBe(200);
+    await aggiornaUtente(su, u.id, { ...u, is_active: false });
     await page.getByRole('link', { name: 'Videogame' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await expect(page).toHaveURL(/\/bo\/login$/);
   });
 
   test('F-AU-05: se un\'altra sessione gli cambia la password, la richiesta dopo porta al login', async ({ page }) => {
     const u = await nuovoUtente(`e2e_${token()}_pwd`);
     await entra(page, { username: u.username, password: PASSWORD });
-    const put = await su.put(`/api/bo/utenti/${u.id}`, { data: { ...u, password: 'e2e-password-cambiata' } });
-    expect(put.status(), await put.text()).toBe(200);
+    await aggiornaUtente(su, u.id, { ...u, password: 'e2e-password-cambiata' });
     await page.getByRole('link', { name: 'Videogame' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/login$/);
+    await expect(page).toHaveURL(/\/bo\/login$/);
   });
 
   test('F-UT-05: dopo SALVA E CONTINUA sul proprio account la barra app mostra il nome nuovo', async ({ page }) => {
     const u = await nuovoUtente(`e2e_${token()}_nome`, { is_superuser: true });
     await entra(page, { username: u.username, password: PASSWORD });
     await expect(page.locator('header.bg-inchiostro:visible')).toContainText(u.username);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await page.getByLabel('Nome', { exact: true }).fill('Ada');
     await page.getByLabel('Cognome').fill('Lovelace');
     const risposta = aggiornato(page);
@@ -344,13 +331,13 @@ test.describe('permessi e sessione', () => {
     await risposta;
     await expect(toast(page)).toContainText('Modifiche salvate');
     await expect(page.locator('header.bg-inchiostro:visible')).toContainText('Ada Lovelace');
-    await expect(page).toHaveURL(new RegExp(`/new-bo/utenti/${u.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/utenti/${u.id}$`));
   });
 
   test('F-AU-05, F-UT-05: chi cambia la propria password resta dentro', async ({ page, playwright }) => {
     const u = await nuovoUtente(`e2e_${token()}_mio`, { is_superuser: true });
     await entra(page, { username: u.username, password: PASSWORD });
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await page.getByLabel('Nuova password').fill('e2e-password-nuova-mia');
     const risposta = aggiornato(page);
     await salvaEContinua(page).click();
@@ -358,7 +345,7 @@ test.describe('permessi e sessione', () => {
     await expect(toast(page)).toContainText('Modifiche salvate');
     await expect(page.getByLabel('Nuova password')).toHaveValue('');
     await page.getByRole('link', { name: 'Videogame' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/videogame$/);
+    await expect(page).toHaveURL(/\/bo\/videogame$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Videogame');
     expect(await puoEntrare(playwright, u.username, 'e2e-password-nuova-mia')).toBe(true);
     expect(await puoEntrare(playwright, u.username, PASSWORD)).toBe(false);
@@ -373,9 +360,9 @@ test.describe('nuovo utente a 1440', () => {
   test('F-UT-04: password obbligatoria, permessi iniziali; CREA apre la modifica', async ({ page, playwright }) => {
     const username = `e2e_${token()}_nuovo`;
     await entra(page);
-    await page.goto('/new-bo/utenti');
+    await page.goto('/bo/utenti');
     await page.getByRole('link', { name: '+ Nuovo utente' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti\/nuovo$/);
+    await expect(page).toHaveURL(/\/bo\/utenti\/nuovo$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Nuovo utente');
     await expect(page.getByText('Password *', { exact: true })).toBeVisible();
     await expect(page.getByPlaceholder('Lascia vuoto per non cambiarla')).toHaveCount(0);
@@ -395,7 +382,7 @@ test.describe('nuovo utente a 1440', () => {
     await page.getByLabel('Cognome').fill('Verdi');
     await page.getByLabel('Email').fill('luca.verdi@example.org');
     await page.getByRole('button', { name: 'Crea' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti\/\d+$/);
+    await expect(page).toHaveURL(/\/bo\/utenti\/\d+$/);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(username);
     const id = Number(page.url().split('/').pop());
     expect((await leggi(id)).body).toMatchObject({
@@ -414,7 +401,7 @@ test.describe('nuovo utente a 1440', () => {
   test('F-UT-04: uno username già usato va nel Toast', async ({ page }) => {
     const esistente = await nuovoUtente(`e2e_${token()}_dup`);
     await entra(page);
-    await page.goto('/new-bo/utenti/nuovo');
+    await page.goto('/bo/utenti/nuovo');
     await page.getByLabel('Username').fill(esistente.username);
     await page.getByLabel('Password').fill(PASSWORD);
     await page.getByRole('button', { name: 'Crea' }).click();
@@ -436,7 +423,7 @@ test.describe('modifica a 1440', () => {
       is_superuser: true,
     });
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(u.username);
     await expect(page.getByLabel('Username')).toHaveValue(u.username);
     await expect(page.getByLabel('Nuova password')).toHaveValue('');
@@ -454,27 +441,27 @@ test.describe('modifica a 1440', () => {
   test('F-UT-05: salva i campi; senza password la password resta, con una nuova cambia', async ({ page, playwright }) => {
     const u = await nuovoUtente(`e2e_${token()}_mod`);
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await page.getByLabel('Nome', { exact: true }).fill('Nuovo nome');
     await page.getByRole('switch', { name: /Superuser/ }).click();
     await page.getByRole('switch', { name: /Attivo/ }).click();
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti$/);
+    await expect(page).toHaveURL(/\/bo\/utenti$/);
     expect((await leggi(u.id)).body).toMatchObject({ first_name: 'Nuovo nome', is_superuser: true, is_active: false, is_staff: true });
     // la password non è cambiata: riattivo e provo
-    await su.put(`/api/bo/utenti/${u.id}`, { data: { ...(await leggi(u.id)).body, is_active: true } });
+    await aggiornaUtente(su, u.id, { ...(await leggi(u.id)).body, is_active: true });
     expect(await puoEntrare(playwright, u.username, PASSWORD)).toBe(true);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await page.getByLabel('Nuova password').fill('e2e-password-seconda');
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti$/);
+    await expect(page).toHaveURL(/\/bo\/utenti$/);
     expect(await puoEntrare(playwright, u.username, 'e2e-password-seconda')).toBe(true);
     expect(await puoEntrare(playwright, u.username, PASSWORD)).toBe(false);
   });
 
   test('F-UT-05: un superuser non può togliersi i privilegi: Toast e si resta sulla pagina', async ({ page }) => {
     await entra(page);
-    await page.goto(`/new-bo/utenti/${io.id}`);
+    await page.goto(`/bo/utenti/${io.id}`);
     await page.getByRole('switch', { name: /Superuser/ }).click();
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
     await expect(toast(page)).toContainText('Non puoi togliere a te stesso i privilegi di staff, attivo o superuser');
@@ -485,7 +472,7 @@ test.describe('modifica a 1440', () => {
   test('F-UT-06: elimina dalla modifica, con ANNULLA che non cancella', async ({ page }) => {
     const u = await nuovoUtente(`e2e_${token()}_del`);
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await barra(page).getByRole('button', { name: 'Elimina utente' }).click();
     await expect(dialogo(page)).toContainText("Eliminare l'utente?");
     await expect(dialogo(page)).toContainText(
@@ -496,13 +483,13 @@ test.describe('modifica a 1440', () => {
     expect((await leggi(u.id)).status).toBe(200);
     await barra(page).getByRole('button', { name: 'Elimina utente' }).click();
     await dialogo(page).getByRole('button', { name: 'Elimina' }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti$/);
+    await expect(page).toHaveURL(/\/bo\/utenti$/);
     expect((await leggi(u.id)).status).toBe(404);
   });
 
   test('F-UT-06: nel proprio account ELIMINA è disattivato con «Non puoi cancellare te stesso»', async ({ page }) => {
     await entra(page);
-    await page.goto(`/new-bo/utenti/${io.id}`);
+    await page.goto(`/bo/utenti/${io.id}`);
     const elimina = barra(page).getByRole('button', { name: 'Elimina utente' });
     await expect(elimina).toBeDisabled();
     await expect(elimina).toHaveAccessibleDescription('Non puoi cancellare te stesso');
@@ -514,7 +501,7 @@ test.describe('modifica a 1440', () => {
   test('SALVA E CONTINUA: resta sulla modifica, Toast, form reimpostato e password di nuovo vuota', async ({ page, playwright }) => {
     const u = await nuovoUtente(`e2e_${token()}_sec`);
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     const form = page.locator('form');
     await page.getByLabel('Cognome').fill('Rossi');
     await page.getByLabel('Nuova password').fill('e2e-password-sec');
@@ -525,7 +512,7 @@ test.describe('modifica a 1440', () => {
     await expect(toast(page)).toHaveAttribute('data-variant', 'success');
     await expect(toast(page)).toContainText('Checkpoint');
     await expect(toast(page)).toContainText('Modifiche salvate');
-    await expect(page).toHaveURL(new RegExp(`/new-bo/utenti/${u.id}$`));
+    await expect(page).toHaveURL(new RegExp(`/bo/utenti/${u.id}$`));
     await expect(form).toHaveAttribute('data-modificato', 'false');
     await expect(page.getByLabel('Nuova password')).toHaveValue('');
     await expect(page.getByLabel('Cognome')).toHaveValue('Rossi');
@@ -544,7 +531,7 @@ test.describe('modifica a 1440', () => {
     const altro = await nuovoUtente(`e2e_${token()}_occ`);
     const u = await nuovoUtente(`e2e_${token()}_dur`);
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     let rilascia;
     const trattenuta = new Promise((ok) => (rilascia = ok));
     await page.route('**/api/graphql', async (route) => {
@@ -584,12 +571,12 @@ test.describe('modifica a 1180', () => {
   test('F-UT-03, F-UT-05: due colonne e salvataggio', async ({ page }) => {
     const u = await nuovoUtente(`e2e_${token()}_1180`);
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     await expect(page.getByTestId('registro')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1180);
     await page.getByLabel('Email').fill('mille@example.org');
     await page.getByRole('button', { name: 'Salva', exact: true }).click();
-    await expect(page).toHaveURL(/\/new-bo\/utenti$/);
+    await expect(page).toHaveURL(/\/bo\/utenti$/);
     expect((await leggi(u.id)).body.email).toBe('mille@example.org');
   });
 });
@@ -600,14 +587,14 @@ test.describe('modifica a 390', () => {
   test('F-UT-03, F-UT-06: ordine dei pannelli, ELIMINA in fondo; nel proprio account disattivato col suggerimento', async ({ page }) => {
     const u = await nuovoUtente(`e2e_${token()}_390`);
     await entra(page);
-    await page.goto(`/new-bo/utenti/${u.id}`);
+    await page.goto(`/bo/utenti/${u.id}`);
     const titoli = page.locator('main [data-slot=card-title]');
     await expect(titoli).toHaveText(['Account', 'Permessi', 'Regole del gioco', 'Registro']);
     await expect(page.getByRole('button', { name: 'Elimina utente' })).toBeEnabled();
     await expect(barra(page).getByRole('button', { name: 'Elimina utente' })).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await expect(page.getByRole('button', { name: 'Salva', exact: true })).toBeInViewport();
-    await page.goto(`/new-bo/utenti/${io.id}`);
+    await page.goto(`/bo/utenti/${io.id}`);
     await expect(page.getByRole('button', { name: 'Elimina utente' })).toBeDisabled();
     await expect(page.getByText('Non puoi cancellare te stesso')).toBeVisible();
   });
@@ -622,7 +609,7 @@ for (const formato of [390, 1180, 1440]) {
     test('barra delle azioni della modifica, nuovo utente e proprio account', async ({ page }) => {
       const u = await nuovoUtente(`e2e_${token()}_barra`, { first_name: 'Giulia', last_name: 'Bianchi', email: 'giulia@example.org' });
       await entra(page);
-      await page.goto(`/new-bo/utenti/${u.id}`);
+      await page.goto(`/bo/utenti/${u.id}`);
       const b = barra(page);
       const annulla = b.getByRole('link', { name: 'Annulla' });
       const continua = b.getByRole('button', { name: 'Salva e continua' });
@@ -643,10 +630,10 @@ for (const formato of [390, 1180, 1440]) {
         expect(rs.x + rs.width).toBeCloseTo(rb.x + rb.width - 16, 0);
       }
       await foto(page, `modifica-utente-${formato}`);
-      await page.goto(`/new-bo/utenti/${io.id}`);
+      await page.goto(`/bo/utenti/${io.id}`);
       await expect(page.getByText('Non puoi cancellare te stesso')).toBeVisible();
       await foto(page, `modifica-utente-proprio-${formato}`);
-      await page.goto('/new-bo/utenti/nuovo');
+      await page.goto('/bo/utenti/nuovo');
       await expect(barra(page).getByRole('button', { name: 'Crea' })).toBeVisible();
       await expect(salvaEContinua(page)).toHaveCount(0);
       await foto(page, `nuovo-utente-${formato}`);
@@ -673,7 +660,7 @@ for (const formato of [390, 1180, 1440]) {
       test('conferma di eliminazione dalla modifica', async ({ page }) => {
         const u = await nuovoUtente(`e2e_${token()}_conf`);
         await entra(page);
-        await page.goto(`/new-bo/utenti/${u.id}`);
+        await page.goto(`/bo/utenti/${u.id}`);
         await page.getByRole('button', { name: 'Elimina utente' }).click();
         await expect(dialogo(page)).toContainText(`«${u.username}»`);
         await foto(page, `modifica-utente-conferma-${formato}`);

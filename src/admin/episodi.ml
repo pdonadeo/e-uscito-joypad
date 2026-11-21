@@ -50,39 +50,6 @@ let fetch_one req id =
   | Some j -> Lwt.return j
   | None -> not_found ()
 
-let list req =
-  Ra_codec.run_list
-    req
-    ~resource:"episodi"
-    ~select_sql:
-      (Printf.sprintf
-         {|SELECT %s FROM backoffice_episodio e
-           WHERE ($1::jsonb->>'q' IS NULL
-                  OR e.titolo ILIKE $1::jsonb->>'q' OR e.episodio_numero ILIKE $1::jsonb->>'q')
-             AND ($1::jsonb->'id' IS NULL
-                  OR e.id IN (SELECT jsonb_array_elements_text($1::jsonb->'id')::bigint))
-             AND ($1::jsonb->'pubblicato' IS NULL OR e.pubblicato = ($1::jsonb->>'pubblicato')::boolean)|}
-         columns)
-    ~whitelist:
-      [
-        ("id", ["id"]);
-        ("titolo", ["titolo"]);
-        ("episodio_numero", ["episodio_numero"]);
-        ("data_uscita", ["data_uscita"]);
-        ("durata", ["durata"]);
-        ("pubblicato", ["pubblicato"]);
-        ("ts", ["ts"]);
-      ]
-    ~default:("data_uscita", Ra_codec.Desc)
-    ~filter:(fun f ->
-      [
-        ("q", Ra_codec.q_filter f);
-        ("id", Ra_codec.id_list_filter f "id");
-        ("pubblicato", Ra_codec.bool_filter f "pubblicato");
-      ])
-
-let get req = Lwt.bind (fetch_one req (int64_param req "id")) json
-
 (* --- Scrittura -------------------------------------------------------- *)
 
 (* Valida il payload e restituisce (episodio, associazioni) come JSON pronti
@@ -241,62 +208,12 @@ let replace_associazioni (module DB : Caqti_lwt.CONNECTION) id = function
     let* () = DB.exec assoc_update_req (id, assoc) in
     DB.exec assoc_insert_req (id, assoc)
 
-let create req =
-  let%lwt body = json_body req in
-  let episodio, assoc = parse_payload body in
-  let assoc = Some (Option.value assoc ~default:"[]") in
-  let%lwt () = check_videogames req assoc in
-  let%lwt r =
-    Dream.sql req (fun ((module DB : Caqti_lwt.CONNECTION) as db) ->
-        DB.with_transaction (fun () ->
-            let open Lwt_result.Syntax in
-            let* id = DB.find insert_req episodio in
-            let* () = replace_associazioni db id assoc in
-            Lwt.return_ok id))
-  in
-  let%lwt id = or_fail r in
-  let%lwt j = fetch_one req id in
-  json ~status:`Created j
-
-let update req =
-  let id = int64_param req "id" in
-  let%lwt body = json_body req in
-  let episodio, assoc = parse_payload body in
-  let%lwt () = check_videogames req assoc in
-  let%lwt r =
-    Dream.sql req (fun ((module DB : Caqti_lwt.CONNECTION) as db) ->
-        DB.with_transaction (fun () ->
-            let open Lwt_result.Syntax in
-            let* found = DB.find_opt update_req (id, episodio) in
-            match found with
-            | None -> Lwt.return_ok false
-            | Some _ ->
-              let* () = replace_associazioni db id assoc in
-              Lwt.return_ok true))
-  in
-  match%lwt or_fail r with
-  | false -> not_found ()
-  | true -> Lwt.bind (fetch_one req id) json
-
 let delete_assoc_req =
   Caqti_request.Infix.(Caqti_type.int64 ->. Caqti_type.unit)
     "DELETE FROM backoffice_associazioneepisodiovideogame WHERE episodio_id = $1"
 
 let delete_req =
   Caqti_request.Infix.(Caqti_type.int64 ->. Caqti_type.unit) "DELETE FROM backoffice_episodio WHERE id = $1"
-
-let delete req =
-  let id = int64_param req "id" in
-  let%lwt j = fetch_one req id in
-  let%lwt r =
-    Dream.sql req (fun (module DB : Caqti_lwt.CONNECTION) ->
-        DB.with_transaction (fun () ->
-            let open Lwt_result.Syntax in
-            let* () = DB.exec delete_assoc_req id in
-            DB.exec delete_req id))
-  in
-  let%lwt () = or_fail r in
-  json j
 
 (* --- Cover ------------------------------------------------------------ *)
 

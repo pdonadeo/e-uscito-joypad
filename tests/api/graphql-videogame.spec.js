@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const { USERS } = require('./env');
 const { loggedIn, rawgCalls, uniq } = require('./helpers');
-const { F, gql, expectOk, expectCode, parseRawg } = require('./gql-helpers');
+const { F, gql, expectOk, expectCode, parseRawg, creaVideogame, creaEpisodio } = require('./gql-helpers');
 
 const CREA = `mutation($d: VideogameInput!) { creaVideogame(dati: $d) { ${F.videogame} } }`;
 const AGGIORNA = `mutation($id: Int!, $d: VideogameInput!) { aggiornaVideogame(id: $id, dati: $d) { ${F.videogame} } }`;
@@ -16,26 +16,18 @@ const ASSOCIAZIONI = `query($e: Int, $v: Int, $ord: OrdinamentoAssociazioni, $di
 const ASSOCIAZIONE = `query($id: Int!) { associazione(id: $id) { ${F.associazione} } }`;
 
 let api;
-const games = []; // fixture create via REST: ogni test è indipendente
+const games = []; // fixture create all'inizio: ogni test è indipendente
 
-async function nuovoVideogame() {
-  const res = await api.post('/api/bo/videogame', { data: { rawg_slug: `e2e-gqlvg-${uniq()}` } });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
+// rawg_json come oggetto, per confrontarlo con parseRawg delle risposte
+const nuovoVideogame = async () => parseRawg(await creaVideogame(api, { rawg_slug: `e2e-gqlvg-${uniq()}` }));
 
-async function nuovoEpisodio(data_uscita, videogame_id, istante) {
-  const res = await api.post('/api/bo/episodi', {
-    data: {
-      titolo: `[E2E] GraphQL citato ${uniq()}`,
-      data_uscita,
-      durata: '0:30:00',
-      associazioni: [{ videogame_id, istante, speaker: 'FOSS', tipologia: 'CONS' }],
-    },
+const nuovoEpisodio = (data_uscita, videogame_id, istante) =>
+  creaEpisodio(api, {
+    titolo: `[E2E] GraphQL citato ${uniq()}`,
+    data_uscita,
+    durata: '0:30:00',
+    associazioni: [{ videogame_id, istante, speaker: 'FOSS', tipologia: 'CONS' }],
   });
-  expect(res.status(), await res.text()).toBe(201);
-  return res.json();
-}
 
 test.beforeAll(async ({ playwright }) => {
   api = await loggedIn(playwright, USERS.staff);
@@ -96,7 +88,7 @@ test('elencoVideogame: ricerca, totale, righe leggere senza rawg_json', async ()
 });
 
 test('elencoVideogame: default per titolo crescente, ordinamento per slug nelle due direzioni', async () => {
-  // il default coincide con TITOLO ASC esplicito (l'ordine esatto rispetto a REST è in graphql-parity)
+  // il default coincide con TITOLO ASC esplicito
   const def = expectOk(await gql(api, ELENCO, { l: 50 })).elencoVideogame.elementi.map((g) => g.id);
   const esplicito = expectOk(await gql(api, ELENCO, { l: 50, ord: 'TITOLO', dir: 'ASC' })).elencoVideogame.elementi.map((g) => g.id);
   expect(def).toEqual(esplicito);
@@ -110,7 +102,7 @@ test('elencoVideogame: default per titolo crescente, ordinamento per slug nelle 
 
 test('videogame: dettaglio con rawg_json serializzato; id inesistente → NOT_FOUND', async () => {
   const got = parseRawg(expectOk(await gql(api, DETTAGLIO, { id: games[0].id })).videogame);
-  expect(got).toEqual(games[0]); // la risposta REST della creazione
+  expect(got).toEqual(games[0]); // la risposta della creazione
   expectCode(await gql(api, DETTAGLIO, { id: 999999999 }), 'NOT_FOUND', 'Risorsa non trovata');
 });
 

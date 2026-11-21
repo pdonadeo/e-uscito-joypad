@@ -12,7 +12,7 @@ const { randomInt } = require('node:crypto');
 const { test, expect } = require('@playwright/test');
 const { USERS } = require('./env');
 const { loggedIn, newContext } = require('./helpers');
-const { F, gql, expectOk, expectCode } = require('./gql-helpers');
+const { F, gql, expectOk, expectCode, creaVideogame, aggiornaVideogame } = require('./gql-helpers');
 
 const CERCA = `query($t: String!, $l: Int) { cercaVideogame(testo: $t, limite: $l) { ${F.videogameInElenco} } }`;
 const CERCA_SENZA_LIMITE = `query($t: String!) { cercaVideogame(testo: $t) { ${F.videogameInElenco} } }`;
@@ -29,14 +29,12 @@ const g = {}; // fixture per nome
 // già presente l'aggiornamento non richiama RAWG e tiene i campi del body.
 async function nuovoVideogame(nome, titolo, extra = {}) {
   const rawg_slug = extra.rawg_slug ?? `e2e-cvg-${nome}-${N}`;
-  const res = await api.post('/api/bo/videogame', { data: { rawg_slug } });
-  expect(res.status(), await res.text()).toBe(201);
-  const { id } = await res.json();
-  const put = await api.put(`/api/bo/videogame/${id}`, {
-    data: { rawg_slug, titolo, descrizione_raw: extra.descrizione_raw ?? 'Descrizione qualsiasi' },
+  const { id } = await creaVideogame(api, { rawg_slug });
+  g[nome] = await aggiornaVideogame(api, id, {
+    rawg_slug,
+    titolo,
+    descrizione_raw: extra.descrizione_raw ?? 'Descrizione qualsiasi',
   });
-  expect(put.status(), await put.text()).toBe(200);
-  g[nome] = await put.json();
 }
 
 const cerca = async (testo, limite) => expectOk(await gql(api, CERCA, { t: testo, l: limite })).cercaVideogame;

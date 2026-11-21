@@ -156,12 +156,6 @@ let login req =
     log.warning (fun m -> m ~request:req "Login admin fallito per «%s»" username);
     fail `Unauthorized "Credenziali non valide o utente non abilitato"
 
-let logout req =
-  let%lwt () = Dream.invalidate_session req in
-  json "{}"
-
-let me req = json_of_yojson (me_json (current_user req))
-
 (* Controllo Origin/Referer per /api/bo, attivo anche con DEBUG=True.
 
    - Se c'è Origin (o, in sua assenza, Referer) il suo host deve coincidere con

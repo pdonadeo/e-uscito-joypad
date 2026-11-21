@@ -1,11 +1,11 @@
 // GraphQL: cambio della propria password (F-AU-06, Fase 3.6c.4d). Ogni test crea i suoi utenti
-// «e2e_…» via REST dal superuser di test (il teardown li cancella): gli utenti condivisi di
+// «e2e_…» via GraphQL dal superuser di test (il teardown li cancella): gli utenti condivisi di
 // env.js non cambiano mai password.
 const { randomInt } = require('node:crypto');
 const { test, expect } = require('@playwright/test');
 const { USERS, django } = require('./env');
 const { loggedIn, newContext } = require('./helpers');
-const { F, gql, expectOk, expectCode, gqlLoggedIn } = require('./gql-helpers');
+const { F, gql, expectOk, expectCode, gqlLoggedIn, creaUtente } = require('./gql-helpers');
 
 const CAMBIA = `mutation($a: String!, $n: String!) { cambiaPassword(attuale: $a, nuova: $n) { ${F.me} } }`;
 const ME = `{ me { ${F.me} } }`;
@@ -26,14 +26,11 @@ test.afterAll(async () => {
 
 const token = () => `${Date.now().toString(36)}${randomInt(1e6).toString(36)}`;
 
-// Un utente staff e attivo creato via REST, con password VECCHIA.
+// Un utente staff e attivo creato via GraphQL, con password VECCHIA.
 async function nuovoUtente(extra = {}) {
   const username = `e2e_gcp_${token()}`;
-  const res = await su.post('/api/bo/utenti', {
-    data: { username, password: VECCHIA, is_staff: true, is_active: true, is_superuser: false, ...extra },
-  });
-  expect(res.status(), await res.text()).toBe(201);
-  return { ...(await res.json()), password: VECCHIA };
+  const u = await creaUtente(su, { username, password: VECCHIA, is_staff: true, is_active: true, is_superuser: false, ...extra });
+  return { ...u, password: VECCHIA };
 }
 
 // Riesce il login GraphQL con questa password?
@@ -67,12 +64,10 @@ for (const superuser of [false, true]) {
     const me = expectOk(await gql(qui, CAMBIA, { a: VECCHIA, n: NUOVA })).cambiaPassword;
     expect(me).toEqual({ id: u.id, username: u.username, fullName: u.username, is_superuser: superuser });
 
-    // la sessione corrente funziona, anche su REST
+    // la sessione corrente funziona
     expect(expectOk(await gql(qui, ME)).me.id).toBe(u.id);
-    expect((await qui.get('/api/bo/me')).status()).toBe(200);
     // un'altra sessione dello stesso utente è chiusa (F-AU-05)
     expectCode(await gql(altrove, ME), 'UNAUTHENTICATED', 'Autenticazione richiesta');
-    expect((await altrove.get('/api/bo/me')).status()).toBe(401);
 
     expect(await puoEntrare(playwright, u.username, NUOVA)).toBe(true);
     expect(await puoEntrare(playwright, u.username, VECCHIA)).toBe(false);
