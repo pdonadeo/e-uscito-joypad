@@ -1,6 +1,4 @@
-[![Build Docker and push to registry](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-dream.yml/badge.svg)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-dream.yml)
-
-[![Build Docker and push to registry (Django)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-django.yml/badge.svg?branch=main)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-image-django.yml)
+[![Build Docker images and push to registry](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-images.yml/badge.svg)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/docker-images.yml)
 
 [![CodeQL](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)](https://github.com/pdonadeo/e-uscito-joypad/actions/workflows/codeql-analysis.yml)
 
@@ -70,12 +68,16 @@ Il database utilizzato è [PostgreSQL](https://www.postgresql.org/).
 
 ### Backoffice
 
-Per il _data entry_ di episodi e giochi occorre un [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) di accesso al database. È realizzato con [react-admin](https://marmelab.com/react-admin/) (codice in `frontend/src/bo/`) sopra un'API REST servita da Dream sotto `/api/bo` (codice in `src/admin/`). Una volta fatto partire il progetto con `docker-compose`, è accessibile a questo indirizzo: http://localhost:5000/bo
+Per il _data entry_ di episodi e giochi occorre un [CRUD](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete) di accesso al database. È un'applicazione React a sé (codice in `new-bo/`) sopra l'API GraphQL servita da Dream su `/api/graphql` (codice in `src/graphql/`; lo schema è in `docs/schema.graphql`). Una volta fatto partire il progetto con `docker-compose`, è accessibile a questo indirizzo: http://localhost:5000/bo
 
-Il vecchio backoffice [Django](https://www.djangoproject.com/) è ancora disponibile, in convivenza e in attesa di essere rimosso, su http://localhost:5000/legacy-bo/ . Usa gli stessi utenti del nuovo admin.
+In sviluppo si entra con l'utente `admin` e la password `CHANGE_ME_IN_PRODUCTION`. Li crea il seed del database di sviluppo, che si carica solo la prima volta, quando il volume di PostgreSQL è vuoto (`infra/db/02_schema_e_seed.sh`).
+
+### Database e migrazioni
+
+Lo schema del database sta nei file SQL numerati di `infra/db/migrazioni/`. All'avvio il binario applica quelli che mancano, sotto un lock, e li registra nella tabella `schema_migrations`. Il seed di sviluppo (`infra/db/seed/`) non entra mai nell'immagine Docker.
 
 ### Variabili d'ambiente per la configurazione del progetto
 
-Le variabili di configurazione del progetto sono contenute nel file `compose_env_devel`. In particolare è poossibile modificare le password di accesso al backoffice, specialmente dell'utente `admin`.
+Le variabili di configurazione del progetto sono contenute nel file `compose_env_devel` (`compose_env` è un link a questo file): utente e password di PostgreSQL, `DEBUG`, il segreto dei cookie di Dream (`DREAM_SECRET`), la chiave di RAWG e quelle del bot Discord.
 
 **⚠️⚠️⚠️ FATE ATTENZIONE A NON COMMITTARE PASSWORD REALMENTE UTILIZZATE IN PRODUZIONE ⚠️⚠️⚠️**

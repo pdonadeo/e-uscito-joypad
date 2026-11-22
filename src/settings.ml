@@ -38,10 +38,10 @@ let django_connection_string = spf "postgresql://%s:%s@%s:%d/%s" pguser pgpasswo
 let dream_secret =
   getenv ~default:None ~f:(fun v -> if String.trim v = "" then None else Some (String.trim v)) "DREAM_SECRET"
 
-(* Directory dei file caricati (cover): la stessa MEDIA di Django. *)
+(* Directory dei file caricati (cover): in sviluppo e in produzione è ./media, montata in /media. *)
 let media_root = getenv ~default:"/media" ~f:Fun.id "MEDIA_ROOT"
 
-(* Variabile condivisa con Django (settings.py: RAWG_API_KEY). *)
+(* Chiave delle API di RAWG. *)
 let rawg_api_key = getenv ~default:"" ~f:Fun.id "RAWG_API_KEY"
 let rawg_api_url = getenv ~default:"https://api.rawg.io/api" ~f:Fun.id "RAWG_API_URL"
 

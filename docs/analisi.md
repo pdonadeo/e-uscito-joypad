@@ -1,7 +1,8 @@
-# Analisi delle funzioni di `/bo` per `/new-bo`
+# Analisi delle funzioni del backoffice `/bo`
 
 - **Stato:** approvata da Paolo il 2026-11-15 (Fase 3.1).
-- **Perimetro:** `/new-bo` deve fare esattamente quello che fa `/bo` (AC-1), niente di più. Dove `/bo` e l'admin Django divergono si segue `/bo`, e la divergenza è annotata nella sezione [Differenze tra Django e `/bo`](#differenze-tra-django-e-bo).
+- **Nota (2026-11-22, rimozione di Django):** l'analisi è nata per riscrivere il vecchio backoffice di `/bo` (React su REST `/api/bo`, codice in `frontend/src/bo/`). Dalla Fase 1 di via-django `/bo` è il backoffice nuovo (`new-bo/`, su GraphQL) e il vecchio non c'è più; Django e `/legacy-bo` sono spariti nelle Fasi 5 e 7. Dove il testo dice «il vecchio `/bo`» parla del backoffice precedente; i riferimenti al suo codice e a quello di Django sono storici.
+- **Perimetro:** il backoffice nuovo doveva fare esattamente quello che faceva il vecchio `/bo` (AC-1), niente di più. Dove il vecchio `/bo` e l'admin Django divergevano si è seguito il vecchio `/bo`, e la divergenza è annotata nella sezione [Differenze tra Django e `/bo`](#differenze-tra-django-e-bo).
 - **Fonti:**
   - `euscitojoypad_db/backoffice/admin.py` e `euscitojoypad_db/backoffice/models.py` (Django);
   - `django.contrib.auth` (tabella `auth_user`);
@@ -92,21 +93,21 @@ L'**utente corrente** (`me`) ha `id`, `username`, `fullName` e `is_superuser`. `
 | F-AU-03 | Utente corrente | `auth.ml:108-116,163`; `authProvider.js:61-77` | Restituisce `id`, `username`, `fullName` e `is_superuser`. Senza sessione valida risponde 401 «Autenticazione richiesta», e l'interfaccia porta al login. Nell'intestazione si mostra `fullName` |
 | F-AU-04 | Permessi staff/superuser | `routes.ml:16-17,36-46`; `App.jsx:35-64`; `authProvider.js:67-72,81-88` | Lo staff gestisce episodi e videogame (e legge le associazioni). **Utenti** è riservato ai superuser: per gli altri la voce di menu non c'è e l'API risponde 403 «Operazione riservata ai superuser». Un 403 si mostra come notifica e non chiude la sessione; un 401 riporta al login |
 | F-AU-05 | Rivalidazione della sessione | `auth.ml:62,75-98` | A ogni richiesta l'utente viene riletto dal DB. Se è stato disattivato o ha perso `is_staff`, la richiesta riceve subito 401. La sessione contiene un'impronta dell'hash della password, quindi un cambio di password fatto da qualunque parte (anche da `/legacy-bo`) chiude le sessioni aperte di quell'utente. Fa eccezione la sessione di chi cambia la propria password (F-UT-05, F-AU-06) |
-| F-AU-06 | Cambio della propria password | `django.contrib.admin` (pagina «Cambia password», oggi in `/legacy-bo`); in `/bo` manca; `/new-bo` dalla 3.6c.4d | Ogni utente staff, superuser o no, cambia la propria password indicando quella attuale. La nuova deve avere almeno 8 caratteri (stesso messaggio di F-UT-04: «Campo «password»: almeno 8 caratteri») e riceve l'hash di F-UT-04. Password attuale sbagliata → «La password attuale non è corretta», come errore di input e non di autenticazione: la sessione resta aperta. La sessione corrente resta valida, quelle dello stesso utente altrove si chiudono (F-AU-05). Solo GraphQL (`cambiaPassword`), nessun endpoint in `/api/bo` |
+| F-AU-06 | Cambio della propria password | `django.contrib.admin` (pagina «Cambia password» di `/legacy-bo`); nel vecchio `/bo` mancava; in `/bo` dalla 3.6c.4d | Ogni utente staff, superuser o no, cambia la propria password indicando quella attuale. La nuova deve avere almeno 8 caratteri (stesso messaggio di F-UT-04: «Campo «password»: almeno 8 caratteri») e riceve l'hash di F-UT-04. Password attuale sbagliata → «La password attuale non è corretta», come errore di input e non di autenticazione: la sessione resta aperta. La sessione corrente resta valida, quelle dello stesso utente altrove si chiudono (F-AU-05). Solo GraphQL (`cambiaPassword`), nessun endpoint in `/api/bo` |
 
 ### Episodi
 
 | ID | Funzione | Origine | Comportamento atteso |
 |---|---|---|---|
-| F-EP-01 | Elenco paginato | `admin.py:29-38,41-42,45-67`; `episodi.jsx:36-58` | 20 righe per pagina, con il totale e il selettore «Righe per pagina» (5, 10, 25, 50) della paginazione di react-admin. Colonne: numero, titolo, data uscita, durata, **cover presente**, **URL audio presente**, **URL post presente**, **URL video presente**, pubblicato. Le quattro colonne "presente" sono booleani calcolati: vero se il campo non è null e non è vuoto. Un clic sulla riga apre la modifica |
+| F-EP-01 | Elenco paginato | `admin.py:29-38,41-42,45-67`; `episodi.jsx:36-58` | 20 righe per pagina, con il totale e il selettore «Righe per pagina» (5, 10, 25, 50) della paginazione del vecchio `/bo`. Colonne: numero, titolo, data uscita, durata, **cover presente**, **URL audio presente**, **URL post presente**, **URL video presente**, pubblicato. Le quattro colonne "presente" sono booleani calcolati: vero se il campo non è null e non è vuoto. Un clic sulla riga apre la modifica |
 | F-EP-02 | Ordinamento | `admin.py:39`; `episodi.ml:66-76`; `ra_codec.ml:78-86` | Il default è `data_uscita` decrescente. Si può ordinare per numero, titolo, data uscita, durata e pubblicato, in entrambe le direzioni; le colonne "presente" non sono ordinabili. I null vanno in fondo, e a parità decide l'`id` |
 | F-EP-03 | Ricerca | `admin.py:40`; `episodi.ml:60-61`; `ra_codec.ml:60-63`; `input.ml:124-133` | Una casella di testo, sempre visibile, cerca in numero e titolo. La ricerca è "contiene" e non distingue maiuscole e minuscole. Gli spazi esterni si ignorano, e `%`, `_` e `\` valgono letteralmente. Una stringa vuota non filtra |
 | F-EP-04 | Filtro «Pubblicato» | `episodi.jsx:31-34`; `episodi.ml:64,81`; `ra_codec.ml:65-69` | Non è sempre visibile: si aggiunge da «Aggiungi filtro». Tre stati: tutti, sì, no. Si combina con la ricerca. **C'è solo in `/bo`**: vedi la questione aperta Q-1 |
 | F-EP-05 | Dettaglio | `episodi.ml:19-51,84`; `choices.js:16-19` | Tutti i campi della tabella [Episodio](#episodio-backoffice_episodio-modelspy83-142), con l'anteprima della cover e le associazioni (F-EP-09) ordinate per istante (null in fondo, a parità per `id`). Il form di modifica parte **sempre** dal dettaglio completo e mai dalla riga dell'elenco: altrimenti un salvataggio cancellerebbe associazioni e cover |
 | F-EP-06 | Creazione | `episodi.ml:90-157,244-259`; `episodi.jsx:62-101,109-113` | Validazione come nella tabella [Episodio](#episodio-backoffice_episodio-modelspy83-142). Nel form la durata vale `0:30:00` e pubblicato vale `false`. Le associazioni si salvano nella stessa richiesta e nella stessa transazione. Una cover scelta nel form si carica subito dopo, con F-EP-10. Dopo il salvataggio si apre la modifica del nuovo episodio |
 | F-EP-07 | Modifica | `episodi.ml:184-279`; `episodi.jsx:103-107` | Stesse regole della creazione. Il salvataggio aspetta la risposta del server (modalità pessimistica). Se il campo `associazioni` manca, le associazioni non si toccano; se vale `null` le cancella tutte, come `[]` (`episodi.ml:111`); altrimenti le sostituisce (F-EP-09). Le modifiche alla cover partono dopo il salvataggio dei campi (F-EP-10, F-EP-11). Su un id inesistente risponde 404 «Risorsa non trovata» |
-| F-EP-08 | Eliminazione | `models.py:175-176`; `episodi.ml:281-299` | Cancella l'episodio e le sue associazioni in un'unica transazione, e restituisce il record cancellato. Il file della cover resta su disco. Si può cancellare dalla modifica oppure **in blocco** dall'elenco, selezionando più righe (azione "Elimina" di react-admin, che corrisponde a `delete_selected` di Django) |
-| F-EP-09 | Giochi associati (inline) | `admin.py:19-23,43`; `models.py:145-198`; `episodi.jsx:84-99`; `episodi.ml:108-171,203-242` | Nel form dell'episodio c'è un elenco di righe da aggiungere e rimuovere. Ogni riga ha: videogame (obbligatorio, scelto con la ricerca testuale di F-VG-03 (titolo, descrizione, slug), opzioni ordinate per titolo; in /new-bo la scelta usa invece `cercaVideogame` (3.6c.4b), che cerca solo nel titolo con le regole della ricerca del sito pubblico: sotto i 6 caratteri «contiene» per parole, per titolo; dai 6 in su `word_similarity` > 0.25, per somiglianza; vedi `docs/schema.graphql`), istante (`H:MM:SS`, default `0:00:00`), speaker (default Tutti) e tipologia (default Chiacchiera libera). Il salvataggio sostituisce le associazioni in tre passi: cancella quelle che non ci sono più, aggiorna quelle con un `id` dell'episodio, inserisce le altre. Due `id` uguali → 400 «Campo «associazioni»: id duplicati». Un videogame inesistente → 400 «Videogame inesistenti: [..]» |
+| F-EP-08 | Eliminazione | `models.py:175-176`; `episodi.ml:281-299` | Cancella l'episodio e le sue associazioni in un'unica transazione, e restituisce il record cancellato. Il file della cover resta su disco. Si può cancellare dalla modifica oppure **in blocco** dall'elenco, selezionando più righe (azione «Elimina» del vecchio `/bo`, che corrisponde a `delete_selected` di Django) |
+| F-EP-09 | Giochi associati (inline) | `admin.py:19-23,43`; `models.py:145-198`; `episodi.jsx:84-99`; `episodi.ml:108-171,203-242` | Nel form dell'episodio c'è un elenco di righe da aggiungere e rimuovere. Ogni riga ha: videogame (obbligatorio, scelto con la ricerca testuale di F-VG-03 (titolo, descrizione, slug), opzioni ordinate per titolo; in `/bo` la scelta usa invece `cercaVideogame` (3.6c.4b), che cerca solo nel titolo con le regole della ricerca del sito pubblico: sotto i 6 caratteri «contiene» per parole, per titolo; dai 6 in su `word_similarity` > 0.25, per somiglianza; vedi `docs/schema.graphql`), istante (`H:MM:SS`, default `0:00:00`), speaker (default Tutti) e tipologia (default Chiacchiera libera). Il salvataggio sostituisce le associazioni in tre passi: cancella quelle che non ci sono più, aggiorna quelle con un `id` dell'episodio, inserisce le altre. Due `id` uguali → 400 «Campo «associazioni»: id duplicati». Un videogame inesistente → 400 «Videogame inesistenti: [..]» |
 | F-EP-10 | Caricamento della cover | `admin.py:10-16`; `models.py:73-80,116-123`; `media.ml:1-131`; `episodi.ml:311-329`; `dataProvider.js:12-45,55-68` | **Resta su REST:** `POST /api/bo/episodi/:id/cover`, multipart con il campo `file`. Accetta solo PNG (estensione `.png` e firma del file), al massimo 10 MB. Il nome salvato è `covers/episodi-<numero>-<nome>.png` (in slug); se esiste già, si aggiunge un suffisso casuale `_xxxxxxx`. Il campo del form di `/bo` dice «Trascina qui un'immagine PNG o fai clic per sceglierla» (`episodi.jsx:69-77`); l'avvertenza di Django «PNG 256×256, nessun ridimensionamento» (`models.py:121-122`) in `/bo` non c'è. Se in creazione l'upload fallisce, l'episodio appena creato **si cancella**, così un nuovo "Salva" non crea un duplicato. Errori: «Il file deve essere un'immagine PNG», «File troppo grande (massimo 10 MB)» (413), «Campo «file» mancante», «File vuoto», «Atteso un upload multipart/form-data con il campo «file»», 404 «Risorsa non trovata» se l'episodio non esiste |
 | F-EP-11 | Rimozione della cover | `episodi.ml:331-337`; `dataProvider.js:35-45` | **Resta su REST:** `DELETE /api/bo/episodi/:id/cover`. Azzera il campo e lascia il file su disco, come il "Cancella" di Django. Parte quando si toglie la cover dal form e si salva |
 
@@ -138,7 +139,7 @@ L'**utente corrente** (`me`) ha `id`, `username`, `fullName` e `is_superuser`. `
 | F-UT-01 | Elenco e ordinamento | `django.contrib.auth` (UserAdmin); `utenti.ml:28-53`; `utenti.jsx:19-32` | Colonne: username, nome, cognome, email, staff, attivo, superuser, ultimo accesso (data e ora). Il default è `username` crescente; tutte le colonne sono ordinabili. 10 righe per pagina, con il totale e il selettore «Righe per pagina»; un clic sulla riga apre la modifica |
 | F-UT-02 | Ricerca | `django.contrib.auth` (UserAdmin, `search_fields`); `utenti.jsx:19`; `utenti.ml:33-35` | Cerca in username, email, nome e cognome, con le stesse regole di F-EP-03 |
 | F-UT-03 | Dettaglio | `django.contrib.auth` (UserAdmin); `utenti.jsx:36-59`; `utenti.ml:9-26,55` | Tutti i campi della tabella [Utente](#utente-auth_user-djangocontribauth), tranne la password |
-| F-UT-04 | Creazione | `utenti.ml:57-133`; `utenti.jsx:34-53,61-65` | Validazione come nella tabella [Utente](#utente-auth_user-djangocontribauth); la password è obbligatoria. L'hash usa le iterazioni del più robusto tra gli hash esistenti, con un minimo di 1.500.000 (`auth.ml:48-57`). Nel form staff e attivo sono accesi e superuser è spento. Username già usato → 409 «Esiste già un utente con questo username». Dopo il salvataggio si apre la modifica (default di react-admin) |
+| F-UT-04 | Creazione | `utenti.ml:57-133`; `utenti.jsx:34-53,61-65` | Validazione come nella tabella [Utente](#utente-auth_user-djangocontribauth); la password è obbligatoria. L'hash usa le iterazioni del più robusto tra gli hash esistenti, con un minimo di 1.500.000 (`auth.ml:48-57`). Nel form staff e attivo sono accesi e superuser è spento. Username già usato → 409 «Esiste già un utente con questo username». Dopo il salvataggio si apre la modifica (come nel vecchio `/bo`) |
 | F-UT-05 | Modifica | `utenti.ml:135-164`; `utenti.jsx:36-59` | La password è opzionale: «Lascia vuoto per non cambiarla». I flag assenti dal payload tornano ai default `true`, `true`, `false` (`utenti.ml:89-91`): il form li manda sempre. Se cambia, si chiudono le sessioni di quell'utente (F-AU-05), ma non quella di chi cambia la propria. Un superuser non può togliere a se stesso staff, attivo o superuser: 400 «Non puoi togliere a te stesso i privilegi di staff, attivo o superuser» |
 | F-UT-06 | Eliminazione | `django.contrib.auth` (UserAdmin); `utenti.jsx:21`; `utenti.ml:166-193` | Non ci si può cancellare da soli: 400 «Non puoi cancellare te stesso». Prima dell'utente si cancellano le sue righe in `django_admin_log`, `auth_user_groups` e `auth_user_user_permissions` (come il CASCADE di Django). Restituisce il record cancellato. Si può cancellare dalla modifica oppure in blocco dall'elenco: il blocco manda una `DELETE` per riga, e se la selezione include se stessi quella riga fallisce con 400 |
 
@@ -148,7 +149,7 @@ L'**utente corrente** (`me`) ha `id`, `username`, `fullName` e `is_superuser`. `
 |---|---|---|---|
 | V-01 | Controllo di Origin e Referer | `auth.ml:165-214` | Se c'è `Origin` (oppure, in sua assenza, `Referer`), il suo host deve coincidere con l'header `Host`, oppure l'origine deve stare in `BO_ALLOWED_ORIGINS`. Sui metodi che modificano dati almeno uno dei due header è obbligatorio. Altrimenti 403 «Origine della richiesta non consentita» o «… non verificabile». Vale anche con `DEBUG=True` |
 | V-02 | Cookie `Secure` | `auth.ml:216-238` | Fuori da `DEBUG`, ogni `Set-Cookie` riceve l'attributo `Secure` |
-| V-03 | Sessione condivisa | `routes.ml:8-13,30` | Sessione nel cookie cifrato `dream.session` (`DREAM_SECRET`), durata 14 giorni come `SESSION_COOKIE_AGE` di Django. `/new-bo` deve usare **la stessa** sessione di `/bo`: un login o un logout su uno dei due vale anche per l'altro |
+| V-03 | Sessione condivisa | `routes.ml:8-13,30` | Sessione nel cookie cifrato `dream.session` (`DREAM_SECRET`), durata 14 giorni come `SESSION_COOKIE_AGE` di Django. `/bo` (GraphQL) e le route REST della cover (`/api/bo/episodi/:id/cover`) usano **la stessa** sessione: un login o un logout su GraphQL vale anche per la cover |
 | V-04 | Limite dei login concorrenti | `password.ml:55-81` | Al massimo 2 hash in calcolo e 8 in coda; oltre, 429 «Troppe richieste di login, riprova tra poco». L'interfaccia mostra il messaggio del server |
 | V-05 | Errori | `resp.ml:9-49`; `input.ml:14` | Gli errori di validazione sono 400 e nominano il campo: «Campo «x»: …». Un valore duplicato è 409, un riferimento a un record inesistente è 400. Un errore del DB o un'eccezione non prevista diventano 500 «Errore del database» o «Errore interno», senza dettagli, e finiscono nel log. Un 404 su id inesistente è «Risorsa non trovata». Le creazioni rispondono 201. Anche un'eccezione sfuggita agli handler produce un JSON `{"message": …}` e mai la pagina d'errore HTML di Dream (`routes.ml:50-71`) |
 | V-06 | Limiti degli elenchi | `ra_codec.ml:24-51` | Al massimo 1000 righe per pagina. Oltre alle colonne visibili, l'API accetta l'ordinamento per `id` (tutte le risorse) e per `ts` (episodi, videogame), che `/bo` non usa. Un ordinamento su un campo non consentito → 400 «Ordinamento non consentito sul campo «x»» |
@@ -157,33 +158,12 @@ L'**utente corrente** (`me`) ha `id`, `username`, `fullName` e `is_superuser`. `
 
 ## Endpoint di `/api/bo` → ID
 
-Le route vengono da `routes.ml:28-47`; `crud` genera `GET` elenco, `GET /:id`, `POST`, `PUT /:id` e `DELETE /:id` (`routes.ml:19-26`).
+Dalla Fase 1 di via-django la REST `/api/bo` ha solo le due route della cover; tutto il resto è in GraphQL (`docs/schema.graphql`, con gli ID nei commenti di ogni operazione).
 
 | Metodo e route | ID | Note |
 |---|---|---|
-| `POST /api/bo/login` | F-AU-01 | |
-| `POST /api/bo/logout` | F-AU-02 | |
-| `GET /api/bo/me` | F-AU-03, F-AU-04, F-AU-05 | |
 | `POST /api/bo/episodi/:id/cover` | F-EP-10 | **resta su REST**, niente equivalente GraphQL |
 | `DELETE /api/bo/episodi/:id/cover` | F-EP-11 | **resta su REST**, niente equivalente GraphQL |
-| `GET /api/bo/episodi` | F-EP-01, F-EP-02, F-EP-03, F-EP-04 | filtro `id` (lista di id) presente nell'API ma non usato da `/bo` |
-| `GET /api/bo/episodi/:id` | F-EP-05, F-EP-09 | |
-| `POST /api/bo/episodi` | F-EP-06, F-EP-09, F-AS-03 | |
-| `PUT /api/bo/episodi/:id` | F-EP-07, F-EP-09, F-AS-03 | |
-| `DELETE /api/bo/episodi/:id` | F-EP-08 | |
-| `GET /api/bo/videogame` | F-VG-01, F-VG-02, F-VG-03 | usato anche dalla scelta del videogame in F-EP-09, che con il filtro `id` (`getMany`) mostra i videogame già scelti |
-| `GET /api/bo/videogame/:id` | F-VG-04 | |
-| `POST /api/bo/videogame` | F-VG-05 | |
-| `PUT /api/bo/videogame/:id` | F-VG-06 | |
-| `DELETE /api/bo/videogame/:id` | F-VG-07 | |
-| `GET /api/bo/associazioni` | F-AS-01, F-VG-08 | filtri `episodio_id`, `videogame_id` e `id` |
-| `GET /api/bo/associazioni/:id` | F-AS-02 | |
-| `GET /api/bo/utenti` | F-UT-01, F-UT-02 | |
-| `GET /api/bo/utenti/:id` | F-UT-03 | |
-| `POST /api/bo/utenti` | F-UT-04 | |
-| `PUT /api/bo/utenti/:id` | F-UT-05 | |
-| `DELETE /api/bo/utenti/:id` | F-UT-06 | |
-| `ANY /api/bo/**` | — | 404 «Endpoint inesistente». In GraphQL un'operazione inesistente è un errore di validazione |
 
 ## Esclusioni
 
@@ -191,11 +171,11 @@ Le route vengono da `routes.ml:28-47`; `crud` genera `GET` elenco, `GET /:id`, `
 |---|---|---|
 | Messaggi Discord (`DiscordMessage`): elenco, ricerca, filtro «consiglio», gerarchia per data, link a Discord | `admin.py:93-113`; `models.py:201-224` | Li scrive il bot Discord e `/bo` non li gestisce già oggi. Sono un non-obiettivo della spec |
 | Gruppi e permessi di `django.contrib.auth` (admin dei `Group`, campi `groups` e `user_permissions`) | `django.contrib.auth` | Né `/bo` né l'API li usano: i permessi dipendono solo da `is_staff` e `is_superuser`. Le righe collegate a un utente si cancellano con lui (F-UT-06) |
-| Filtri laterali dell'elenco utenti di Django (`is_staff`, `is_superuser`, `is_active`, gruppi) e pagina separata «Cambia password» | `django.contrib.auth` (UserAdmin) | I filtri non ci sono in `/bo` né in `/new-bo`. La pagina «Cambia password» manca in `/bo`: un superuser cambia la password dal form dell'utente (F-UT-05), uno staff non superuser poteva farlo solo da `/legacy-bo`. In `/new-bo` la sostituisce F-AU-06 |
+| Filtri laterali dell'elenco utenti di Django (`is_staff`, `is_superuser`, `is_active`, gruppi) e pagina separata «Cambia password» | `django.contrib.auth` (UserAdmin) | I filtri non c'erano nel vecchio `/bo` e non ci sono in `/bo`. La pagina «Cambia password» mancava nel vecchio `/bo`: un superuser cambia la password dal form dell'utente (F-UT-05), uno staff non superuser poteva farlo solo da `/legacy-bo`. In `/bo` la sostituisce F-AU-06 |
 | Modifica delle associazioni dalla pagina del videogame | `admin.py:90` | In `/bo` sono in sola lettura (F-VG-08): si modificano dall'episodio |
 | Registro delle azioni (`django_admin_log`) e cronologia del record | Django admin | `/bo` non scrive il registro |
 | Upload della cover via GraphQL | spec, non-obiettivi | La cover resta su REST (F-EP-10, F-EP-11) |
-| Esportazione CSV degli elenchi | react-admin (pulsante "Esporta" di default) | Default di react-admin che Django non ha e nessuno ha chiesto (Q-2) |
+| Esportazione CSV degli elenchi | vecchio `/bo` (pulsante «Esporta» di default) | Default della libreria del vecchio `/bo` che Django non ha e nessuno ha chiesto (Q-2) |
 
 ## Differenze tra Django e `/bo`
 
@@ -206,14 +186,14 @@ Il perimetro segue `/bo`.
 | Ricerca | divide la stringa in parole e le cerca tutte (AND) | cerca la stringa intera come sottostringa |
 | Elenco episodi | niente colonna né filtro «pubblicato» | colonna e filtro «pubblicato» (F-EP-01, F-EP-04) |
 | Elenco videogame | titolo, slug | miniatura della cover, titolo, slug (F-VG-01) |
-| Righe per pagina | 20 per gli episodi, 100 per il resto | 20 per gli episodi, 10 per il resto (default di react-admin, modificabile) |
+| Righe per pagina | 20 per gli episodi, 100 per il resto | 20 per gli episodi, 10 per il resto (default del vecchio `/bo`, modificabile) |
 | Creazione di un videogame | `pre_save` chiama RAWG se `rawg_json` è vuoto, cioè sempre in creazione | uguale: chiama sempre RAWG (F-VG-05) |
 | Scelta del videogame nell'inline | popup `raw_id_fields` | campo con ricerca testuale (F-VG-03, F-EP-09) |
 
 ## Questioni aperte
 
 - **Q-1. Filtro «Pubblicato» (F-EP-04).** La spec dice "filtri e ordinamenti solo dove li ha admin.py", ma AC-1 dice che il perimetro coincide con `/bo`, e `/bo` il filtro ce l'ha. **Deciso da Paolo (2026-11-15):** si tiene, perché prevale la parità con `/bo`.
-- **Q-2. Esportazione CSV.** È un default di react-admin che Django non ha, e nessuno l'ha mai chiesta esplicitamente. **Deciso da Paolo (2026-11-15):** esclusa.
+- **Q-2. Esportazione CSV.** È un default della libreria del vecchio `/bo` che Django non ha, e nessuno l'ha mai chiesta esplicitamente. **Deciso da Paolo (2026-11-15):** esclusa.
 - **Q-3. Vincoli `V-` fuori dal lint dello schema.** Il lint di 3.3b verifica che nello schema compaiano solo gli ID `F-`. I vincoli `V-` si verificano con i test API di 3.5 e non hanno un e2e dedicato. **Deciso da Paolo (2026-11-15):** divisione approvata.
 - **Q-4. Funzioni dell'API non usate da `/bo`** (F-AS-02, filtro `id` sugli episodi, ordinamenti per `id` e `ts`). **Deciso da Paolo (2026-11-15):** in GraphQL c'è solo F-AS-02, per la parità delle route richiesta da AC-4; gli altri non si replicano.
 - **Q-4b. Ordinamento degli utenti per `date_joined`.** L'API lo ammette, ma `/bo` non mostra la colonna. **Deciso da Paolo (2026-11-15):** escluso da GraphQL, come `id` e `ts` in Q-4.
@@ -229,14 +209,14 @@ Il perimetro segue `/bo`.
 
   Mappati su `INTERNAL`, i primi due perderebbero il loro significato. Da decidere nello schema, per esempio con `RATE_LIMITED` e `UPSTREAM_ERROR`.
 - **Divergenze da REST decise con lo spike** (`docs/spike-graphql.md`, punto 6): in GraphQL `associazioni` assente o `null` lascia le associazioni come sono (F-EP-07), e `istante` assente o `null` lascia il campo vuoto (F-EP-09). Il default `0:00:00` lo mette l'interfaccia.
-- Il filtro per lista di `id` (`getMany`) è un meccanismo interno di react-admin. In GraphQL forse non serve, perché l'episodio porta già `videogame_titolo` per ogni associazione.
+- Il filtro per lista di `id` (`getMany`) è un meccanismo interno del vecchio `/bo`. In GraphQL forse non serve, perché l'episodio porta già `videogame_titolo` per ogni associazione.
 
 ## Tabella di copertura
 
 Si riempie nelle Fasi 3.5 (test API) e 3.6c (test e2e). I file sono in `tests/api/`, con il
 nome senza `.spec.js`; i nomi lunghi dei test sono abbreviati con «…».
 
-| ID | Test API (GraphQL) | Test e2e (`/new-bo`) |
+| ID | Test API (GraphQL) | Test e2e (`/bo`) |
 |---|---|---|
 | F-AU-01 | `graphql-auth` › «login di un utente staff → UtenteCorrente, poi me»; «login rifiutato: … → UNAUTHENTICATED, nessuna sessione» | `new-bo-e2e` › «credenziali sbagliate: messaggio del server nell'Alert…»; «un utente non staff o non attivo non entra…» |
 | F-AU-02 | `graphql-auth` › «anonimo: logout riesce sempre»; «logout su GraphQL → anonimo su GraphQL e su REST» | `new-bo-e2e` › «ESCI chiude la sessione, anche per /api/bo» |

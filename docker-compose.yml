@@ -10,7 +10,7 @@ services:
     ports:
       - "5000:80"
     volumes:
-      - ./euscitojoypad_db/MEDIA:/usr/share/nginx/html/bo/files
+      - ./media:/usr/share/nginx/html/bo/files
       - ./infra/nginx/conf.d:/etc/nginx/conf.d
 
   # PostgreSQL
@@ -42,7 +42,7 @@ services:
       MEDIA_ROOT: "/media"
     env_file: ./compose_env
     volumes:
-      - ./euscitojoypad_db/MEDIA:/media
+      - ./media:/media
 
   # Discord bot (Go)
   bot:

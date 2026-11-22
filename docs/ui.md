@@ -1,4 +1,4 @@
-# Interfaccia di `/new-bo` (stile C «Avventura 8-bit»)
+# Interfaccia di `/bo` (stile C «Avventura 8-bit»)
 
 Questo documento è il riferimento per la Fase 3.6c. Tutto quello che contiene viene da
 `docs/design/new-bo.figcraft` (commit `0e76c12`) e non è ricostruito a occhio:
@@ -489,7 +489,7 @@ override del layout legato ai token `spacing`. A 390 le schede sono cliccabili c
   «Il gioco non c'è?» seguito dal Button `dashed` · `xs` «+ CREALO QUI», che apre il Dialog
   «Nuovo videogame» ([Nuovo videogame dal form dell'episodio](#nuovo-videogame-dal-form-dellepisodio)).
 
-Il trigger è l'Input `ricerca` `sm`. In /new-bo la ricerca è la query `cercaVideogame`
+Il trigger è l'Input `ricerca` `sm`. In /bo la ricerca è la query `cercaVideogame`
 (3.6c.4b), non quella di F-VG-03: cerca solo nel titolo, con le regole della ricerca del sito
 pubblico. Sotto i 6 caratteri trova i titoli che contengono le parole scritte, nell'ordine, senza
 maiuscole né accenti, ordinati per titolo; dai 6 caratteri in su ordina per somiglianza
@@ -826,7 +826,7 @@ Stessa schermata di «Modifica utente», con queste differenze:
 
 ### Cambia parola d'ordine (F-AU-06)
 
-Indirizzo `/new-bo/password`, per ogni utente staff (anche non superuser). Si apre da
+Indirizzo `/bo/password`, per ogni utente staff (anche non superuser). Si apre da
 PAROLA D'ORDINE nella [Barra app](#barra-app-nessun-equivalente-shadcn) `desktop` (prima di ESCI)
 e nello Sheet (sopra ESCI). Stessa griglia e stessa barra delle azioni di «Modifica utente», con
 queste differenze:

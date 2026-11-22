@@ -11,7 +11,7 @@ services:
     ports:
       - "127.0.0.1:8000:80"
     volumes:
-      - ./euscitojoypad_db/MEDIA:/usr/share/nginx/html/bo/files
+      - ./media:/usr/share/nginx/html/bo/files
       - ./infra/nginx/conf.d:/etc/nginx/conf.d
 
   # PostgreSQL
@@ -65,7 +65,8 @@ services:
     #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-c6150f6
     #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-42f4c02
     #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-d57348e
-    image: ghcr.io/pdonadeo/e-uscito-joypad:sha-100d7e5
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-100d7e5
+    image: ghcr.io/pdonadeo/e-uscito-joypad:sha-XXXXXXX # da aggiornare al deploy di v45
     depends_on:
       - "postgresql"
     container_name: "euj-app-prod"
@@ -78,7 +79,7 @@ services:
       MEDIA_ROOT: "/media"
     env_file: ./compose_env_prod
     volumes:
-      - ./euscitojoypad_db/MEDIA:/media
+      - ./media:/media
 
   # Discord bot (Go)
   bot:

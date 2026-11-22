@@ -12,3 +12,6 @@ docker-compose.yml
 REAL_PROD
 dump-prod
 compose_env_prod
+euscitojoypad_db
+media
+infra/db/seed

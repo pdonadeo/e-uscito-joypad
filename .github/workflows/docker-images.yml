@@ -13,17 +13,14 @@ jobs:
       contents: read
       packages: write
     strategy:
-      # Se una delle tre immagini fallisce, le altre due vengono comunque
-      # buildate e pushate.
+      # Se una delle due immagini fallisce, l'altra viene comunque
+      # buildata e pushata.
       fail-fast: false
       matrix:
         include:
           - name: Dream
             context: .
             image: e-uscito-joypad
-          - name: Django
-            context: ./euscitojoypad_db/
-            image: e-uscito-joypad-db
           - name: Discord bot
             context: ./discord-bot/
             image: e-uscito-joypad-bot

@@ -2,17 +2,23 @@
 // PostgreSQL usa e getta (postgres:15-alpine su 127.0.0.1:55433, dati in tmpfs). Ogni caso
 // lavora su un suo database. I binari ascoltano su 3921 e 3922.
 //
-// Il container riceve solo le variabili POSTGRES_* e PG* di compose_env, una per una con -e:
-// con --env-file compose_env le righe `export` fanno fallire docker run.
-const { test, expect } = require('@playwright/test');
+// I casi «initdb» usano un secondo PostgreSQL usa e getta (127.0.0.1:55435), che nasce come
+// quello del compose di sviluppo: con infra/db/ intero in /docker-entrypoint-initdb.d.
+//
+// I container ricevono solo le variabili POSTGRES_* e PG* di compose_env (più DEBUG nei casi
+// «initdb»), una per una con -e: con --env-file compose_env le righe `export` fanno fallire
+// docker run.
+const { test, expect, request: richieste } = require('@playwright/test');
 const fs = require('fs');
 const net = require('net');
 const path = require('path');
-const { spawn, execFileSync } = require('child_process');
+const { spawn, spawnSync, execFileSync } = require('child_process');
 const { ROOT, BINARY, composeEnv, dreamEnv, sql } = require('./env');
 
 const CONTAINER = 'euj-prova-migrazioni';
 const PORTA_PG = 55433;
+const CONTAINER_INITDB = 'euj-prova-initdb';
+const PORTA_PG_INITDB = 55435;
 const PORTE = [3921, 3922];
 const PROVA_SINTASSI = path.join(ROOT, '_build', 'default', 'src', 'migrazioni', 'test', 'prova_sintassi.exe');
 // chiave di pg_advisory_lock del runner: 0x45554A4D, "EUJM" (vedi migrazioni.ml)
@@ -42,10 +48,10 @@ function creaDb(nome) {
   docker(['exec', CONTAINER, 'createdb', '-U', env.POSTGRES_USER, '-O', PGUSER, nome]);
 }
 
-function envDb(db, porta = PORTE[0]) {
+function envDb(db, porta = PORTE[0], portaPg = PORTA_PG) {
   return {
     ...process.env,
-    ...dreamEnv({ PGHOST: '127.0.0.1', PGPORT: String(PORTA_PG), PGDATABASE: db, REST_LISTEN_PORT: String(porta) }),
+    ...dreamEnv({ PGHOST: '127.0.0.1', PGPORT: String(portaPg), PGDATABASE: db, REST_LISTEN_PORT: String(porta) }),
   };
 }
 
@@ -128,36 +134,44 @@ async function tieniLock(db) {
 
 const righe = (log, testo) => log.split('\n').filter((r) => r.includes(testo));
 
+// Variabili POSTGRES_* e PG* di compose_env, come argomenti -e di docker run.
+const variabiliPg = () =>
+  Object.entries(env)
+    .filter(([k]) => /^(POSTGRES_|PG)[A-Z_]*$/.test(k))
+    .flatMap(([k, v]) => ['-e', `${k}=${v}`]);
+
+// Aspetta che il Postgres risponda su TCP: durante initdb ascolta solo sul socket locale, quindi
+// la prima risposta su 127.0.0.1 arriva a initdb finito.
+function attendiPostgres(container, ms) {
+  const fine = Date.now() + ms;
+  for (;;) {
+    try {
+      docker(['exec', container, 'psql', '-h', '127.0.0.1', '-U', PGUSER, '-d', env.PGDATABASE, '-c', 'SELECT 1'], {
+        stdio: 'ignore',
+      });
+      return;
+    } catch {
+      if (Date.now() > fine) throw new Error(`il Postgres ${container} non è partito entro ${ms} ms`);
+      execFileSync('sleep', ['0.5']);
+    }
+  }
+}
+
 test.describe.configure({ mode: 'serial' });
 
 test.beforeAll(() => {
   try {
     docker(['rm', '-fv', CONTAINER], { stdio: 'ignore' });
   } catch {}
-  const variabili = Object.entries(env)
-    .filter(([k]) => /^(POSTGRES_|PG)[A-Z_]*$/.test(k))
-    .flatMap(([k, v]) => ['-e', `${k}=${v}`]);
   docker([
     'run', '--rm', '-d', '--name', CONTAINER,
     '-p', `127.0.0.1:${PORTA_PG}:5432`,
     '--tmpfs', '/var/lib/postgresql/data',
-    ...variabili,
+    ...variabiliPg(),
     '-v', `${path.join(ROOT, 'infra', 'db', '01_init_pg.sh')}:/docker-entrypoint-initdb.d/01_init_pg.sh:ro`,
     'postgres:15-alpine',
   ]);
-  // pronto quando risponde su TCP (durante initdb ascolta solo sul socket locale)
-  const fine = Date.now() + 45_000;
-  for (;;) {
-    try {
-      docker(['exec', CONTAINER, 'psql', '-h', '127.0.0.1', '-U', PGUSER, '-d', env.PGDATABASE, '-c', 'SELECT 1'], {
-        stdio: 'ignore',
-      });
-      return;
-    } catch {
-      if (Date.now() > fine) throw new Error('il Postgres usa e getta non è partito');
-      execFileSync('sleep', ['0.5']);
-    }
-  }
+  attendiPostgres(CONTAINER, 45_000);
 });
 
 test.afterEach(async () => {
@@ -166,6 +180,9 @@ test.afterEach(async () => {
 
 test.afterAll(() => {
   docker(['rm', '-fv', CONTAINER], { stdio: 'ignore' });
+  try {
+    docker(['rm', '-fv', CONTAINER_INITDB], { stdio: 'ignore' });
+  } catch {}
 });
 
 test('DB vuoto: 0001 eseguita e registrata, 0002 no-op registrata, tutto di proprietà di PGUSER', async () => {
@@ -337,4 +354,117 @@ test('lock mai rilasciato: dopo 60 s il binario esce con 13', async () => {
   } finally {
     await lock.rilascia();
   }
+});
+
+// ---- initdb di sviluppo (Fase 7): 01_init_pg.sh e 02_schema_e_seed.sh su un volume vuoto ----
+
+const TABELLE_DATI = [
+  'auth_user',
+  'backoffice_associazioneepisodiovideogame',
+  'backoffice_episodio',
+  'backoffice_videogame',
+];
+
+// SQL sul Postgres dei casi initdb, nel database PGDATABASE, come PGUSER
+const qi = (query) => sql(query, {}, { container: CONTAINER_INITDB });
+
+// Un Postgres nuovo, con infra/db/ montato come nel compose di sviluppo e DEBUG come indicato.
+function avviaInitdb(debug) {
+  try {
+    docker(['rm', '-fv', CONTAINER_INITDB], { stdio: 'ignore' });
+  } catch {}
+  docker([
+    'run', '--rm', '-d', '--name', CONTAINER_INITDB,
+    '-p', `127.0.0.1:${PORTA_PG_INITDB}:5432`,
+    '--tmpfs', '/var/lib/postgresql/data',
+    ...variabiliPg(),
+    '-e', `DEBUG=${debug}`,
+    '-v', `${path.join(ROOT, 'infra', 'db')}:/docker-entrypoint-initdb.d:ro`,
+    'postgres:15-alpine',
+  ]);
+  attendiPostgres(CONTAINER_INITDB, 90_000);
+}
+
+// Le righe di initdb dal log del container (docker logs scrive su stdout e su stderr).
+function logInitdb() {
+  const { stdout, stderr } = spawnSync('docker', ['logs', CONTAINER_INITDB], { encoding: 'utf8' });
+  return (stdout + stderr)
+    .split('\n')
+    .filter((riga) => /02_schema_e_seed|01_init_pg|docker-entrypoint-initdb|ERROR|FATAL/.test(riga))
+    .join('\n');
+}
+
+test('initdb di sviluppo (DEBUG del compose, True): schema e seed, poi il binario registra 0001 e applica 0002', async () => {
+  test.setTimeout(150_000);
+  expect(env.DEBUG.toLowerCase()).toBe('true');
+  avviaInitdb(env.DEBUG);
+  const log = logInitdb();
+  console.log(log);
+  expect(log).toContain('02_schema_e_seed: carico lo schema da /docker-entrypoint-initdb.d/migrazioni/0001_schema_di_partenza.sql');
+  expect(log).toContain('02_schema_e_seed: carico il seed da /docker-entrypoint-initdb.d/seed/seed_sviluppo.sql');
+
+  // i dati della fixture e il solo admin
+  expect(qi('SELECT count(*) FROM backoffice_episodio')).toBe('108');
+  expect(qi('SELECT count(*) FROM backoffice_videogame')).toBe('681');
+  expect(qi('SELECT count(*) FROM backoffice_associazioneepisodiovideogame')).toBe('1209');
+  expect(qi('SELECT username FROM auth_user')).toBe('admin');
+  // tutto di PGUSER, nessun registro (lo crea il binario)
+  expect(qi("SELECT string_agg(tablename, ',' ORDER BY tablename) FROM pg_tables WHERE schemaname = 'public'")).toBe(
+    TABELLE_DATI.join(','),
+  );
+  expect(qi("SELECT DISTINCT tableowner FROM pg_tables WHERE schemaname = 'public'")).toBe(PGUSER);
+  // sequenze oltre il max(id): il prossimo id non collide
+  for (const t of TABELLE_DATI) {
+    const ultimo = qi(
+      `SELECT last_value FROM pg_sequences WHERE schemaname || '.' || sequencename = pg_get_serial_sequence('public.${t}', 'id')`,
+    );
+    const massimo = qi(`SELECT max(id) FROM ${t}`);
+    expect(Number(ultimo), t).toBeGreaterThanOrEqual(Number(massimo));
+  }
+
+  // il binario trova lo schema senza registro: registra 0001, applica 0002 (no-op)
+  const b = avvia(BINARY, envDb(env.PGDATABASE, PORTE[0], PORTA_PG_INITDB));
+  await attendiPorta(b, PORTE[0]);
+  console.log(b.log);
+  expect(b.log).toContain('migrazioni: stato del DB: Esistente_senza_registro');
+  expect(b.log).toContain('migrazioni: 0001_schema_di_partenza registrata senza eseguirla');
+  expect(b.log).toMatch(/migrazioni: 0002_via_tabelle_django applicata in \d+ ms/);
+  expect(qi("SELECT versione || '|' || eseguita FROM schema_migrations ORDER BY 1")).toBe(
+    ['0001|false', '0002|true'].join('\n'),
+  );
+  expect(qi('SELECT count(*) FROM backoffice_episodio')).toBe('108');
+
+  // login GraphQL di admin con la password del seed
+  const base = `http://127.0.0.1:${PORTE[0]}`;
+  const ctx = await richieste.newContext({ baseURL: base, extraHTTPHeaders: { Origin: base } });
+  try {
+    const login = await (
+      await ctx.post('/api/graphql', {
+        data: {
+          query: 'mutation($c: CredenzialiInput!) { login(credenziali: $c) { id } }',
+          variables: { c: { username: 'admin', password: 'CHANGE_ME_IN_PRODUCTION' } },
+        },
+      })
+    ).json();
+    expect(login.errors, JSON.stringify(login)).toBeUndefined();
+    const me = await (await ctx.post('/api/graphql', { data: { query: '{ me { username } }' } })).json();
+    expect(me.data.me.username).toBe('admin');
+  } finally {
+    await ctx.dispose();
+  }
+});
+
+test('initdb di sviluppo con DEBUG=False: schema sì, seed no', async () => {
+  test.setTimeout(120_000);
+  avviaInitdb('False');
+  const log = logInitdb();
+  console.log(log);
+  expect(log).toContain('02_schema_e_seed: carico lo schema da /docker-entrypoint-initdb.d/migrazioni/0001_schema_di_partenza.sql');
+  expect(log).toContain('02_schema_e_seed: DEBUG non è True, niente seed');
+  expect(log).not.toContain('carico il seed');
+
+  expect(qi("SELECT string_agg(tablename, ',' ORDER BY tablename) FROM pg_tables WHERE schemaname = 'public'")).toBe(
+    TABELLE_DATI.join(','),
+  );
+  for (const t of TABELLE_DATI) expect(qi(`SELECT count(*) FROM ${t}`), t).toBe('0');
 });

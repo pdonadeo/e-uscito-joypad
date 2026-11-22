@@ -22,7 +22,9 @@ yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune
   cambia e non si ricompila, si prova il binario vecchio.
 - **Migrazioni:** `tests/api/migrazioni.spec.js` prova il runner delle migrazioni su un PostgreSQL usa e getta
   (`euj-prova-migrazioni`, porta 55433) che avvia e toglie da solo. Usa `prova_sintassi.exe`, che `@install` non
-  compila: per questo il comando lo nomina.
+  compila: per questo il comando lo nomina. I casi «initdb» avviano un secondo PostgreSQL usa e getta
+  (`euj-prova-initdb`, porta 55435) con `infra/db/` montato come nel compose di sviluppo, e provano schema e seed
+  con `DEBUG=True` e con `DEBUG=False`.
 - **Durata:** circa 10 minuti. I test girano uno alla volta, perché condividono il database.
 - **Una sola esecuzione per volta:** due suite in parallelo usano lo stesso database e la stessa porta, e si disturbano.
 

@@ -26,28 +26,6 @@ function routeTable() {
   }));
 }
 
-// ID citati nei commenti «# F-…» che precedono un campo di Query o Mutation.
-function operationIds() {
-  const ids = new Set();
-  let inRoot = false;
-  let pending = [];
-  for (const line of SDL.split('\n')) {
-    const t = line.trim();
-    if (/^type (Query|Mutation) \{/.test(t)) {
-      inRoot = true;
-      pending = [];
-    } else if (inRoot && t === '}') {
-      inRoot = false;
-    } else if (inRoot && t.startsWith('#')) {
-      pending.push(...(t.match(ID_RE) || []));
-    } else if (inRoot && /^[a-zA-Z_]\w*[(:]/.test(t)) {
-      pending.forEach((id) => ids.add(id));
-      pending = [];
-    }
-  }
-  return ids;
-}
-
 test.describe('lint di docs/schema.graphql', () => {
   test('buildSchema accetta lo schema', () => {
     expect(() => buildSchema(SDL)).not.toThrow();
@@ -60,11 +38,12 @@ test.describe('lint di docs/schema.graphql', () => {
     expect(ids.filter((id) => !inSchema.has(id))).toEqual([]);
   });
 
-  test('ogni route di /api/bo ha un\'operazione GraphQL (tranne la cover)', () => {
-    const ops = operationIds();
-    const routes = routeTable().filter((r) => !r.route.includes('/cover') && r.ids.length > 0);
-    expect(routes.length).toBeGreaterThan(15);
-    const missing = routes.filter((r) => !r.ids.some((id) => ops.has(id))).map((r) => r.route);
-    expect(missing).toEqual([]);
+  // Dalla Fase 1 di via-django la REST /api/bo ha solo la cover: la tabella di analisi.md
+  // ha solo quelle due righe. Che ogni ID di analisi.md compaia nello schema lo prova il test sopra.
+  test('la tabella di /api/bo in analisi.md ha solo le due route della cover', () => {
+    expect(routeTable()).toEqual([
+      { route: 'POST /api/bo/episodi/:id/cover', ids: ['F-EP-10'] },
+      { route: 'DELETE /api/bo/episodi/:id/cover', ids: ['F-EP-11'] },
+    ]);
   });
 });

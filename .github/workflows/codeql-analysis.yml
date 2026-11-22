@@ -26,9 +26,6 @@ jobs:
           # Il frontend React.
           - language: javascript-typescript
             build-mode: none
-          # Il backoffice Django in euscitojoypad_db/.
-          - language: python
-            build-mode: none
           # Il bot Discord in discord-bot/: è l'unico linguaggio compilato,
           # l'autobuilder trova da solo il go.mod.
           - language: go

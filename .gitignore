@@ -42,3 +42,5 @@ compose_env_prod
 /test-results/
 /REAL_PROD/
 /dump-prod/
+/euscitojoypad_db/
+/media/
