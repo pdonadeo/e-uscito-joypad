@@ -168,7 +168,7 @@ test.afterAll(() => {
   docker(['rm', '-fv', CONTAINER], { stdio: 'ignore' });
 });
 
-test('DB vuoto: 0001 eseguita e registrata, tutto di proprietà di PGUSER', async () => {
+test('DB vuoto: 0001 eseguita e registrata, 0002 no-op registrata, tutto di proprietà di PGUSER', async () => {
   creaDb('vuoto');
   const b = avviaBinario('vuoto');
   await attendiPorta(b, PORTE[0]);
@@ -177,7 +177,11 @@ test('DB vuoto: 0001 eseguita e registrata, tutto di proprietà di PGUSER', asyn
   expect(b.log).toContain('migrazioni: stato del DB: Vuoto');
   expect(b.log).toContain('migrazioni: applico 0001_schema_di_partenza');
   expect(b.log).toMatch(/migrazioni: 0001_schema_di_partenza applicata in \d+ ms/);
-  expect(q('vuoto', "SELECT versione || '|' || eseguita FROM schema_migrations ORDER BY 1")).toBe('0001|true');
+  // 0002 non trova tabelle di Django da togliere: DROP TABLE IF EXISTS è un no-op
+  expect(b.log).toMatch(/migrazioni: 0002_via_tabelle_django applicata in \d+ ms/);
+  expect(q('vuoto', "SELECT versione || '|' || eseguita FROM schema_migrations ORDER BY 1")).toBe(
+    ['0001|true', '0002|true'].join('\n'),
+  );
   expect(q('vuoto', "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'")).toBe('5');
   expect(q('vuoto', "SELECT DISTINCT tableowner FROM pg_tables WHERE schemaname = 'public'")).toBe(PGUSER);
   expect(q('vuoto', "SELECT extname || '|' || extowner::regrole FROM pg_extension WHERE extname <> 'plpgsql' ORDER BY 1")).toBe(
@@ -185,10 +189,19 @@ test('DB vuoto: 0001 eseguita e registrata, tutto di proprietà di PGUSER', asyn
   );
 });
 
-test('DB come produzione (schema di Django): 0001 registrata senza eseguirla', async () => {
+const SCHEMA_DJANGO = fs.readFileSync(path.join(ROOT, 'tests', 'migrazioni', 'schema-django.sql'), 'utf8');
+const TABELLE_FINALI = [
+  'auth_user',
+  'backoffice_associazioneepisodiovideogame',
+  'backoffice_episodio',
+  'backoffice_videogame',
+  'schema_migrations',
+].join('\n');
+
+test('DB come produzione (schema di Django): 0001 registrata senza eseguirla, 0002 toglie le tabelle Django', async () => {
   creaDb('produzione');
-  q('produzione', fs.readFileSync(path.join(ROOT, 'tests', 'migrazioni', 'schema-django.sql'), 'utf8'));
-  const prima = q('produzione', "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'");
+  q('produzione', SCHEMA_DJANGO);
+  expect(q('produzione', "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'")).toBe('14');
   const b = avviaBinario('produzione');
   await attendiPorta(b, PORTE[0]);
   console.log(b.log);
@@ -196,9 +209,35 @@ test('DB come produzione (schema di Django): 0001 registrata senza eseguirla', a
   expect(b.log).toContain('migrazioni: stato del DB: Esistente_senza_registro');
   expect(b.log).toContain('migrazioni: 0001_schema_di_partenza registrata senza eseguirla');
   expect(b.log).not.toContain('migrazioni: applico 0001');
-  expect(q('produzione', "SELECT versione || '|' || eseguita FROM schema_migrations ORDER BY 1")).toBe('0001|false');
-  // le tabelle di Django restano (le toglie la 0002, Fase 5): in più c'è solo il registro
-  expect(Number(q('produzione', "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'"))).toBe(Number(prima) + 1);
+  expect(b.log).toContain('migrazioni: applico 0002_via_tabelle_django');
+  expect(b.log).toMatch(/migrazioni: 0002_via_tabelle_django applicata in \d+ ms/);
+  expect(q('produzione', "SELECT versione || '|' || eseguita FROM schema_migrations ORDER BY 1")).toBe(
+    ['0001|false', '0002|true'].join('\n'),
+  );
+  // restano le 4 tabelle dei dati e il registro
+  expect(q('produzione', "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY 1")).toBe(TABELLE_FINALI);
+});
+
+test('0002 fallisce (vista su django_session): esce con 12, rollback, tabelle Django intatte', async () => {
+  creaDb('vista');
+  q('vista', SCHEMA_DJANGO);
+  q('vista', 'CREATE VIEW sessioni_e2e AS SELECT session_key FROM django_session');
+  const b = avviaBinario('vista');
+  const codice = await entro(b.uscita, 15_000, 'uscita del binario');
+  console.log(b.log);
+
+  expect(codice).toBe(12);
+  expect(b.log).toContain('migrazioni: 0001_schema_di_partenza registrata senza eseguirla');
+  const errore = righe(b.log, 'migrazioni: ERRORE in 0002_via_tabelle_django');
+  expect(errore).toHaveLength(1);
+  // 2BP01: dependent_objects_still_exist (senza CASCADE il DROP si ferma sulla vista)
+  expect(errore[0]).toContain('SQLSTATE 2BP01');
+  // il DETAIL di Postgres, in coda alla stessa riga, nomina la vista e la tabella
+  expect(errore[0]).toContain('— DETAIL: view sessioni_e2e depends on table django_session');
+  // 0001 era registrata in una transazione sua; la 0002 è andata in rollback
+  expect(q('vista', "SELECT versione || '|' || eseguita FROM schema_migrations ORDER BY 1")).toBe('0001|false');
+  expect(q('vista', "SELECT count(*) FROM pg_tables WHERE schemaname = 'public'")).toBe('15');
+  expect(q('vista', "SELECT to_regclass('public.django_session') IS NOT NULL")).toBe('t');
 });
 
 test('DB parziale: esce con 11, schema non riconosciuto, nessun registro', async () => {
@@ -273,7 +312,9 @@ test('lock occupato: il binario aspetta e parte quando il lock si libera', async
     await lock.rilascia();
     await attendiPorta(b, PORTE[0], 10_000);
     console.log(b.log);
-    expect(q('lock', 'SELECT versione FROM schema_migrations ORDER BY 1')).toBe('0001');
+    expect(q('lock', 'SELECT versione FROM schema_migrations ORDER BY 1')).toBe(
+      MIGRAZIONI.map((m) => m.slice(0, 4)).join('\n'),
+    );
   } finally {
     lock.termina();
   }

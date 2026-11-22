@@ -147,17 +147,30 @@ type errore = {
   sqlstate : string; (* "" se Postgres non l'ha dato *)
   riga : int option;
   messaggio : string;
+  dettaglio : string; (* DETAIL di Postgres, "" se manca *)
+  suggerimento : string; (* HINT di Postgres, "" se manca *)
 }
 
+(* Gli a capo di DETAIL e HINT diventano «; », così l'errore resta su una riga sola. *)
+let su_una_riga s =
+  String.split_on_char '\n' s |> List.map String.trim |> List.filter (fun r -> r <> "") |> String.concat "; "
+
 let testo_errore e =
+  let coda etichetta s =
+    match su_una_riga s with
+    | "" -> ""
+    | s -> Printf.sprintf " — %s: %s" etichetta s
+  in
   Printf.sprintf
-    "ERRORE in %s (SQLSTATE %s, %s): %s"
+    "ERRORE in %s (SQLSTATE %s, %s): %s%s%s"
     e.migrazione
     (if e.sqlstate = "" then "sconosciuto" else e.sqlstate)
     (match e.riga with
     | Some r -> Printf.sprintf "riga %d" r
     | None -> "riga sconosciuta")
     e.messaggio
+    (coda "DETAIL" e.dettaglio)
+    (coda "HINT" e.suggerimento)
 
 let log_errore e = Log.err (fun m -> m "migrazioni: %s" (testo_errore e))
 let ok = Postgresql.[Command_ok; Tuples_ok]
@@ -197,7 +210,15 @@ let applica_testo (conn : Postgresql.connection) ~versione ~nome ~sql ~eseguita 
             | Some posizione -> riga_di ~sql ~posizione
             | None -> None
           in
-          Error { migrazione; sqlstate = campo Postgresql.Error_field.SQLSTATE; riga; messaggio }
+          Error
+            {
+              migrazione;
+              sqlstate = campo Postgresql.Error_field.SQLSTATE;
+              riga;
+              messaggio;
+              dettaglio = campo Postgresql.Error_field.MESSAGE_DETAIL;
+              suggerimento = campo Postgresql.Error_field.MESSAGE_HINT;
+            }
     in
     match esito with
     | Error _ as e ->
@@ -213,7 +234,15 @@ let applica_testo (conn : Postgresql.connection) ~versione ~nome ~sql ~eseguita 
       Ok ()
   with Postgresql.Error e ->
     rollback ();
-    Error { migrazione; sqlstate = ""; riga = None; messaggio = Postgresql.string_of_error e }
+    Error
+      {
+        migrazione;
+        sqlstate = "";
+        riga = None;
+        messaggio = Postgresql.string_of_error e;
+        dettaglio = "";
+        suggerimento = "";
+      }
 
 (* ---- Runner ---- *)
 

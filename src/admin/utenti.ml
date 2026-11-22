@@ -109,10 +109,4 @@ let update_req =
       WHERE u.id = $1
       RETURNING u.id|}
 
-(* Come il CASCADE di Django: prima le righe che puntano all'utente. *)
-let delete_refs_reqs =
-  List.map
-    (fun table -> Caqti_request.Infix.(Caqti_type.int ->. Caqti_type.unit) ("DELETE FROM " ^ table ^ " WHERE user_id = $1"))
-    ["django_admin_log"; "auth_user_groups"; "auth_user_user_permissions"]
-
 let delete_req = Caqti_request.Infix.(Caqti_type.int ->. Caqti_type.unit) "DELETE FROM auth_user WHERE id = $1"

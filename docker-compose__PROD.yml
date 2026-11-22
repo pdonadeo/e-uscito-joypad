@@ -1,0 +1,130 @@
+---
+version: "3.7"
+services:
+  balancer:
+    depends_on:
+      - "app"
+    image: nginx:stable-alpine
+    container_name: "euj-balancer-prod"
+    networks:
+      - euj_prod
+    ports:
+      - "127.0.0.1:8000:80"
+    volumes:
+      - ./euscitojoypad_db/MEDIA:/usr/share/nginx/html/bo/files
+      - ./infra/nginx/conf.d:/etc/nginx/conf.d
+
+  # PostgreSQL
+  postgresql:
+    image: postgres:15-alpine
+    container_name: "euj-postgresql-prod"
+    networks:
+      - euj_prod
+    ports:
+      - "127.0.0.1:15432:5432"
+    env_file: ./compose_env_prod
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./infra/db/:/docker-entrypoint-initdb.d/
+
+  # È uscito Joypad? (Backend Dream + React SPA)
+  app:
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-64e6795
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-3ccd21f
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-dda0848
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-8f23456
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-6832e7d
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-932a518
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-007c3fb
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-356f784
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-4ad4a5d
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-cf35c67
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-3f7dce0
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-6f4d788
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-da8ca42
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-e5510a0
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-87c57b2
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-89b3b22
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:latest
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-de7bd84
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-4abc057
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-3bd7d25
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-7a362fe
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:latest
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-25248d3
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-a7ca411
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-26656b8
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-bb442a7
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-544e24b
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-54a6064
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-c08898e
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-deeef74
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-dbb7b2e
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-db4df67
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-524eb85
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-c6150f6
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-42f4c02
+    #image: ghcr.io/pdonadeo/e-uscito-joypad:sha-d57348e
+    image: ghcr.io/pdonadeo/e-uscito-joypad:sha-100d7e5
+    depends_on:
+      - "postgresql"
+    container_name: "euj-app-prod"
+    build: ./
+    networks:
+      - euj_prod
+    environment:
+      PGHOST: "postgresql"
+      PGPORT: "5432"
+      MEDIA_ROOT: "/media"
+    env_file: ./compose_env_prod
+    volumes:
+      - ./euscitojoypad_db/MEDIA:/media
+
+  # Discord bot (Go)
+  bot:
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:latest
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-007c3fb
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-356f784
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-4ad4a5d
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-cf35c67
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-3f7dce0
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-6f4d788
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-da8ca42
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:latest
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-de7bd84
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-4abc057
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-3bd7d25
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-7a362fe
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-25248d3
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-a7ca411
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-26656b8
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-bb442a7
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-544e24b
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-54a6064
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-c08898e
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-deeef74
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-dbb7b2e
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-db4df67
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-524eb85
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-c6150f6
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-42f4c02
+    #image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-d57348e
+    image: ghcr.io/pdonadeo/e-uscito-joypad-bot:sha-100d7e5
+    depends_on:
+      - "postgresql"
+    container_name: "euj-bot-prod"
+    build: ./discord-bot/
+    networks:
+      - euj_prod
+    environment:
+      PGHOST: "postgresql"
+      PGPORT: "5432"
+    env_file: ./compose_env_prod
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  euj_prod:
+    name: euj_prod

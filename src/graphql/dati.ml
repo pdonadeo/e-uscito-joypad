@@ -352,15 +352,6 @@ let elimina_utente req (me : Auth.user) id =
   let%lwt j = Utenti.fetch_one req id in
   let%lwt () =
     db req (fun (module DB : DB) ->
-        DB.with_transaction (fun () ->
-            let open Lwt_result.Syntax in
-            let* () =
-              List.fold_left
-                (fun acc r ->
-                  let* () = acc in
-                  DB.exec r id)
-                (Lwt.return_ok ()) Utenti.delete_refs_reqs
-            in
-            DB.exec Utenti.delete_req id))
+        DB.with_transaction (fun () -> DB.exec Utenti.delete_req id))
   in
   Lwt.return (parse j)

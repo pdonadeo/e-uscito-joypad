@@ -89,6 +89,46 @@ let () =
   assert (
     c = "host='db.example' port='5432' user='utente' password='p%a#s?s@w\\'o\\\\r d' dbname='euj' connect_timeout='5'")
 
+(* ---- testo_errore ---- *)
+
+let () =
+  let e =
+    {
+      migrazione = "0002_via_tabelle_django";
+      sqlstate = "2BP01";
+      riga = Some 8;
+      messaggio = "cannot drop desired object(s) because other objects depend on them";
+      dettaglio = "view sessioni_e2e depends on table django_session";
+      suggerimento = "Use DROP ... CASCADE to drop the dependent objects too.";
+    }
+  in
+  let inizio =
+    "ERRORE in 0002_via_tabelle_django (SQLSTATE 2BP01, riga 8): cannot drop desired object(s) because other objects \
+     depend on them"
+  in
+  (* con DETAIL e HINT *)
+  assert (
+    testo_errore e
+    = inizio
+      ^ " — DETAIL: view sessioni_e2e depends on table django_session — HINT: Use DROP ... CASCADE to drop the \
+         dependent objects too.");
+  (* solo DETAIL *)
+  assert (
+    testo_errore { e with suggerimento = "" } = inizio ^ " — DETAIL: view sessioni_e2e depends on table django_session");
+  (* senza nessuno dei due: il formato di prima *)
+  assert (testo_errore { e with dettaglio = ""; suggerimento = "" } = inizio);
+  (* a capo nel DETAIL (anche in coda): «; » e nessuna riga vuota *)
+  let t =
+    testo_errore { e with dettaglio = "view a depends on table x\nview b depends on table x\n"; suggerimento = "" }
+  in
+  assert (t = inizio ^ " — DETAIL: view a depends on table x; view b depends on table x");
+  assert (not (String.contains t '\n'));
+  (* senza SQLSTATE né riga *)
+  assert (
+    testo_errore { e with sqlstate = ""; riga = None; dettaglio = ""; suggerimento = "" }
+    = "ERRORE in 0002_via_tabelle_django (SQLSTATE sconosciuto, riga sconosciuta): cannot drop desired object(s) \
+       because other objects depend on them")
+
 (* ---- classifica ---- *)
 
 let quattro = tabelle_dei_dati
@@ -99,13 +139,9 @@ let django =
       "auth_group";
       "auth_group_permissions";
       "auth_permission";
-      "auth_user_groups";
-      "auth_user_user_permissions";
       "backoffice_discordmessage";
-      "django_admin_log";
       "django_content_type";
       "django_migrations";
-      "django_session";
     ]
 
 let non_riconosciuto = function

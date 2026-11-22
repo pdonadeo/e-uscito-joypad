@@ -2,7 +2,6 @@
 services:
   balancer:
     depends_on:
-      - "backoffice"
       - "app"
     image: nginx:stable-alpine
     container_name: "euj-balancer"
@@ -12,7 +11,6 @@ services:
       - "5000:80"
     volumes:
       - ./euscitojoypad_db/MEDIA:/usr/share/nginx/html/bo/files
-      - ./euscitojoypad_db/STATIC:/usr/share/nginx/html/legacy-bo/static
       - ./infra/nginx/conf.d:/etc/nginx/conf.d
 
   # PostgreSQL
@@ -45,25 +43,6 @@ services:
     env_file: ./compose_env
     volumes:
       - ./euscitojoypad_db/MEDIA:/media
-
-  # Backoffice (Django)
-  backoffice:
-    image: ghcr.io/pdonadeo/e-uscito-joypad-db:latest
-    depends_on:
-      - "postgresql"
-    container_name: "euj-backoffice"
-    build: ./euscitojoypad_db/
-    networks:
-      - euj
-    environment:
-      PGHOST: "postgresql"
-      PGPORT: "5432"
-    env_file: ./compose_env
-    volumes:
-      - ./euscitojoypad_db/backoffice:/app/backoffice
-      - ./euscitojoypad_db/euscitojoypad_db:/app/euscitojoypad_db
-      - ./euscitojoypad_db/MEDIA:/app/MEDIA
-      - ./euscitojoypad_db/STATIC:/app/STATIC
 
   # Discord bot (Go)
   bot:

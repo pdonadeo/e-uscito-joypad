@@ -118,17 +118,13 @@ test('creaUtente: validazioni → BAD_USER_INPUT', async () => {
   }
 });
 
-test('eliminaUtente: un utente con righe in django_admin_log si cancella', async () => {
-  const username = `e2e_gql_log_${uniq()}`.slice(0, 30);
-  const id = salvaUtente({ username, password: 'e2e-password-log' });
-  // una riga come quelle che scriveva l'admin di Django (action_flag 1 = ADDITION)
-  sql(
-    `INSERT INTO django_admin_log (action_time, object_repr, action_flag, change_message, user_id)
-VALUES (now(), 'e2e', 1, 'e2e', :'id'::int)`,
-    { id },
-  );
+test('eliminaUtente: nessuna FK punta ad auth_user e la cancellazione riesce', async () => {
+  // dopo la migrazione 0002 le tabelle di Django (e le loro FK verso auth_user) non ci sono più
+  expect(sql(`SELECT count(*) FROM pg_constraint WHERE confrelid = 'auth_user'::regclass`)).toBe('0');
+  const username = `e2e_gql_del_${uniq()}`.slice(0, 30);
+  const id = salvaUtente({ username, password: 'e2e-password-del' });
   expect(expectOk(await gql(su, ELIMINA, { id })).eliminaUtente.username).toBe(username);
-  expect(sql(`SELECT count(*) FROM django_admin_log WHERE user_id = :'id'::int`, { id })).toBe('0');
+  expect(sql(`SELECT count(*) FROM auth_user WHERE id = :'id'::int`, { id })).toBe('0');
   expectCode(await gql(su, ELIMINA, { id: 999999999 }), 'NOT_FOUND', 'Risorsa non trovata');
 });
 
