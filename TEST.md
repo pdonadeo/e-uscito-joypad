@@ -11,7 +11,7 @@ su `/bo`. Configurazione: `playwright.api.config.js`. Test: `tests/api/*.spec.js
 ```fish
 cd ~/Programmazione/e-uscito-joypad
 docker compose up -d postgresql
-yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune build @install; and npx playwright test -c playwright.api.config.js
+yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune build @install src/migrazioni/test/prova_sintassi.exe; and npx playwright test -c playwright.api.config.js
 ```
 
 - **Cosa fa da sola:** avvia il binario compilato da dune e un finto RAWG (`tests/api/mock-rawg.js`), poi li spegne
@@ -20,8 +20,16 @@ yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune
   suite stessa, in SQL con `psql` dentro quel container.
 - **Perché i build prima:** i test girano sul binario in `_build/`, non sul container `euj-app`. Se il codice OCaml
   cambia e non si ricompila, si prova il binario vecchio.
-- **Durata:** circa 9 minuti. I test girano uno alla volta, perché condividono il database.
+- **Migrazioni:** `tests/api/migrazioni.spec.js` prova il runner delle migrazioni su un PostgreSQL usa e getta
+  (`euj-prova-migrazioni`, porta 55433) che avvia e toglie da solo. Usa `prova_sintassi.exe`, che `@install` non
+  compila: per questo il comando lo nomina.
+- **Durata:** circa 10 minuti. I test girano uno alla volta, perché condividono il database.
 - **Una sola esecuzione per volta:** due suite in parallelo usano lo stesso database e la stessa porta, e si disturbano.
+
+## Test unitari (OCaml)
+
+`opam exec -- dune test` lancia i test unitari del runner delle migrazioni (`src/migrazioni/test/`): nomi e
+contenuto dei file in `infra/db/migrazioni/` e funzioni pure. Non servono né Docker né il database.
 
 ## Suite visual
 

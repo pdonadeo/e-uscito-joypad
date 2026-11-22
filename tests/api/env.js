@@ -121,6 +121,7 @@ module.exports = {
   RAWG_KEY,
   USERS,
   BINARY,
+  composeEnv,
   dreamEnv,
   sql,
   hashDjango,

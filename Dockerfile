@@ -28,6 +28,7 @@ FROM pdonadeo/e-uscito-joypad-base:latest AS build-stage-2
 USER root
 ADD --chown=opam:opam ./dune ./dune-project /app/
 ADD --chown=opam:opam ./src /app/src
+ADD --chown=opam:opam ./infra/db/migrazioni /app/infra/db/migrazioni
 RUN mkdir -p /app/euscitojoypad_db /app/frontend/public /app/frontend/build
 ADD --chown=opam:opam ./frontend/public /app/frontend/public
 ADD --chown=opam:opam ./euscitojoypad_db/prerendered_index.html /app/euscitojoypad_db/prerendered_index.html

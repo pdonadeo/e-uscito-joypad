@@ -1,0 +1,14 @@
+; Test unitari del runner (opam exec -- dune test).
+
+(test
+ (name test_migrazioni)
+ (modules test_migrazioni)
+ (libraries migrazioni))
+
+; Eseguibile di prova per tests/api/migrazioni.spec.js (caso «errore di sintassi»).
+; Non è installato e non finisce mai nell'immagine.
+
+(executable
+ (name prova_sintassi)
+ (modules prova_sintassi)
+ (libraries migrazioni postgresql logs))

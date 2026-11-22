@@ -17,6 +17,7 @@
   admin
   gql
   settings
+  migrazioni
   batteries
   malloc
   timedesc

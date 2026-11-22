@@ -23,6 +23,7 @@ depends: [
   "tyxml-ppx" {= "4.6.0"}
   "ppx_deriving_yojson" {= "3.9.1"}
   "caqti-driver-postgresql" {= "2.2.4"}
+  "postgresql" {= "5.3.2"}
   "decimal" {= "1.0.2"}
   "crunch" {= "4.0.0"}
   "dune" {>= "3.20" & dev & = "3.20.2"}

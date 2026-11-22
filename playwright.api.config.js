@@ -4,7 +4,7 @@
 // Avvia un Dream locale (build di dune) e un finto RAWG; usa il PostgreSQL del
 // compose di sviluppo, dove crea gli utenti di test in SQL (tests/api/global-setup.js).
 //
-//   yarn --cwd frontend build && bun run --cwd new-bo build && opam exec -- dune build @install && npx playwright test -c playwright.api.config.js
+//   yarn --cwd frontend build && bun run --cwd new-bo build && opam exec -- dune build @install src/migrazioni/test/prova_sintassi.exe && npx playwright test -c playwright.api.config.js
 const { defineConfig } = require('@playwright/test');
 const { API_URL, API_PORT, RAWG_PORT, RAWG_KEY, BINARY, dreamEnv } = require('./tests/api/env');
 

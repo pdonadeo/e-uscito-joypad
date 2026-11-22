@@ -6,9 +6,6 @@ let signal_handler s =
   log "Exiting on signal %d" s;
   Lwt.wakeup stop_now ()
 
-let _ = Lwt_unix.on_signal 15 signal_handler
-let _ = Lwt_unix.on_signal 2 signal_handler
-
 let level =
   match Settings.debug with
   | true -> `Debug
@@ -74,8 +71,11 @@ let check_admin_settings () =
   if Settings.dream_secret = None
   then log.warning (fun m -> m "DREAM_SECRET non impostata: le sessioni dell'admin non sopravvivono al riavvio")
 
-let server =
-  check_admin_settings ();
+let server () =
+  (* sostituiscono i gestori di SIGTERM e SIGINT installati prima delle migrazioni: quelli di
+     Lwt scrivono su una pipe che legge solo il loop di Lwt_main.run *)
+  let _ = Lwt_unix.on_signal 15 signal_handler in
+  let _ = Lwt_unix.on_signal 2 signal_handler in
   Lwt.async Joypad_monitor.monitor (* TODO ELIMINARE Lwt.async *);
   Lwt.async (Utils.gc_loop Settings.gc_period_sec) (* TODO ELIMINARE Lwt.async *);
 
@@ -134,4 +134,15 @@ let server =
          get "/" default_handler;
        ]
 
-let () = Lwt_main.run server
+let () =
+  check_admin_settings ();
+  (* Nel container il binario è il PID 1: senza un gestore il kernel ignora SIGTERM. Questi
+     gestori valgono durante le migrazioni (sincrone, prima del loop Lwt); se il processo esce a
+     metà di una migrazione, Postgres annulla la transazione aperta. *)
+  Sys.set_signal Sys.sigterm (Sys.Signal_handle (fun _ -> exit 143));
+  Sys.set_signal Sys.sigint (Sys.Signal_handle (fun _ -> exit 130));
+  Migrazioni.esegui
+    ~conninfo:
+      (Migrazioni.conninfo ~host:Settings.pghost ~port:Settings.pgport ~user:Settings.pguser
+         ~password:Settings.pgpassword ~dbname:Settings.pgdatabase);
+  Lwt_main.run (server ())

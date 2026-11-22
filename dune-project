@@ -47,6 +47,8 @@
    (= 3.9.1))
   (caqti-driver-postgresql
    (= 2.2.4))
+  (postgresql
+   (= 5.3.2))
   (decimal
    (= 1.0.2))
   (crunch

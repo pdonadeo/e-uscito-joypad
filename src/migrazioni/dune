@@ -1,0 +1,17 @@
+; Runner delle migrazioni dello schema del DB (vedi migrazioni.ml).
+; I file SQL di infra/db/migrazioni/ sono incorporati nel binario con ocaml-crunch.
+; Solo i *.sql del primo livello: infra/db/seed/ resta fuori.
+
+(library
+ (name migrazioni)
+ (modules migrazioni sql_incorporati)
+ (libraries postgresql unix logs))
+
+(rule
+ (target sql_incorporati.ml)
+ (deps
+  (glob_files %{project_root}/infra/db/migrazioni/*.sql))
+ (action
+  (with-stdout-to
+   %{target}
+   (run ocaml-crunch -m plain %{project_root}/infra/db/migrazioni))))
