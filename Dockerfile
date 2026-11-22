@@ -29,11 +29,11 @@ USER root
 ADD --chown=opam:opam ./dune ./dune-project /app/
 ADD --chown=opam:opam ./src /app/src
 ADD --chown=opam:opam ./infra/db/migrazioni /app/infra/db/migrazioni
-RUN mkdir -p /app/euscitojoypad_db /app/frontend/public /app/frontend/build
+RUN mkdir -p /app/frontend/public /app/frontend/build
 ADD --chown=opam:opam ./frontend/public /app/frontend/public
-ADD --chown=opam:opam ./euscitojoypad_db/prerendered_index.html /app/euscitojoypad_db/prerendered_index.html
+ADD --chown=opam:opam ./frontend/prerendered_index.html /app/frontend/prerendered_index.html
 COPY --from=build-stage-1 --chown=opam:opam /app/build /app/frontend/build
-RUN chown opam:opam /app/frontend /app/frontend/build /app/frontend/public /app/euscitojoypad_db
+RUN chown opam:opam /app/frontend /app/frontend/build /app/frontend/public
 RUN mkdir -p /app/new-bo/dist
 ADD --chown=opam:opam ./new-bo/dune /app/new-bo/dune
 COPY --from=build-new-bo --chown=opam:opam /app/new-bo/dist /app/new-bo/dist

@@ -46,7 +46,7 @@
  (deps
   (glob_files_rec %{project_root}/frontend/build/*)
   (glob_files_rec %{project_root}/new-bo/dist/*)
-  (file %{project_root}/euscitojoypad_db/prerendered_index.html))
+  (file %{project_root}/frontend/prerendered_index.html))
  (action
   (progn
    (bash
@@ -72,7 +72,7 @@
    (bash
     "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/static/")
    (bash
-    "cp %{project_root}/euscitojoypad_db/prerendered_index.html %{project_root}/static_filesystem/")
+    "cp %{project_root}/frontend/prerendered_index.html %{project_root}/static_filesystem/")
    (bash
     "if [ -d %{project_root}/new-bo/dist ]; then cp -a %{project_root}/new-bo/dist %{project_root}/static_filesystem/bo; fi")
    (with-stdout-to
