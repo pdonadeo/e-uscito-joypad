@@ -11,7 +11,9 @@ docker-compose.yml
 **/.omc
 REAL_PROD
 dump-prod
-compose_env_prod
+compose_env_prod*
+**/*.swp
+**/*~
 euscitojoypad_db
 media
 infra/db/seed

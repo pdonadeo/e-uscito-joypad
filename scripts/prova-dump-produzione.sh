@@ -102,7 +102,10 @@ FALLITI=0
 
 pulizia() {
   local rc=$?
-  trap - EXIT INT TERM
+  # Durante la pulizia i segnali si ignorano: un secondo Ctrl-C non deve lasciare acceso il
+  # Postgres con il dump.
+  trap '' INT TERM HUP
+  trap - EXIT
   for pid in "${PID_BINARI[@]}"; do kill "$pid" 2> /dev/null; done
   for pid in "${PID_BINARI[@]}"; do wait "$pid" 2> /dev/null; done
   docker rm -fv "${CONTENITORI[@]}" > /dev/null 2>&1
@@ -135,13 +138,17 @@ interrompi() {
   exit 1
 }
 
-casuale() { head -c 24 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c "$1"; }
+casuale() { head -c 64 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c "$1"; }
 SU_PASSWORD=$(casuale 32)
 RUOLO_PASSWORD=$(casuale 32)
 SEGRETO=$(casuale 48)
 
-# psql come superuser sul Postgres usa e getta; output senza intestazioni, campi separati da |
-q() { docker exec -i "$PG" psql -X -q -A -t -v ON_ERROR_STOP=1 -U postgres -d "$1" -c "$2"; }
+# I segreti (password, DREAM_SECRET, cookie di sessione) non passano mai in argv, che ogni utente
+# locale legge in /proc/*/cmdline: vanno in file 600 dentro $TMP, su stdin o nell'ambiente.
+
+# psql come superuser sul Postgres usa e getta, con l'SQL su stdin; output senza intestazioni,
+# campi separati da |
+q() { printf '%s\n' "$2" | docker exec -i "$PG" psql -X -q -A -t -v ON_ERROR_STOP=1 -U postgres -d "$1"; }
 
 di "== prova sul dump: $(basename "$DUMP") ($(stat -c %s "$DUMP") byte, sha256 $(sha256sum "$DUMP" | cut -c1-16))"
 if [ -n "$IMMAGINE" ]; then di "versione nuova: immagine $IMMAGINE"; else di "versione nuova: binario $BINARIO"; fi
@@ -150,8 +157,9 @@ di "versione in produzione: $IMMAGINE_VECCHIA"
 # ---- Postgres usa e getta ----
 
 docker network create "$RETE" > /dev/null || interrompi "creazione della rete $RETE"
+printf 'POSTGRES_PASSWORD=%s\n' "$SU_PASSWORD" > "$TMP/pg.env"
 docker run -d --name "$PG" --network "$RETE" -p "127.0.0.1:$PORTA_PG:5432" \
-  --tmpfs /var/lib/postgresql/data -e POSTGRES_PASSWORD="$SU_PASSWORD" "$IMMAGINE_PG" > /dev/null \
+  --tmpfs /var/lib/postgresql/data --env-file "$TMP/pg.env" "$IMMAGINE_PG" > /dev/null \
   || interrompi "avvio del Postgres usa e getta"
 for _ in $(seq 1 90); do
   q postgres 'SELECT 1' > /dev/null 2>&1 && docker exec "$PG" pg_isready -q -h 127.0.0.1 && break
@@ -190,22 +198,29 @@ AMBIENTE=(DEBUG=False "DREAM_SECRET=$SEGRETO" MEDIA_URL=bo/files/ TZ=Europe/Rome
   "PGUSER=$RUOLO" "PGPASSWORD=$RUOLO_PASSWORD")
 
 avvia_contenitore() { # nome porta db immagine
-  local e=()
-  local v
-  for v in "${AMBIENTE[@]}" MEDIA_ROOT=/media REST_LISTEN_ADDRESS=0.0.0.0 REST_LISTEN_PORT=3000 \
-    "PGHOST=$PG" PGPORT=5432 "PGDATABASE=$3"; do e+=(-e "$v"); done
-  docker run -d --name "$1" --network "$RETE" -p "127.0.0.1:$2:3000" -v "$MEDIA:/media" "${e[@]}" "$4" > /dev/null
+  printf '%s\n' "${AMBIENTE[@]}" MEDIA_ROOT=/media REST_LISTEN_ADDRESS=0.0.0.0 REST_LISTEN_PORT=3000 \
+    "PGHOST=$PG" PGPORT=5432 "PGDATABASE=$3" > "$TMP/$1.env"
+  docker run -d --name "$1" --network "$RETE" -p "127.0.0.1:$2:3000" -v "$MEDIA:/media" --env-file "$TMP/$1.env" "$4" \
+    > /dev/null
 }
 avvia_binario() { # nome porta db
-  env -i HOME="$TMP" PATH=/usr/bin:/bin "${AMBIENTE[@]}" "MEDIA_ROOT=$MEDIA" REST_LISTEN_ADDRESS=127.0.0.1 \
-    "REST_LISTEN_PORT=$2" PGHOST=127.0.0.1 "PGPORT=$PORTA_PG" "PGDATABASE=$3" "$BINARIO" > "$TMP/$1.log" 2>&1 &
+  # Un ambiente vuoto, poi solo le variabili della tabella: export è un builtin, quindi i valori
+  # non compaiono in argv.
+  # Valori calcolati prima di svuotare l'ambiente, in variabili locali non esportate.
+  local _bin=$BINARIO _amb=(HOME="$TMP" PATH=/usr/bin:/bin "${AMBIENTE[@]}" "MEDIA_ROOT=$MEDIA"
+    REST_LISTEN_ADDRESS=127.0.0.1 "REST_LISTEN_PORT=$2" PGHOST=127.0.0.1 "PGPORT=$PORTA_PG" "PGDATABASE=$3")
+  (
+    for _v in $(compgen -e); do unset "$_v" 2> /dev/null; done
+    for _v in "${_amb[@]}"; do export "$_v"; done
+    exec "$_bin"
+  ) > "$TMP/$1.log" 2>&1 &
   PID_BINARI+=($!)
 }
 log_server() { # nome
   if [ -n "$BINARIO" ] && [ "$1" != euj-prova-dump-vecchia ]; then cat "$TMP/$1.log" 2> /dev/null; else docker logs "$1" 2>&1; fi
 }
 # Le righe del runner, senza il DETAIL e l'HINT di Postgres (possono citare valori)
-righe_runner() { log_server "$1" | grep -o 'migrazioni: .*' | sed 's/ — DETAIL: .*//'; }
+righe_runner() { log_server "$1" | grep -o 'migrazioni: .*' | sed -e 's/ — DETAIL: .*//' -e 's/ — HINT: .*//'; }
 
 attendi_server() { # nome porta
   local i
@@ -272,24 +287,27 @@ di "== cancellazione utente su $PORTA_NUOVA"
 ORIGINE=http://127.0.0.1:$PORTA_NUOVA
 SUPER=prova_dump_su_$(casuale 8)
 PROVA=prova_dump_utente_$(casuale 8)
-gql() { # cookie corpo-json -> stampa il corpo della risposta
-  curl -s -H 'Content-Type: application/json' -H "Origin: $ORIGINE" ${1:+-H "Cookie: $1"} \
-    --data "$2" "$ORIGINE/api/graphql"
+gql() { # corpo-json -> stampa il corpo della risposta; il cookie di sessione è in $TMP/cookie.h
+  printf '%s' "$1" > "$TMP/gql.json"
+  curl -s -H 'Content-Type: application/json' -H "Origin: $ORIGINE" -H "@$TMP/cookie.h" \
+    --data "@$TMP/gql.json" "$ORIGINE/api/graphql"
 }
 codici() { grep -o '"code":"[A-Z_]*"' <<< "$1" | paste -sd ' '; }
 cancellazione() {
   q euj_migrato "INSERT INTO auth_user (password, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) VALUES ('$VETTORE_HASH', true, '$SUPER', '', '', '', true, true, now())" > /dev/null \
     || { esito FALLITO "cancellazione utente: inserimento del superuser temporaneo"; return; }
   local intestazioni=$TMP/login.h cookie risposta id
+  printf '%s' "{\"query\":\"mutation(\$c: CredenzialiInput!) { login(credenziali: \$c) { id } }\",\"variables\":{\"c\":{\"username\":\"$SUPER\",\"password\":\"$VETTORE_PASSWORD\"}}}" \
+    > "$TMP/gql.json"
   curl -s -D "$intestazioni" -o /dev/null -H 'Content-Type: application/json' -H "Origin: $ORIGINE" \
-    --data "{\"query\":\"mutation(\$c: CredenzialiInput!) { login(credenziali: \$c) { id } }\",\"variables\":{\"c\":{\"username\":\"$SUPER\",\"password\":\"$VETTORE_PASSWORD\"}}}" \
-    "$ORIGINE/api/graphql"
+    --data "@$TMP/gql.json" "$ORIGINE/api/graphql"
   cookie=$(grep -i '^set-cookie: dream.session=' "$intestazioni" | head -1 | sed -E 's/^[^:]*: *([^;]*).*/\1/' | tr -d '\r')
   [ -n "$cookie" ] || { esito FALLITO "cancellazione utente: login del superuser temporaneo (nessun cookie di sessione)"; return; }
-  risposta=$(gql "$cookie" "{\"query\":\"mutation { creaUtente(dati: {username: \\\"$PROVA\\\", password: \\\"$(casuale 20)\\\", is_staff: true, is_active: true, is_superuser: false}) { id } }\"}")
+  printf 'Cookie: %s\n' "$cookie" > "$TMP/cookie.h"
+  risposta=$(gql "{\"query\":\"mutation { creaUtente(dati: {username: \\\"$PROVA\\\", password: \\\"$(casuale 20)\\\", is_staff: true, is_active: true, is_superuser: false}) { id } }\"}")
   id=$(grep -o '"creaUtente":{"id":[0-9]*' <<< "$risposta" | grep -o '[0-9]*$')
   [ -n "$id" ] || { esito FALLITO "cancellazione utente: creaUtente ($(codici "$risposta"))"; return; }
-  risposta=$(gql "$cookie" "{\"query\":\"mutation { eliminaUtente(id: $id) { id } }\"}")
+  risposta=$(gql "{\"query\":\"mutation { eliminaUtente(id: $id) { id } }\"}")
   grep -q "\"eliminaUtente\":{\"id\":$id}" <<< "$risposta" \
     || { esito FALLITO "cancellazione utente: eliminaUtente ($(codici "$risposta"))"; return; }
   controlla "cancellazione utente: creaUtente, eliminaUtente, poi la SELECT non lo trova" 0 \

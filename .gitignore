@@ -34,7 +34,7 @@ _opam/
 
 data/
 .DS_Store
-compose_env_prod
+compose_env_prod*
 
 # Playwright
 /node_modules/
