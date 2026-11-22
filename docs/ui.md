@@ -8,7 +8,7 @@ Questo documento è il riferimento per la Fase 3.6c. Tutto quello che contiene v
   legati ai loro livelli;
 - le schermate sono nella pagina «Schermate · stile C»: una riga per schermata, con le colonne
   390, 1180 e 1440 px;
-- i PNG in `docs/design/png/` sono esportati da quel file.
+- i PNG delle schermate si esportano da quel file (non sono più nel repository).
 
 Nel file nessun colore, font, dimensione del testo, spaziatura, bordo, ombra od opacità è
 scritto a mano: sono tutti legati a una variabile. Fa eccezione l'interlinea in percentuale
@@ -640,23 +640,23 @@ vale la regola: le classi si scrivono intere.
 
 ## Schermate
 
-Per ogni schermata ci sono i PNG nei tre formati, i componenti usati (ricavati dalle istanze
-del file) e le funzioni coperte.
+Per ogni schermata ci sono i formati in cui è disegnata, i componenti usati (ricavati dalle
+istanze del file) e le funzioni coperte.
 
-| Schermata | PNG | Componenti | Funzioni |
+| Schermata | Formati | Componenti | Funzioni |
 |---|---|---|---|
-| Login | [390](design/png/login-390.png) · [1180](design/png/login-1180.png) · [1440](design/png/login-1440.png) | Dialog `retro`, Input `retro`, Button `retro` | F-AU-01 |
-| Login · errore | [390](design/png/login-errore-390.png) · [1180](design/png/login-errore-1180.png) · [1440](design/png/login-errore-1440.png) | come Login + Alert `destructive` | F-AU-01 (401), V-04 (429) |
-| Menu (solo 390) | [390](design/png/menu-390.png) | Sheet sopra l'elenco episodi, Barra app `mobile`, Avatar, Button | F-AU-02, F-AU-03, F-AU-04 |
-| Elenco episodi | [390](design/png/elenco-episodi-390.png) · [1180](design/png/elenco-episodi-1180.png) · [1440](design/png/elenco-episodi-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input, Select, Checkbox, Badge, Avatar, TableHeader e TableRow (1180, 1440), Card `scheda-episodio` (390), Pagination, PaginationLink | F-EP-01, F-EP-02, F-EP-03, F-EP-04, F-EP-08 (in blocco) |
-| Modifica episodio | [390](design/png/modifica-episodio-390.png) · [1180](design/png/modifica-episodio-1180.png) · [1440](design/png/modifica-episodio-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input, Textarea, Select, Switch, Badge, Avatar, Card, TableHeader e TableRow `associazioni` (1180, 1440) | F-EP-05, F-EP-07, F-EP-09, F-EP-10, F-EP-11, F-AS-03 |
-| Modifica episodio · conferma eliminazione | [390](design/png/modifica-episodio-conferma-390.png) · [1180](design/png/modifica-episodio-conferma-1180.png) · [1440](design/png/modifica-episodio-conferma-1440.png) | come Modifica episodio + Dialog, Alert | F-EP-08 |
-| Modifica episodio · scelta videogame | [390](design/png/modifica-episodio-scelta-videogame-390.png) · [1180](design/png/modifica-episodio-scelta-videogame-1180.png) · [1440](design/png/modifica-episodio-scelta-videogame-1440.png) | come Modifica episodio + Combobox, ComboboxItem, TableRow `nuova` | F-EP-09, F-VG-03 |
-| Elenco videogame | [390](design/png/elenco-videogame-390.png) · [1180](design/png/elenco-videogame-1180.png) · [1440](design/png/elenco-videogame-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input, Select, Checkbox, Avatar, TableHeader e TableRow (1180, 1440), Card `scheda-videogame` (390), Pagination, PaginationLink | F-VG-01, F-VG-02, F-VG-03, F-VG-07 (in blocco) |
-| Nuovo videogame | [390](design/png/nuovo-videogame-390.png) · [1180](design/png/nuovo-videogame-1180.png) · [1440](design/png/nuovo-videogame-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input (`errore`; `slug` prima dell'invio), Textarea, Avatar, Alert `warning`, Toast, Card | F-VG-05 |
-| Modifica videogame | [390](design/png/modifica-videogame-390.png) · [1180](design/png/modifica-videogame-1180.png) · [1440](design/png/modifica-videogame-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input, Textarea, Avatar, Card, TableHeader e TableRow `episodi-citati` e Pagination `compatta` (1180, 1440) | F-VG-04, F-VG-06, F-VG-07, F-VG-08, F-AS-01 |
-| Elenco utenti | [390](design/png/elenco-utenti-390.png) · [1180](design/png/elenco-utenti-1180.png) · [1440](design/png/elenco-utenti-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input, Select, Checkbox, Badge (390), Avatar, TableHeader e TableRow (1180, 1440), Card `scheda-utente` (390), Pagination, PaginationLink | F-UT-01, F-UT-02, F-UT-06 (in blocco), F-AU-04 |
-| Modifica utente | [390](design/png/modifica-utente-390.png) · [1180](design/png/modifica-utente-1180.png) · [1440](design/png/modifica-utente-1440.png) | Barra app, Sidebar (1180, 1440), Button, Input, Switch, Avatar, Card | F-UT-03, F-UT-05, F-UT-06 |
+| Login | 390 · 1180 · 1440 | Dialog `retro`, Input `retro`, Button `retro` | F-AU-01 |
+| Login · errore | 390 · 1180 · 1440 | come Login + Alert `destructive` | F-AU-01 (401), V-04 (429) |
+| Menu (solo 390) | 390 | Sheet sopra l'elenco episodi, Barra app `mobile`, Avatar, Button | F-AU-02, F-AU-03, F-AU-04 |
+| Elenco episodi | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input, Select, Checkbox, Badge, Avatar, TableHeader e TableRow (1180, 1440), Card `scheda-episodio` (390), Pagination, PaginationLink | F-EP-01, F-EP-02, F-EP-03, F-EP-04, F-EP-08 (in blocco) |
+| Modifica episodio | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input, Textarea, Select, Switch, Badge, Avatar, Card, TableHeader e TableRow `associazioni` (1180, 1440) | F-EP-05, F-EP-07, F-EP-09, F-EP-10, F-EP-11, F-AS-03 |
+| Modifica episodio · conferma eliminazione | 390 · 1180 · 1440 | come Modifica episodio + Dialog, Alert | F-EP-08 |
+| Modifica episodio · scelta videogame | 390 · 1180 · 1440 | come Modifica episodio + Combobox, ComboboxItem, TableRow `nuova` | F-EP-09, F-VG-03 |
+| Elenco videogame | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input, Select, Checkbox, Avatar, TableHeader e TableRow (1180, 1440), Card `scheda-videogame` (390), Pagination, PaginationLink | F-VG-01, F-VG-02, F-VG-03, F-VG-07 (in blocco) |
+| Nuovo videogame | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input (`errore`; `slug` prima dell'invio), Textarea, Avatar, Alert `warning`, Toast, Card | F-VG-05 |
+| Modifica videogame | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input, Textarea, Avatar, Card, TableHeader e TableRow `episodi-citati` e Pagination `compatta` (1180, 1440) | F-VG-04, F-VG-06, F-VG-07, F-VG-08, F-AS-01 |
+| Elenco utenti | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input, Select, Checkbox, Badge (390), Avatar, TableHeader e TableRow (1180, 1440), Card `scheda-utente` (390), Pagination, PaginationLink | F-UT-01, F-UT-02, F-UT-06 (in blocco), F-AU-04 |
+| Modifica utente | 390 · 1180 · 1440 | Barra app, Sidebar (1180, 1440), Button, Input, Switch, Avatar, Card | F-UT-03, F-UT-05, F-UT-06 |
 
 Funzioni senza una schermata propria:
 - **F-AU-05** (rivalidazione della sessione): si vede solo come ritorno al login dopo un 401.

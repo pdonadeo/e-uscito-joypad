@@ -208,7 +208,7 @@ Il perimetro segue `/bo`.
   - 409 dei duplicati, che il piano unisce a `BAD_USER_INPUT`.
 
   Mappati su `INTERNAL`, i primi due perderebbero il loro significato. Da decidere nello schema, per esempio con `RATE_LIMITED` e `UPSTREAM_ERROR`.
-- **Divergenze da REST decise con lo spike** (`docs/spike-graphql.md`, punto 6): in GraphQL `associazioni` assente o `null` lascia le associazioni come sono (F-EP-07), e `istante` assente o `null` lascia il campo vuoto (F-EP-09). Il default `0:00:00` lo mette l'interfaccia.
+- **Divergenze da REST decise con lo spike** (spike del 2026-11-15, commit `5ea0a28`): in GraphQL `associazioni` assente o `null` lascia le associazioni come sono (F-EP-07), e `istante` assente o `null` lascia il campo vuoto (F-EP-09). Il default `0:00:00` lo mette l'interfaccia.
 - Il filtro per lista di `id` (`getMany`) è un meccanismo interno del vecchio `/bo`. In GraphQL forse non serve, perché l'episodio porta già `videogame_titolo` per ogni associazione.
 
 ## Tabella di copertura

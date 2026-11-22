@@ -76,19 +76,6 @@ In sviluppo si entra con l'utente `admin` e la password `CHANGE_ME_IN_PRODUCTION
 
 Lo schema del database sta nei file SQL numerati di `infra/db/migrazioni/`. All'avvio il binario applica quelli che mancano, sotto un lock, e li registra nella tabella `schema_migrations`. Il seed di sviluppo (`infra/db/seed/`) non entra mai nell'immagine Docker.
 
-### Prova sul dump di produzione
-
-Prima di un rilascio che cambia lo schema, `scripts/prova-dump-produzione.sh` prova le migrazioni su una copia della produzione. Carica il dump in un PostgreSQL usa e getta (dati solo in memoria, container e rete tolti alla fine), migra il DB con la versione nuova e la confronta con l'immagine in produzione: schema, conteggi, cancellazione di un utente e risposte delle API pubbliche. Ogni controllo scrive una riga `OK` o `FALLITO`; il log, senza righe di dati, va in `dump-prod/prova-<data>.log`. Esce con 0 se tutto è `OK`, con 1 se qualcosa è `FALLITO`, con 2 se rifiuta di partire (per esempio con la suite API in corso).
-
-1. Il dump si fa sul server:
-
-   `docker exec euj-postgresql-prod sh -c 'pg_dump -U "$POSTGRES_USER" -Fc "$PGDATABASE"' > euj-prod.dump`
-
-2. Contiene password ed email: subito `chmod 600 euj-prod.dump`. Lo script rifiuta un dump con permessi diversi da `600`.
-3. Va nella cartella `dump-prod/` del repository, che git e Docker ignorano: per esempio `dump-prod/euj-prod.dump`.
-4. Si lancia con `scripts/prova-dump-produzione.sh --immagine ghcr.io/pdonadeo/e-uscito-joypad:sha-<commit> dump-prod/euj-prod.dump`, cioè con l'immagine che andrà in produzione. Senza `--immagine` prova il binario compilato in `_build/`.
-5. Dopo il deploy il dump va cancellato.
-
 ### Variabili d'ambiente per la configurazione del progetto
 
 Le variabili di configurazione del progetto sono contenute nel file `compose_env_devel` (`compose_env` è un link a questo file): utente e password di PostgreSQL, `DEBUG`, il segreto dei cookie di Dream (`DREAM_SECRET`), la chiave di RAWG e quelle del bot Discord.

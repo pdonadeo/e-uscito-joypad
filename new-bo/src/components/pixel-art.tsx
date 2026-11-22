@@ -162,7 +162,7 @@ export function Prato({ className }: { className?: string }) {
 // Glifi a pixel (▶ ◆ ★ ▼ ✕ ⏏) al posto dei caratteri del font: i sottoinsiemi latin dei font
 // non li hanno, e quelli di sistema cambiano misura e aspetto (⏏ diventa un'emoji).
 // Ogni glifo è una bitmap: «#» = pixel acceso. Il colore è currentColor, la misura è quella
-// dei PNG di docs/design/png (pixel coperti almeno a metà), 1 cella = 1 px.
+// delle schermate di docs/design/new-bo.figcraft (pixel coperti almeno a metà), 1 cella = 1 px.
 
 type Bitmap = readonly string[]
 

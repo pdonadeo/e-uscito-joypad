@@ -1,4 +1,4 @@
-(* Errori di /api/graphql (docs/schema.graphql, docs/spike-graphql.md).
+(* Errori di /api/graphql (docs/schema.graphql; spike GraphQL del 2026-11-15, commit 5ea0a28).
 
    Graphql_lwt non ha extensions nei suoi errori di campo. I resolver sollevano
    [Admin.Resp.Http_error] come gli handler di /api/bo; [guard] lo trasforma nel

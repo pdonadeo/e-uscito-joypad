@@ -55,7 +55,7 @@
 # stringa intera (Q-6).
 #
 # Input: per la libreria un campo assente e un campo null sono la stessa cosa
-# (docs/spike-graphql.md, punto 6).
+# (spike GraphQL del 2026-11-15, commit 5ea0a28).
 
 schema {
   query: Query
