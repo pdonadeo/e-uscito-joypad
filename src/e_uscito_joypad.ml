@@ -31,8 +31,8 @@ let with_noindex_follow handler req =
   let () = Dream.add_header resp "X-Robots-Tag" "noindex, follow" in
   Lwt.return resp
 
-let default_handler _req =
-  let uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.elabora_risposta () in
+let default_handler req =
+  let%lwt uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.risposta req in
   Dream.html (Views.index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no)
 
 let game_page_handler req = with_noindex_follow default_handler req
@@ -108,10 +108,8 @@ let server () =
          get "/favicon-16x16.png" @@ static ~loader "";
          get "/favicon-32x32.png" @@ static ~loader "";
          get "/favicon.ico" @@ static ~loader "";
-         get "/api/ultima-puntata" (fun _r ->
-             let uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no =
-               Joypad_monitor.elabora_risposta ()
-             in
+         get "/api/ultima-puntata" (fun r ->
+             let%lwt uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.risposta r in
              let dati = Joypad_monitor.{ uscito; giorni_fa; data_italiano; ep_num; titolo; msg_risposta_no } in
              Joypad_monitor.dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
          get "/api/last-episodes/:num/:offset" (fun r -> Rest.decorator r Rest.Last_episodes.view);

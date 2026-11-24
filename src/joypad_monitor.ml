@@ -78,8 +78,41 @@ let extract_data_from_page () =
   let%lwt body = body () in
   Lwt.return (extract_data_from_soup (Soup.parse body))
 
-let elabora_risposta () =
-  match !last_episode_data with
+let ep_num_of_string = function
+  | None -> NonSpecificato
+  | Some s -> (
+    match String.trim s with
+    | "" -> NonSpecificato
+    | s -> ( try Intero (int_of_string s) with _ -> Stringa s))
+
+(* L'ultima puntata pubblicata nel DB dal backoffice. Serve per gli speciali, come le
+   dirette su YouTube, che non compaiono sulla pagina del Post letta dal monitor. *)
+let ultima_dal_db req =
+  try%lwt
+    match%lwt Dream.sql req (fun db -> Db.Django.Episodio.get_last_episods db ~n:1 ~offset:0 ()) with
+    | Ok (ep :: _) ->
+      Lwt.return_some
+        {
+          ep_num = ep_num_of_string ep.Db.Django.Episodio.episodio_numero;
+          title = ep.titolo;
+          date = ep.data_uscita;
+        }
+    | Ok [] -> Lwt.return_none
+    | Error e ->
+      log.error (fun l -> l "Ultima puntata dal DB: %a" Caqti_error.pp e);
+      Lwt.return_none
+  with exn ->
+    log.error (fun l -> l "Ultima puntata dal DB: %s" (Printexc.to_string exn));
+    Lwt.return_none
+
+(* La più recente fra la puntata del Post e quella del DB; a pari data vince il Post. *)
+let piu_recente post db =
+  match (post, db) with
+  | None, x | x, None -> x
+  | Some p, Some d -> if Timedesc.Date.diff_days d.date p.date > 0 then Some d else Some p
+
+let elabora_risposta last_episode_data =
+  match last_episode_data with
   | Some last_episode_data ->
     let tz = Timedesc.Time_zone.make_exn "Europe/Rome" in
     let adesso = Timedesc.now ~tz_of_date_time:tz () in
@@ -101,6 +134,10 @@ let elabora_risposta () =
     in
     (uscito, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, msg_risposta_no)
   | None -> (false, "", "", NonSpecificato, "", None)
+
+let risposta req =
+  let%lwt dal_db = ultima_dal_db req in
+  Lwt.return (elabora_risposta (piu_recente !last_episode_data dal_db))
 
 let rec monitor () =
   log.debug (fun l -> l "Scarico info ultima puntata...");
