@@ -747,17 +747,17 @@
     "@svgr/hast-util-to-babel-ast" "8.0.0"
     svg-parser "^2.0.4"
 
-"@tanstack/query-core@5.107.1":
-  version "5.107.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.107.1.tgz#cd1f9952b4d623e66349931df631b287d9c4a3fe"
-  integrity sha512-PSyAik11oQBEVOiVy5hjZWHmoUqOXqK1WYy4v55mcxozEfKaQgpUMsgnXhWjuESzSht8JfzqMS1m6M/9CpNgvg==
+"@tanstack/query-core@5.108.2":
+  version "5.108.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.108.2.tgz#31939445cfe8b6d7c4df18f4a52e348ff4a473d8"
+  integrity sha512-0l+0xDKqn71hfJBKaAvFP/X7WYM0TbscEk6nK1pHaWQUWUEA+WJD0VlT8wF+HIJANMV9B/DouPWwDnX3w/l9BA==
 
-"@tanstack/react-query@^5.107.1":
-  version "5.107.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.107.1.tgz#277e4b8c4d6d0496047ef15afacbc8c091ce0532"
-  integrity sha512-udCOOLp3ZAheUrIHLCe+ZZge6nr2ZUrGMSWcCuXsjY1Bf2JeeE09oxst97PILiCY6N8xo/7bIo3Hvz13zh06FA==
+"@tanstack/react-query@^5.108.2":
+  version "5.108.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.108.2.tgz#6435540ed75608d44fcfd10d16a2025de5877a8b"
+  integrity sha512-wV6hEjVGTfh9rvu3uREYW0hgBfS9klDejGelhPY575jD5jg6qbAb1nzT7hR1Q+wemR66ZjtE5p9pAGUwqK8zbg==
   dependencies:
-    "@tanstack/query-core" "5.107.1"
+    "@tanstack/query-core" "5.108.2"
 
 "@types/babel__core@^7.20.5":
   version "7.20.5"
