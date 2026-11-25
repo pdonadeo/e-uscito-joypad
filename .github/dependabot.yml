@@ -5,18 +5,31 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    ignore:
+      # @eslint/js segue la major di eslint, che resta alla 9 finché
+      # eslint-plugin-react non supporta ESLint 10.
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
 
   # Backoffice /bo (React, Bun)
   - package-ecosystem: "bun"
     directory: "/new-bo"
     schedule:
       interval: "weekly"
+    ignore:
+      # graphql-request 7 accetta solo graphql 14-16.
+      - dependency-name: "graphql"
+        update-types: ["version-update:semver-major"]
 
   # Test Playwright alla radice
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      # Stessa major di graphql del backoffice (vedi /new-bo).
+      - dependency-name: "graphql"
+        update-types: ["version-update:semver-major"]
 
   # Workflow di GitHub Actions
   - package-ecosystem: "github-actions"
