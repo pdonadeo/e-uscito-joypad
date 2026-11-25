@@ -1,6 +1,25 @@
 version: 2
 updates:
+  # Sito pubblico (React, yarn)
   - package-ecosystem: "npm"
     directory: "/frontend"
+    schedule:
+      interval: "weekly"
+
+  # Backoffice /bo (React, Bun)
+  - package-ecosystem: "bun"
+    directory: "/new-bo"
+    schedule:
+      interval: "weekly"
+
+  # Test Playwright alla radice
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  # Workflow di GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
