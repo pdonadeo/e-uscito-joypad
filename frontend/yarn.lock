@@ -2449,10 +2449,10 @@ rolldown@~1.2.18:
     "@rolldown/binding-win32-arm64-msvc" "1.2.19"
     "@rolldown/binding-win32-x64-msvc" "1.2.19"
 
-rollup-plugin-visualizer@^7.1.2:
-  version "7.1.2"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-visualizer/-/rollup-plugin-visualizer-7.1.2.tgz#e52a0c459a59a0782c561d59dfef472c4b9777c6"
-  integrity sha512-+yrEz9LJ7fxd7T0yj4GPvcKHKfJNzTzKT7FHiF3f/US+7EaWlgB8PoGbUOlobD4Al8v6TeCCl/Fgbov5FV/DaA==
+rollup-plugin-visualizer@^7.1.3:
+  version "7.1.3"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-visualizer/-/rollup-plugin-visualizer-7.1.3.tgz#ce87a4bf8586c6c38c2085e3829a0ee6375fd8f8"
+  integrity sha512-P7G0p9RowDd0ahXXBtx4MOHlSVzclyW5pDeZ2Z0HensWSI9vJdu2bqdZDsD375g+0AxND8VJzWYuKD9yH38etw==
   dependencies:
     open "^11.0.0"
     picomatch "^4.0.5"
