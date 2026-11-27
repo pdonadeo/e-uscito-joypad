@@ -599,7 +599,7 @@ test.describe('modifica a 1440', () => {
     await expect(righeTabella).toHaveCount(2);
     const attese = r.data.elencoAssociazioni.elementi.map((a) => a.episodio_titolo);
     await expect(righeTabella.locator('td:nth-child(2)')).toHaveText(attese);
-    await expect(righeTabella.nth(1)).toContainText('Osservatorio Start Citizen');
+    await expect(righeTabella.nth(1)).toContainText('Osservatorio Star Citizen');
   });
 
   test('SALVA E CONTINUA: resta sulla modifica, mostra il Toast e il form riparte dai dati salvati', async ({ page }) => {

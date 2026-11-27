@@ -28,7 +28,7 @@ export const TIPOLOGIA: readonly { valore: Tipologia; etichetta: string }[] = [
   { valore: 'FREE', etichetta: 'Chiacchiera libera' },
   { valore: 'RECE', etichetta: 'Recensione' },
   { valore: 'CONS', etichetta: 'Consiglio' },
-  { valore: 'STAR', etichetta: 'Osservatorio Start Citizen' },
+  { valore: 'STAR', etichetta: 'Osservatorio Star Citizen' },
 ]
 
 // --- Formati -------------------------------------------------------------------------------

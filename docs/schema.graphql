@@ -363,7 +363,7 @@ enum Tipologia {
   RECE
   "Consiglio"
   CONS
-  "Osservatorio Start Citizen"
+  "Osservatorio Star Citizen"
   STAR
 }
 

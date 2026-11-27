@@ -59,7 +59,7 @@ let tipologia_labels =
     ("FREE", "Chiacchiera libera");
     ("RECE", "Recensione");
     ("CONS", "Consiglio");
-    ("STAR", "Osservatorio Start Citizen");
+    ("STAR", "Osservatorio Star Citizen");
   ]
 
 let speaker_values = List.map labelled speaker_labels

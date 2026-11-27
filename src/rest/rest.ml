@@ -23,7 +23,7 @@ module Types = struct
     | "FREE" -> "Chiacchiera libera"
     | "RECE" -> "Recensione"
     | "CONS" -> "Consiglio"
-    | "STAR" -> "Osservatorio Start Citizen"
+    | "STAR" -> "Osservatorio Star Citizen"
     | s -> failwith (Printf.sprintf "decode_tipologia: unknown value \"%s\"" s)
 
   type gioco = {

@@ -387,8 +387,8 @@ test.describe('modifica a 1440', () => {
     ]);
     await page.getByRole('option', { name: 'Alessandro Zampini (spara!)' }).click();
     await page.getByRole('combobox', { name: 'Tipologia, riga 1' }).click();
-    await expect(page.getByRole('option')).toHaveText(['Chiacchiera libera', 'Recensione', 'Consiglio', 'Osservatorio Start Citizen']);
-    await page.getByRole('option', { name: 'Osservatorio Start Citizen' }).click();
+    await expect(page.getByRole('option')).toHaveText(['Chiacchiera libera', 'Recensione', 'Consiglio', 'Osservatorio Star Citizen']);
+    await page.getByRole('option', { name: 'Osservatorio Star Citizen' }).click();
     await expect(page.locator('main')).not.toContainText(/\b(TUTT|BORD|FOSS|ZAMP|FREE|RECE|CONS|STAR)\b/);
     // riga nuova: default 0:00:00, Tutti, Chiacchiera libera; senza videogame non si salva
     await page.getByRole('button', { name: '+ Aggiungi videogame' }).click();
