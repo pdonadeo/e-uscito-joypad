@@ -6,6 +6,7 @@ import { BarraAzioni } from '@/components/barra-azioni'
 import { Campo, InputData } from '@/components/campi'
 import { ConfermaEliminazione } from '@/components/conferma-eliminazione'
 import { PannelloCover, type SceltaCover } from '@/components/episodi/cover'
+import { ImportaExcel } from '@/components/episodi/importa-excel'
 import { SceltaVideogame } from '@/components/episodi/scelta-videogame'
 import { IntestazionePagina } from '@/components/intestazione-pagina'
 import { GlifoChiudi, GlifoOrdine, GlifoSpunta } from '@/components/pixel-art'
@@ -489,18 +490,43 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
                 ))}
               </ul>
             )}
-            <Button
-              type="button"
-              variant="dashed"
-              className="w-full"
-              onClick={() => {
-                const r = rigaNuova()
-                campo.pushValue(r)
-                setDaAprire(r.chiave)
-              }}
-            >
-              + Aggiungi videogame
-            </Button>
+            <div className="flex flex-col gap-12 lg:flex-row">
+              <Button
+                type="button"
+                variant="dashed"
+                className="w-full lg:flex-1"
+                onClick={() => {
+                  const r = rigaNuova()
+                  campo.pushValue(r)
+                  setDaAprire(r.chiave)
+                }}
+              >
+                + Aggiungi videogame
+              </Button>
+              {/* import da Excel (P3: anche nel nuovo episodio): sostituisce le righe, non salva */}
+              <ImportaExcel
+                className="w-full lg:w-auto"
+                durata={() => form.state.values.durata}
+                presenti={() => form.state.values.associazioni.length}
+                onImporta={(importate) => {
+                  form.setFieldValue(
+                    'associazioni',
+                    importate.map((r) => ({
+                      chiave: nuovaChiave(),
+                      id: null,
+                      videogame_id: r.videogame_id,
+                      videogame_titolo: r.videogame_titolo,
+                      istante: r.istante,
+                      speaker: r.speaker,
+                      tipologia: r.tipologia,
+                      nuova: true,
+                    })),
+                  )
+                  setMostraInvalidi(false)
+                  setDaAprire(null)
+                }}
+              />
+            </div>
           </CardContent>
         </Card>
       )}

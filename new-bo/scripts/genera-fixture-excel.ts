@@ -44,6 +44,16 @@ const FIXTURE: Record<string, RigaCompilata[]> = {
     { videogame: uno, istante: '1:00' },
     { slug: 'e2e-missing-import', istante: '2:00' },
   ],
+  // uno slug nuovo e uno che RAWG non conosce: il primo si crea e resta nel DB, l'import fallisce
+  'slug-misto.xlsx': [
+    { slug: 'e2e-import-resta', istante: '1:00' },
+    { slug: 'e2e-missing-misto', istante: '2:00' },
+  ],
+  // un id ben scritto che nel DB non c'è: errore prima di qualsiasi chiamata a RAWG
+  'id-inesistente.xlsx': [
+    { slug: 'e2e-import-mai', istante: '1:00' },
+    { videogame: '990999-Non esiste', istante: '2:00' },
+  ],
   // un errore per tipo, più una riga valida che non deve entrare
   'errori-misti.xlsx': [
     { videogame: uno, istante: '1:00' },
