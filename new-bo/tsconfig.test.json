@@ -1,6 +1,6 @@
 {
-  // Test con `bun test` (src/**/*.test.ts): i tipi di Bun valgono solo qui, non nel codice
-  // dell'app, che tsconfig.app.json controlla senza i file di test.
+  // Test con `bun test` (src/**/*.test.ts) e script lanciati con bun (scripts/): i tipi di Bun
+  // valgono solo qui, non nel codice dell'app, che tsconfig.app.json controlla senza i test.
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
     "target": "es2023",
@@ -21,5 +21,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.test.ts"]
+  "include": ["src/**/*.test.ts", "scripts/**/*.ts"]
 }

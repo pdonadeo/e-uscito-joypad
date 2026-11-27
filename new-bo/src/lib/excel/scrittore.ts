@@ -220,5 +220,7 @@ export function scriviXlsx(fogli: Foglio[], nomi: NomeDefinito[]): Uint8Array {
     'xl/sharedStrings.xml': strToU8(stringheCondivise),
   }
   xmlFogli.forEach((x, i) => (parti[`xl/worksheets/sheet${i + 1}.xml`] = strToU8(x)))
-  return zipSync(parti, { level: 6 })
+  // data fissa sulle parti dello zip: lo stesso contenuto dà sempre lo stesso file (le fixture
+  // dei test si rigenerano senza differenze). È una data locale, quindi non dipende dal fuso.
+  return zipSync(parti, { level: 6, mtime: new Date(2026, 0, 1) })
 }
