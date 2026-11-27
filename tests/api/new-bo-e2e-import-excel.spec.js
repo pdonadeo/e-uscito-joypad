@@ -366,6 +366,54 @@ test('12. il template vuoto scaricato da /bo/template e reimportato (P6, I10): e
   expect(await righeForm(page)).toEqual([]);
 });
 
+// --- andata e ritorno nei tre programmi (Fase 5, T7) ---------------------------------------------
+
+test('T7 LibreOffice: valido-slug.xlsx risalvato da LibreOffice si importa come l\'originale', async ({ page }) => {
+  senzaGioco('e2e-import-nuovo');
+  const e = await episodio();
+  await apri(page, e.id);
+  await importa(page, fixture('libreoffice.xlsx'));
+  await expect(toast(page)).toContainText('3 righe importate, 1 videogame creato da RAWG');
+  expect(await righeForm(page)).toEqual([
+    ['E2E Game e2e-import-nuovo', '0:05:00', 'Consiglio', 'Tutti'],
+    ['E2E Fixture 1', '0:06:00', 'Chiacchiera libera', 'Tutti'],
+    ['E2E Game e2e-import-nuovo', '0:07:00', 'Chiacchiera libera', 'Francesco Fossetti (salta!)'],
+  ]);
+});
+
+// excel.xlsx e sheets.xlsx li ha compilati Paolo a mano, partendo dal template scaricato da
+// /bo/template con il DB di sviluppo (istruzioni in TEST.md, «Fixture manuali dell'import Excel»).
+// VALGONO SOLO PER IL DB DI SVILUPPO: la riga 2 cita il videogame 542 «Death Stranding 2» scelto
+// dal menu. Se quel gioco cambia, le fixture vanno rifatte.
+const GIOCO_MANUALE = { id: 542, titolo: 'Death Stranding 2' };
+
+// Tutti e due hanno lo slug e2e-excel-manuale: ogni test toglie prima il gioco che crea.
+for (const [file, programma] of [
+  ['excel.xlsx', 'Excel (online)'],
+  ['sheets.xlsx', 'Google Sheets'],
+]) {
+  const slug = 'e2e-excel-manuale';
+  test(`T7 ${programma}: ${file}, compilato a mano, si importa`, async ({ page }) => {
+    if (!fs.existsSync(fixture(file)))
+      throw new Error(`manca fixture/import-excel/${file}: va compilato in ${programma} (TEST.md, «Fixture manuali dell'import Excel»)`);
+    const titolo = sql(`SELECT titolo FROM backoffice_videogame WHERE id = :'id'::int`, { id: GIOCO_MANUALE.id });
+    if (titolo !== GIOCO_MANUALE.titolo)
+      throw new Error(
+        `${file} cita il videogame ${GIOCO_MANUALE.id} «${GIOCO_MANUALE.titolo}», che nel DB di sviluppo ` +
+          `${titolo ? `ora si chiama «${titolo}»` : 'non c\'è più'}: rifai le fixture manuali (TEST.md).`,
+      );
+    senzaGioco(slug);
+    const e = await episodio();
+    await apri(page, e.id);
+    await importa(page, fixture(file));
+    await expect(toast(page)).toContainText('2 righe importate, 1 videogame creato da RAWG');
+    expect(await righeForm(page)).toEqual([
+      [GIOCO_MANUALE.titolo, '0:12:30', 'Recensione', 'Matteo Bordone (corri!)'],
+      [`E2E Game ${slug}`, '1:02:03', 'Consiglio', 'Tutti'],
+    ]);
+  });
+}
+
 test('un file che non è un .xlsx: errore leggibile', async ({ page }) => {
   const e = await episodio();
   await apri(page, e.id);

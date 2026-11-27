@@ -28,6 +28,30 @@ yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune
 - **Durata:** circa 10 minuti. I test girano uno alla volta, perché condividono il database.
 - **Una sola esecuzione per volta:** due suite in parallelo usano lo stesso database e la stessa porta, e si disturbano.
 
+## Fixture manuali dell'import Excel
+
+`tests/api/fixture/import-excel/` contiene i file `.xlsx` dei test dell'import. Quasi tutti si rigenerano da soli:
+
+- `~/.bun/bin/bun run new-bo/scripts/genera-fixture-excel.ts` rigenera quelli prodotti dal template;
+- `scripts/prova-template-libreoffice.sh` rifà `libreoffice.xlsx`, cioè `valido-slug.xlsx` risalvato da
+  LibreOffice.
+
+`excel.xlsx` e `sheets.xlsx` invece sono compilati a mano, in Excel e in Google Sheets, per provare l'andata e
+ritorno nei programmi veri. **Valgono solo per il DB di sviluppo**: citano il videogame 542 «Death Stranding 2».
+Se quel gioco cambia, l'e2e lo dice e i due file vanno rifatti così:
+
+1. avviare il binario compilato su una porta libera e scaricare il template dalla sua pagina `/bo/template`
+   (oppure dal sito, se il gioco 542 è lo stesso);
+2. compilare il foglio `minutaggi`, scegliendo dai menu tutto quello che ha un menu:
+
+   | Riga | VIDEOGAME | RAWG SLUG | ISTANTE | TIPOLOGIA | SPEAKER |
+   |---|---|---|---|---|---|
+   | 2 | `542-Death Stranding 2` | | `12:30` | Recensione | Matteo Bordone (corri!) |
+   | 3 | | `e2e-excel-manuale` (lo stesso in tutti e due i file) | `1:02:03` | Consiglio | Tutti |
+
+3. salvare in formato `.xlsx` (in Sheets: «File → Scarica → Microsoft Excel (.xlsx)») come `excel.xlsx` o
+   `sheets.xlsx` in `tests/api/fixture/import-excel/`.
+
 ## Test unitari (OCaml)
 
 `opam exec -- dune test` lancia i test unitari del runner delle migrazioni (`src/migrazioni/test/`): nomi e

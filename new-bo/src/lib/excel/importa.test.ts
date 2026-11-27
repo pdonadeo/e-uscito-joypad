@@ -341,6 +341,10 @@ describe('fixture', () => {
     })
   })
 
+  test('libreoffice.xlsx (valido-slug risalvato da LibreOffice, T7): le stesse righe dell\'originale', async () => {
+    expect(await importa('libreoffice.xlsx')).toEqual(await importa('valido-slug.xlsx'))
+  })
+
   test('riga-vuota-in-mezzo.xlsx: righe 2 e 4', async () => {
     expect((await importa('riga-vuota-in-mezzo.xlsx')).righe.map((r) => r.riga)).toEqual([2, 4])
   })
