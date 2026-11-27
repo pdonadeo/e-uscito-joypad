@@ -19,6 +19,12 @@ const ERRORE_FILE = 'Non riesco a preparare il file. Ricarica la pagina e riprov
 
 class ErroreElenco extends Error {}
 
+// I canali ufficiali per contattare lo staff.
+const ISSUE_GITHUB = 'https://github.com/pdonadeo/e-uscito-joypad/issues'
+const DISCORD = 'https://discord.gg/abQEbvuBrt'
+const LINK =
+  'font-extrabold text-viola underline outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-viola'
+
 type Videogame = { id: number; titolo: string }
 
 async function elencoVideogame(): Promise<Videogame[]> {
@@ -108,7 +114,17 @@ function PaginaTemplate() {
               <li>
                 TIPOLOGIA e SPEAKER si scelgono dal menu. Se li lasci vuoti valgono «Chiacchiera libera» e «Tutti».
               </li>
-              <li>Salva il file in formato .xlsx e mandalo allo staff.</li>
+              <li>
+                Salva il file in formato .xlsx e mandalo allo staff: allegalo a una{' '}
+                <a href={ISSUE_GITHUB} target="_blank" rel="noreferrer" className={LINK}>
+                  issue su GitHub
+                </a>{' '}
+                oppure scrivici sul{' '}
+                <a href={DISCORD} target="_blank" rel="noreferrer" className={LINK}>
+                  server Discord
+                </a>
+                .
+              </li>
             </ol>
 
             {errore !== null && (

@@ -45,6 +45,12 @@ test('si apre senza login e senza chiamate a /api/graphql', async ({ page }) => 
   await expect(page.getByRole('button', { name: 'Scarica il template' })).toBeVisible();
   expect(await page.context().cookies()).toEqual([]);
   expect(graphql).toEqual([]);
+  // i due canali ufficiali per mandare il file allo staff
+  await expect(page.getByRole('link', { name: 'issue su GitHub' })).toHaveAttribute(
+    'href',
+    'https://github.com/pdonadeo/e-uscito-joypad/issues',
+  );
+  await expect(page.getByRole('link', { name: 'server Discord' })).toHaveAttribute('href', 'https://discord.gg/abQEbvuBrt');
 });
 
 test('il clic scarica minutaggi-joypad.xlsx con il videogame appena creato', async ({ page }) => {

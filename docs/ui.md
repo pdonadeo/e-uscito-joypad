@@ -947,7 +947,9 @@ centrato in verticale da `lg`. Dentro:
 - un elenco numerato di cinque passi: scaricare e aprire il file (Excel, LibreOffice Calc o
   Google Sheets); una riga per videogame, dal menu VIDEOGAME o, se manca, con il RAWG SLUG;
   l'ISTANTE come `1:02:03` o `12:30`; TIPOLOGIA e SPEAKER dal menu, vuoti valgono «Chiacchiera
-  libera» e «Tutti»; salvare in .xlsx e mandarlo allo staff;
+  libera» e «Tutti»; salvare in .xlsx e mandarlo allo staff, allegandolo a una issue su GitHub o
+  sul server Discord (i due canali ufficiali, come link in `font-extrabold text-viola underline`,
+  aperti in una nuova scheda);
 - Button `retro` · `xl` «▶ SCARICA IL TEMPLATE», a tutta larghezza.
 
 Il file si genera nel browser solo al clic, mai all'apertura della pagina: prima chiede
