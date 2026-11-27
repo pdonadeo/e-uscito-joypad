@@ -64,7 +64,7 @@ L'elenco espone solo `id`, `titolo`, `rawg_slug`, `cover` e `ts` (`videogame.ml:
 | `episodio_id`, `videogame_id` | intero | `videogame_id` è obbligatorio e il videogame deve esistere |
 | `istante` | durata o null | `H:MM:SS`. Campo assente → `0:00:00`; null o stringa vuota → null |
 | `speaker` | scelta | `TUTT` (Tutti, default), `BORD` (Matteo Bordone (corri!)), `FOSS` (Francesco Fossetti (salta!)), `ZAMP` (Alessandro Zampini (spara!)) |
-| `tipologia` | scelta | `FREE` (Chiacchiera libera, default), `RECE` (Recensione), `CONS` (Consiglio), `STAR` (Osservatorio Start Citizen) |
+| `tipologia` | scelta | `FREE` (Chiacchiera libera, default), `RECE` (Recensione), `CONS` (Consiglio), `STAR` (Osservatorio Star Citizen) |
 | `videogame_titolo` | testo | denormalizzato, sola lettura |
 | `episodio_titolo`, `episodio_numero`, `data_uscita` | — | denormalizzati, sola lettura. Ci sono solo nella risorsa `associazioni`, non dentro l'episodio |
 

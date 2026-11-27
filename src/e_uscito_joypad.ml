@@ -116,6 +116,11 @@ let server () =
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
          get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
          get "/api/episodes-by-game-id/:gameId" (fun r -> Rest.decorator r Rest.Episodes_by_game_id.view);
+         (* no-store: il template deve proporre sempre l'elenco aggiornato *)
+         get "/api/template/videogame" (fun r ->
+             let%lwt resp = Rest.decorator r Rest.Template_videogame.view in
+             Dream.set_header resp "Cache-Control" "no-store";
+             Lwt.return resp);
          post "/api/joycord/channels" store_joycord_json_tree;
          get "/api/joycord/channels" get_joycord_json_tree;
          get "/api/joycord/games-for-score.tsv" (fun r -> Dream.sql r (Rest.Games_for_score.view r));

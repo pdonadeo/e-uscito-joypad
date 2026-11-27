@@ -18,6 +18,18 @@ Ho attivato la pagina delle donazioni per sostenere eventuali costi di trascrizi
 
 Per ora, tuttavia, **non servono fondi quindi aspettate a donare**.
 
+## Contribuire i minutaggi con Excel
+
+Anche senza saper programmare si può aiutare a segnare in quale punto di ogni episodio si parla di un videogioco:
+
+1. scarica il template da https://www.euscitojoypad.it/bo/template (bottone «SCARICA IL TEMPLATE»);
+2. aprilo con Excel, LibreOffice Calc o Google Sheets e compila una riga per ogni videogioco: il gioco si sceglie dal
+   menu della colonna VIDEOGAME oppure, se manca, si scrive il suo RAWG SLUG (la parte finale dell'indirizzo del gioco
+   su [rawg.io](https://rawg.io/)); l'istante si scrive come `1:02:03` o `12:30`;
+3. salva il file in formato `.xlsx` e mandalo allo staff, che lo importa nella scheda dell'episodio: allegalo a una
+   [issue su GitHub](https://github.com/pdonadeo/e-uscito-joypad/issues) oppure scrivici sul
+   [server Discord](https://discord.gg/abQEbvuBrt).
+
 ## Come faccio girare il progetto sul mio PC?
 
 Se tutto quello che vi interessa è far partire il progetto seguite le istruzioni per la prima shell qui sotto.

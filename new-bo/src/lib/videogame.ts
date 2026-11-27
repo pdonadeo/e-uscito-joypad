@@ -64,6 +64,24 @@ export const elencoVideogame = (p: ParametriElencoVideogame) =>
     placeholderData: keepPreviousData,
   })
 
+// Tutti i videogame, senza paginazione (senza `limit` il server li restituisce tutti): servono
+// all'import Excel per trovare i giochi per id e per slug con una sola richiesta.
+const documentoElencoCompleto = graphql(`
+  query ElencoCompletoVideogame {
+    elencoVideogame {
+      elementi {
+        id
+        titolo
+        rawg_slug
+      }
+    }
+  }
+`)
+
+export async function elencoCompletoVideogame() {
+  return (await esegui(documentoElencoCompleto)).elencoVideogame.elementi
+}
+
 // --- Dettaglio (F-VG-04) --------------------------------------------------------------------
 
 const documentoVideogame = graphql(`

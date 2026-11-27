@@ -23,7 +23,7 @@ module Types = struct
     | "FREE" -> "Chiacchiera libera"
     | "RECE" -> "Recensione"
     | "CONS" -> "Consiglio"
-    | "STAR" -> "Osservatorio Start Citizen"
+    | "STAR" -> "Osservatorio Star Citizen"
     | s -> failwith (Printf.sprintf "decode_tipologia: unknown value \"%s\"" s)
 
   type gioco = {
@@ -216,6 +216,33 @@ module Episodes_by_game_id = struct
     let game_id = Dream.param request "gameId" |> Int64.of_string in
     let* episodi_db = Db.Django.Episodio.search_episodes_by_game_id db ~game_id () in
     episodes_adapter db episodi_db
+end
+
+(* Elenco dei videogame per il menu VIDEOGAME del template Excel (/bo/template): pubblico, in
+   sola lettura. I giochi senza titolo restano fuori (la colonna è nullable): nel template si
+   possono indicare con il RAWG slug. L'ordine non distingue maiuscole e minuscole, a prescindere
+   dalla collation del DB; a parità decide l'id. *)
+module Template_videogame = struct
+  let view (_request : Dream.request) (db : Caqti_lwt.connection) =
+    let open Lwt_result.Syntax in
+    let q =
+      let open Caqti_request.Infix in
+      let open Caqti_type in
+      (unit ->* t2 int64 string)
+        {|
+          SELECT id, titolo
+          FROM backoffice_videogame
+          WHERE titolo IS NOT NULL
+          ORDER BY lower(titolo), id
+        |}
+    in
+    let module DB = (val db : Caqti_lwt.CONNECTION) in
+    let* records = DB.collect_list q () in
+    let records =
+      ListLabels.map records ~f:(fun (id, titolo) ->
+          `Assoc [("id", `Intlit (Int64.to_string id)); ("titolo", `String titolo)])
+    in
+    Lwt_result.return (`List records)
 end
 
 module Games_for_score = struct

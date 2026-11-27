@@ -932,6 +932,94 @@ eliminare 1 episodio e tutti i suoi collegamenti…»). Per gli utenti la selezi
 comprendere il proprio utente, che non ha la casella. Se il backend risponde comunque 400 per
 una riga, le altre si cancellano e il Toast mostra «Non puoi cancellare te stesso».
 
+### Template dei minutaggi
+
+Indirizzo `/bo/template`, **pubblico**: chiunque scarica il template Excel per segnare in quale
+punto di un episodio si parla di ogni videogame, e lo manda allo staff, che lo importa nel form
+dell'episodio. È sorella del login, quindi fuori dal guard delle pagine dello staff, e non chiama
+`/api/graphql`.
+
+Stessa composizione del Login: cielo, nuvole e prato, Dialog `retro` largo al massimo 640 px,
+centrato in verticale da `lg`. Dentro:
+
+- titolo «MINUTAGGI» e sotto «di «È uscito Joypad?»», come «RETROBOTTEGA» nel login;
+- «Aiutaci a segnare in quale punto di un episodio si parla di ogni videogame.»;
+- un elenco numerato di cinque passi: scaricare e aprire il file (Excel, LibreOffice Calc o
+  Google Sheets); una riga per videogame, dal menu VIDEOGAME o, se manca, con il RAWG SLUG;
+  l'ISTANTE come `1:02:03` o `12:30`; TIPOLOGIA e SPEAKER dal menu, vuoti valgono «Chiacchiera
+  libera» e «Tutti»; salvare in .xlsx e mandarlo allo staff, allegandolo a una issue su GitHub o
+  sul server Discord (i due canali ufficiali, come link in `font-extrabold text-viola underline`,
+  aperti in una nuova scheda);
+- Button `retro` · `xl` «▶ SCARICA IL TEMPLATE», a tutta larghezza.
+
+Il file si genera nel browser solo al clic, mai all'apertura della pagina: prima chiede
+l'elenco aggiornato dei videogame a `GET /api/template/videogame`, poi scarica
+`minutaggi-joypad.xlsx`. Durante la generazione il bottone dice «Attendi…» con `aria-busy`. Se
+l'elenco non arriva, sopra il bottone compare l'Alert `destructive` «Non riesco a scaricare
+l'elenco dei videogame. Riprova tra poco.» e nessun file viene scaricato. Se invece non si
+riesce a preparare il file, per esempio in una pagina aperta prima di un aggiornamento del sito,
+l'Alert dice «Non riesco a preparare il file. Ricarica la pagina e riprova.». L'Alert sparisce al
+clic successivo.
+
+### Import dei minutaggi da Excel
+
+In «Modifica episodio» e in «Nuovo episodio», sotto le righe di «Videogiochi citati», accanto a
+«+ AGGIUNGI VIDEOGAME»: Button `dashed` «IMPORTA DA EXCEL». Il bottone è disegnato in
+`new-bo.figcraft`, in tutte le cornici di «Modifica episodio» (frame «azioni associazioni»); i
+Dialog dell'import no, e seguono questa sezione. Su desktop sta a destra, largo
+quanto il testo, e «+ AGGIUNGI VIDEOGAME» prende il resto; a 390 i due bottoni sono uno sotto
+l'altro, a tutta larghezza. Il clic apre la scelta di un file `.xlsx`, cioè un template dei
+minutaggi compilato ([Template dei minutaggi](#template-dei-minutaggi)).
+
+Il file sostituisce le righe di «Videogiochi citati», **senza salvare**: le righe importate sono
+righe nuove come quelle di «+ AGGIUNGI VIDEOGAME», si modificano e si eliminano, e le scrive
+SALVA (o CREA). I passi, in quest'ordine:
+
+1. si legge e si controlla tutto il file, senza chiamate al server. Gli istanti si confrontano con
+   la durata scritta in quel momento nel form;
+2. se il form ha già delle righe, il Dialog di conferma, prima di qualsiasi chiamata al DB o a
+   RAWG. ANNULLA chiude e non cambia niente;
+3. si cercano i videogame nel DB; gli slug che non ci sono si creano da RAWG, una volta sola anche
+   se sono su più righe. Durante questo passo un Dialog di avanzamento, senza azioni e che ESC non
+   chiude, copre il form: «▶ IMPORT DA EXCEL», titolo «Attendi…», e «Cerco i videogame del file
+   nel DB.» oppure «Creo i videogame nuovi da RAWG: 1 di 2.». Una richiesta a RAWG può durare
+   fino a 15 secondi;
+4. le righe nel form, nell'ordine del file, e il Toast `success` «3 righe importate, 1 videogame
+   creato da RAWG: ricordati di salvare» (senza la parte su RAWG se non ne crea).
+
+Tutto o niente: con un solo errore, in qualunque passo, compare il Dialog degli errori e il form
+resta com'era. I videogame già creati da RAWG restano nel DB, e il Dialog lo dice. Se nel
+frattempo si lascia la pagina, alla fine non compare niente. Con la sessione scaduta si torna al
+login, come nel resto del `/bo`.
+
+**Dialog di conferma** (Dialog di «Conferme di eliminazione», senza l'Alert «NON SI PUÒ
+ANNULLARE»):
+> ▶ IMPORT DA EXCEL
+> **Sostituire le 2 associazioni presenti con le 3 del file?**
+> Le righe di «Videogiochi citati» lasciano il posto a quelle del file. L'episodio non si salva
+> finché non premi SALVA.
+
+Azioni: ANNULLA (focus iniziale) e SOSTITUISCI (`destructive-pieno`). Al singolare: «Sostituire
+l'associazione presente con quella del file?».
+
+**Dialog degli errori:**
+> ▶ IMPORT NON RIUSCITO
+> **6 errori nel file** (oppure «Il file non si può importare» per un errore unico, come un file
+> che non è un template o la durata del form vuota)
+> Il form non è cambiato: correggi il file e riprova.
+
+Sotto, l'elenco degli errori in un riquadro bianco con il bordo inchiostro, alto al massimo 240
+px e con lo scorrimento: «**Riga 4:** istante non valido…», con il numero di riga del foglio,
+cioè quello che si vede in Excel. Un'unica azione, CHIUDI, a tutta larghezza.
+
+Quando il file non c'entra (il server non risponde, RAWG non risponde in tempo, una pagina
+aperta prima di un aggiornamento del sito) il titolo è «Qualcosa è andato storto», il testo «Il
+form non è cambiato.» e l'elenco ha il solo messaggio dell'errore, senza numero di riga. Solo lo
+slug che RAWG non conosce è un errore di riga; gli altri errori di RAWG fermano l'import.
+
+Limite noto: una cella con un errore di formula (`#N/A`, `#VALUE!`) si legge come vuota. Il
+template non ha formule; chi ne usa deve sostituirle con i loro valori prima di importare.
+
 ## Prototipo
 
 Il prototipo è nella pagina «Schermate · stile C» di `new-bo.figcraft`. Ha due flussi:
