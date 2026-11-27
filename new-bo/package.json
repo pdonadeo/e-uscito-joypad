@@ -10,6 +10,7 @@
     "typecheck": "bun run codegen && tsc -b",
     "build": "bun run lint:classi && bun run codegen && vite build",
     "lint": "oxlint",
+    "test": "TZ=Europe/Rome bun test src/lib/excel",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "fflate": "^0.8.3",
     "graphql": "^16.15.0",
     "graphql-request": "^7.4.0",
     "radix-ui": "^1.8.1",
@@ -40,6 +42,7 @@
     "@graphql-typed-document-node/core": "^3.2.0",
     "@tanstack/router-cli": "^1.168.0",
     "@tanstack/router-plugin": "^1.169.0",
+    "@types/bun": "^1.4.5",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

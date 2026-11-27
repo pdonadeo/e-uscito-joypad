@@ -932,6 +932,33 @@ eliminare 1 episodio e tutti i suoi collegamenti…»). Per gli utenti la selezi
 comprendere il proprio utente, che non ha la casella. Se il backend risponde comunque 400 per
 una riga, le altre si cancellano e il Toast mostra «Non puoi cancellare te stesso».
 
+### Template dei minutaggi
+
+Indirizzo `/bo/template`, **pubblico**: chiunque scarica il template Excel per segnare in quale
+punto di un episodio si parla di ogni videogame, e lo manda allo staff, che lo importa nel form
+dell'episodio. È sorella del login, quindi fuori dal guard delle pagine dello staff, e non chiama
+`/api/graphql`.
+
+Stessa composizione del Login: cielo, nuvole e prato, Dialog `retro` largo al massimo 640 px,
+centrato in verticale da `lg`. Dentro:
+
+- titolo «MINUTAGGI» e sotto «di «È uscito Joypad?»», come «RETROBOTTEGA» nel login;
+- «Aiutaci a segnare in quale punto di un episodio si parla di ogni videogame.»;
+- un elenco numerato di cinque passi: scaricare e aprire il file (Excel, LibreOffice Calc o
+  Google Sheets); una riga per videogame, dal menu VIDEOGAME o, se manca, con il RAWG SLUG;
+  l'ISTANTE come `1:02:03` o `12:30`; TIPOLOGIA e SPEAKER dal menu, vuoti valgono «Chiacchiera
+  libera» e «Tutti»; salvare in .xlsx e mandarlo allo staff;
+- Button `retro` · `xl` «▶ SCARICA IL TEMPLATE», a tutta larghezza.
+
+Il file si genera nel browser solo al clic, mai all'apertura della pagina: prima chiede
+l'elenco aggiornato dei videogame a `GET /api/template/videogame`, poi scarica
+`minutaggi-joypad.xlsx`. Durante la generazione il bottone dice «Attendi…» con `aria-busy`. Se
+l'elenco non arriva, sopra il bottone compare l'Alert `destructive` «Non riesco a scaricare
+l'elenco dei videogame. Riprova tra poco.» e nessun file viene scaricato. Se invece non si
+riesce a preparare il file, per esempio in una pagina aperta prima di un aggiornamento del sito,
+l'Alert dice «Non riesco a preparare il file. Ricarica la pagina e riprova.». L'Alert sparisce al
+clic successivo.
+
 ## Prototipo
 
 Il prototipo è nella pagina «Schermate · stile C» di `new-bo.figcraft`. Ha due flussi:

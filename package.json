@@ -20,6 +20,7 @@
   "homepage": "https://github.com/pdonadeo/e-uscito-joypad#readme",
   "devDependencies": {
     "@playwright/test": "^1.65.1",
+    "fflate": "^0.8.3",
     "graphql": "^16.15.0"
   }
 }

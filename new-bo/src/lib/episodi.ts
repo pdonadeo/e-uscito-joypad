@@ -15,21 +15,9 @@ import { ErroreApi, esegui, MESSAGGIO_RETE } from '@/lib/graphql'
 
 export type { Direzione, OrdinamentoEpisodi, Speaker, Tipologia }
 
-// --- Etichette (F-AS-03: l'interfaccia mostra le etichette, mai i codici) ---------------------
+// --- Etichette (F-AS-03): definite in etichette.ts, senza GraphQL a runtime ---------------------
 
-export const SPEAKER: readonly { valore: Speaker; etichetta: string }[] = [
-  { valore: 'TUTT', etichetta: 'Tutti' },
-  { valore: 'BORD', etichetta: 'Matteo Bordone (corri!)' },
-  { valore: 'FOSS', etichetta: 'Francesco Fossetti (salta!)' },
-  { valore: 'ZAMP', etichetta: 'Alessandro Zampini (spara!)' },
-]
-
-export const TIPOLOGIA: readonly { valore: Tipologia; etichetta: string }[] = [
-  { valore: 'FREE', etichetta: 'Chiacchiera libera' },
-  { valore: 'RECE', etichetta: 'Recensione' },
-  { valore: 'CONS', etichetta: 'Consiglio' },
-  { valore: 'STAR', etichetta: 'Osservatorio Star Citizen' },
-]
+export { SPEAKER, TIPOLOGIA } from '@/lib/etichette'
 
 // --- Formati -------------------------------------------------------------------------------
 
