@@ -139,7 +139,7 @@ function PaginaTemplate() {
               size="xl"
               aria-busy={inCorso}
               onClick={() => void alClic()}
-              className="mt-24 gap-17 aria-busy:cursor-wait lg:mt-28"
+              className="mt-24 gap-17 aria-busy:cursor-wait max-[390px]:gap-8 max-[390px]:px-10 max-[390px]:text-[length:clamp(12px,calc((100vw_-_150px)/11.8),18px)] max-[390px]:tracking-wide lg:mt-28"
             >
               <GlifoPlay misura="grande" /> {inCorso ? 'Attendi…' : 'Scarica il template'}
             </Button>

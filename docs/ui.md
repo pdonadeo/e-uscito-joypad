@@ -730,7 +730,7 @@ Cosa cambia:
 - **Login:** stessa cornice `retro` centrata, 500 px su desktop e quasi tutta la larghezza a
   390. Il paesaggio (nuvole, erba, joypad) si adatta alla larghezza; nello stato d'errore a 390
   il joypad e le scintille sono nascosti per fare spazio all'Alert.
-- **Sotto 390 (da 300 px, 3.6c.4c):** valgono le regole di 390, più poche correzioni con il prefisso `max-[390px]:` (da 390 in su non cambiano nulla): RETROBOTTEGA del login scala con la viewport da 32 fino a 22 px; «+ FILTRO» va a capo sotto il filtro; il selettore delle righe per pagina non si stringe; nella barra delle azioni ANNULLA ha `px-12` e SALVA/CREA `px-10 gap-8 tracking-wide`. I valori lunghi troncati con i puntini restano troncati, come a 390. A tutte le larghezze, nei titoli di pagina e nel testo delle conferme le parole lunghe (per esempio uno username) vanno a capo (`wrap-anywhere`).
+- **Sotto 390 (da 300 px, 3.6c.4c):** valgono le regole di 390, più poche correzioni con il prefisso `max-[390px]:` (da 390 in su non cambiano nulla): RETROBOTTEGA del login scala con la viewport da 32 fino a 22 px; «+ FILTRO» va a capo sotto il filtro; il selettore delle righe per pagina non si stringe; nella barra delle azioni ANNULLA ha `px-12` e SALVA/CREA `px-10 gap-8 tracking-wide`; «SCARICA IL TEMPLATE» ha anche lui `px-10 gap-8 tracking-wide` e il testo scala con la viewport da 18 fino a 12 px. I valori lunghi troncati con i puntini restano troncati, come a 390. A tutte le larghezze, nei titoli di pagina e nel testo delle conferme le parole lunghe (per esempio uno username) vanno a capo (`wrap-anywhere`).
 
 ## Schermate non disegnate
 
@@ -950,7 +950,8 @@ centrato in verticale da `lg`. Dentro:
   libera» e «Tutti»; salvare in .xlsx e mandarlo allo staff, allegandolo a una issue su GitHub o
   sul server Discord (i due canali ufficiali, come link in `font-extrabold text-viola underline`,
   aperti in una nuova scheda);
-- Button `retro` · `xl` «▶ SCARICA IL TEMPLATE», a tutta larghezza.
+- Button `retro` · `xl` «▶ SCARICA IL TEMPLATE», a tutta larghezza; sotto 390 si stringe per
+  restare dentro la cornice (vedi «Sotto 390»).
 
 Il file si genera nel browser solo al clic, mai all'apertura della pagina: prima chiede
 l'elenco aggiornato dei videogame a `GET /api/template/videogame`, poi scarica
