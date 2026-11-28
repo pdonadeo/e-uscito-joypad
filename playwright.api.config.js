@@ -1,12 +1,12 @@
 // @ts-check
 // Test d'integrazione del backoffice: GraphQL (/api/graphql), cover (/api/bo/episodi/:id/cover)
-// ed e2e di new-bo su /bo (tests/api/*.spec.js).
-// Avvia un Dream locale (build di dune) e un finto RAWG; usa il PostgreSQL del
+// rotte e meta del sito, ed e2e del backoffice su /bo (tests/api/*.spec.js).
+// Avvia un Dream locale (build di dune), un finto RAWG e una finta pagina del Post; usa il PostgreSQL del
 // compose di sviluppo, dove crea gli utenti di test in SQL (tests/api/global-setup.js).
 //
-//   yarn --cwd frontend build && bun run --cwd new-bo build && opam exec -- dune build @install src/migrazioni/test/prova_sintassi.exe && npx playwright test -c playwright.api.config.js
+//   bun run --cwd frontend build && opam exec -- dune build @install src/migrazioni/test/prova_sintassi.exe @src/meta/test/runtest && npx playwright test -c playwright.api.config.js
 const { defineConfig } = require('@playwright/test');
-const { API_URL, API_PORT, RAWG_PORT, RAWG_KEY, BINARY, dreamEnv } = require('./tests/api/env');
+const { API_URL, API_PORT, RAWG_PORT, ILPOST_PORT, RAWG_KEY, BINARY, dreamEnv } = require('./tests/api/env');
 
 module.exports = defineConfig({
   testDir: './tests',
@@ -27,6 +27,13 @@ module.exports = defineConfig({
       command: 'node tests/api/mock-rawg.js',
       url: `http://127.0.0.1:${RAWG_PORT}/health`,
       env: { PORT: String(RAWG_PORT), RAWG_TEST_KEY: RAWG_KEY },
+      reuseExistingServer: false,
+    },
+    // prima del binario: il monitor scarica la pagina appena parte
+    {
+      command: 'node tests/api/mock-ilpost.js',
+      url: `http://127.0.0.1:${ILPOST_PORT}/health`,
+      env: { PORT: String(ILPOST_PORT) },
       reuseExistingServer: false,
     },
     {

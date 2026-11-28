@@ -1,8 +1,8 @@
-// /bo è il backoffice (new-bo, Fase 1 di via-django): Dream serve new-bo/dist su /bo.
+// /bo è il backoffice (frontend/, Fase 1 di via-django): Dream serve frontend/dist.
 // /new-bo non esiste più; di /api/bo resta solo la cover.
 const { test, expect } = require('@playwright/test');
 
-test('/bo e /bo/episodi servono index.html di new-bo, senza framing', async ({ request }) => {
+test('/bo e /bo/episodi servono index.html di frontend, senza framing', async ({ request }) => {
   for (const url of ['/bo', '/bo/episodi']) {
     const res = await request.get(url, { maxRedirects: 0 });
     expect(res.status(), url).toBe(200);
@@ -10,15 +10,15 @@ test('/bo e /bo/episodi servono index.html di new-bo, senza framing', async ({ r
     expect(res.headers()['cache-control'], url).toBe('no-cache');
     expect(res.headers()['x-frame-options'], url).toBe('DENY');
     expect(res.headers()['content-security-policy'], url).toContain("frame-ancestors 'none'");
-    // gli asset hanno il prefisso /bo/ (base di Vite)
+    // gli asset hanno il prefisso /assets/ (base «/» di Vite)
     const html = await res.text();
-    expect(html, url).toMatch(/src="\/bo\/assets\/[^"]+\.js"/);
+    expect(html, url).toMatch(/src="\/assets\/[^"]+\.js"/);
   }
 });
 
-test('gli asset di new-bo stanno sotto /bo/assets', async ({ request }) => {
+test('gli asset di frontend stanno sotto /assets', async ({ request }) => {
   const html = await (await request.get('/bo')).text();
-  const js = html.match(/src="(\/bo\/assets\/[^"]+\.js)"/)[1];
+  const js = html.match(/src="(\/assets\/[^"]+\.js)"/)[1];
   const res = await request.get(js);
   expect(res.status()).toBe(200);
   expect(res.headers()['content-type']).toContain('javascript');

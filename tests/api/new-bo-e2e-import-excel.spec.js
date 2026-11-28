@@ -1,5 +1,5 @@
 // Import Excel nel form dell'episodio (Fase 4 del piano dell'import, criteri I1-I7, I10, P1-P6).
-// I file di prova sono in fixture/import-excel/ (li genera new-bo/scripts/genera-fixture-excel.ts)
+// I file di prova sono in fixture/import-excel/ (li genera frontend/scripts/genera-fixture-excel.ts)
 // e citano i videogame 990001-990003, inseriti da global-setup.js. Gli slug «e2e-…» passano dal
 // finto RAWG (mock-rawg.js), che conta le chiamate su /calls.
 const { test, expect } = require('@playwright/test');

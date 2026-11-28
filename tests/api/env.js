@@ -8,6 +8,7 @@ const { execFileSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '..', '..');
 const API_PORT = Number(process.env.ADMIN_API_PORT || 3901);
 const RAWG_PORT = Number(process.env.ADMIN_RAWG_PORT || 3902);
+const ILPOST_PORT = Number(process.env.ADMIN_ILPOST_PORT || 3903);
 const API_URL = `http://127.0.0.1:${API_PORT}`;
 const MEDIA_ROOT = path.join(os.tmpdir(), 'euj-admin-api-test-media');
 const RAWG_KEY = 'e2e-rawg-key';
@@ -41,6 +42,7 @@ function dreamEnv(extra = {}) {
     MEDIA_URL: 'bo/files/',
     RAWG_API_URL: `http://127.0.0.1:${RAWG_PORT}`,
     RAWG_API_KEY: RAWG_KEY,
+    JOYPAD_PAGE_URL: `http://127.0.0.1:${ILPOST_PORT}/podcasts/joypad/`,
     GC_PERIOD_SEC: '3600',
     ...extra,
   };
@@ -116,6 +118,7 @@ module.exports = {
   ROOT,
   API_PORT,
   RAWG_PORT,
+  ILPOST_PORT,
   API_URL,
   MEDIA_ROOT,
   RAWG_KEY,

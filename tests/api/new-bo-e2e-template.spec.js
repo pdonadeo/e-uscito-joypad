@@ -86,7 +86,7 @@ test('se il generatore non si carica (sito aggiornato a pagina aperta), l\'Alert
   await page.goto('/bo/template');
   await expect(page.getByRole('heading', { name: 'MINUTAGGI' })).toBeVisible();
   // la pagina è già caricata: l'unico pezzo «template-*.js» che resta da chiedere è il generatore
-  await page.route('**/bo/assets/template-*.js', (r) => r.abort());
+  await page.route('**/assets/template-*.js', (r) => r.abort());
   await page.getByRole('button', { name: 'Scarica il template' }).click();
   await expect(page.getByRole('alert')).toHaveText('Non riesco a preparare il file. Ricarica la pagina e riprova.');
 });

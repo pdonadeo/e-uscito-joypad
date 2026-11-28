@@ -1,19 +1,8 @@
 version: 2
 updates:
-  # Sito pubblico (React, yarn)
-  - package-ecosystem: "npm"
-    directory: "/frontend"
-    schedule:
-      interval: "weekly"
-    ignore:
-      # @eslint/js segue la major di eslint, che resta alla 9 finché
-      # eslint-plugin-react non supporta ESLint 10.
-      - dependency-name: "@eslint/js"
-        update-types: ["version-update:semver-major"]
-
-  # Backoffice /bo (React, Bun)
+  # Sito pubblico e backoffice /bo (React, Bun)
   - package-ecosystem: "bun"
-    directory: "/new-bo"
+    directory: "/frontend"
     schedule:
       interval: "weekly"
     ignore:
@@ -27,7 +16,7 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      # Stessa major di graphql del backoffice (vedi /new-bo).
+      # Stessa major di graphql del frontend (vedi /frontend).
       - dependency-name: "graphql"
         update-types: ["version-update:semver-major"]
 

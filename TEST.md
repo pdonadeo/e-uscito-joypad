@@ -12,7 +12,7 @@ su `/bo`. Configurazione: `playwright.api.config.js`. Test: `tests/api/*.spec.js
 ```fish
 cd ~/Programmazione/e-uscito-joypad
 docker compose up -d postgresql
-yarn --cwd frontend build; and bun run --cwd new-bo build; and opam exec -- dune build @install src/migrazioni/test/prova_sintassi.exe; and npx playwright test -c playwright.api.config.js
+bun run --cwd frontend build; and opam exec -- dune build @install src/migrazioni/test/prova_sintassi.exe @src/meta/test/runtest; and npx playwright test -c playwright.api.config.js
 ```
 
 - **Cosa fa da sola:** avvia il binario compilato da dune e un finto RAWG (`tests/api/mock-rawg.js`), poi li spegne

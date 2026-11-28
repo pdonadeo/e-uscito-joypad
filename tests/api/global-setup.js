@@ -19,7 +19,7 @@ module.exports = async () => {
   }
   // Videogame di prova dell'import Excel, con id fissi: le fixture committate in
   // fixture/import-excel/ contengono «990001-E2E Fixture 1» nella colonna VIDEOGAME (le genera
-  // new-bo/scripts/genera-fixture-excel.ts, con gli stessi id e titoli). Il teardown li
+  // frontend/scripts/genera-fixture-excel.ts, con gli stessi id e titoli). Il teardown li
   // cancella con gli altri (slug «e2e-…»).
   // ATTENZIONE: un INSERT con id esplicito non fa avanzare la sequenza degli id. Se i videogame
   // veri arrivassero a 990001 (oggi sono circa 900) questo INSERT fallirebbe: andrebbero scelti

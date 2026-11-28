@@ -1,7 +1,7 @@
 // Test e2e di /bo (Fase 3.6c). Girano con playwright.api.config.js: Dream locale
-// con il bundle di new-bo nel crunch, DB del compose di sviluppo.
+// con il bundle di frontend nel crunch, DB del compose di sviluppo.
 //
-//   (cd new-bo && bun run build) && opam exec -- dune build @install
+//   bun run --cwd frontend build && opam exec -- dune build @install
 //   npx playwright test -c playwright.api.config.js new-bo-e2e
 //
 // Prima metà di 3.6c: login (F-AU-01), logout (F-AU-02), utente corrente nella shell

@@ -3,7 +3,7 @@
 #
 #   scripts/prova-template-libreoffice.sh
 #
-# Prende la fixture generata valido-slug.xlsx (new-bo/scripts/genera-fixture-excel.ts), la fa
+# Prende la fixture generata valido-slug.xlsx (frontend/scripts/genera-fixture-excel.ts), la fa
 # aprire e risalvare in .xlsx da LibreOffice senza interfaccia, e scrive il risultato in
 # tests/api/fixture/import-excel/libreoffice.xlsx, che si committa. Il file risalvato ha la
 # struttura che produce LibreOffice (stili, stringhe, convalide riscritte a modo suo): i test
@@ -18,7 +18,7 @@ sorgente="$cartella/valido-slug.xlsx"
 destinazione="$cartella/libreoffice.xlsx"
 
 command -v soffice >/dev/null || { echo "soffice non trovato: serve LibreOffice" >&2; exit 1; }
-[ -f "$sorgente" ] || { echo "manca $sorgente: lancia prima new-bo/scripts/genera-fixture-excel.ts" >&2; exit 1; }
+[ -f "$sorgente" ] || { echo "manca $sorgente: lancia prima frontend/scripts/genera-fixture-excel.ts" >&2; exit 1; }
 
 lavoro="$(mktemp -d)"
 trap 'rm -rf "$lavoro"' EXIT
