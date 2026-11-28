@@ -16,7 +16,7 @@ import { scriviXlsx } from './scrittore'
 import { creaTemplate } from './template'
 
 // Test del parser dell'import (criteri I6-I9 della spec, decisioni P1, P2, P4, P6, P7).
-// Si lanciano con `bun run --cwd new-bo test`, che imposta TZ=Europe/Rome: gli orari convertiti
+// Si lanciano con `bun run --cwd frontend test`, che imposta TZ=Europe/Rome: gli orari convertiti
 // da Excel arrivano come Date del 1899, e il fuso di Roma di allora non deve spostarli.
 
 test('il fuso è Europe/Rome (lo imposta lo script «test» di package.json)', () => {

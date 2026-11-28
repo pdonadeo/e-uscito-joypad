@@ -3,7 +3,7 @@ import type { RigaLetta } from './importa'
 import { type GiocoNoto, risolviGiochi } from './risolvi'
 
 // Test della risoluzione dei videogame dell'import (criterio I6), con elenco e RAWG finti.
-// Si lanciano con `bun run --cwd new-bo test`.
+// Si lanciano con `bun run --cwd frontend test`.
 
 test('il fuso è Europe/Rome (lo imposta lo script «test» di package.json)', () => {
   expect(process.env.TZ).toBe('Europe/Rome')

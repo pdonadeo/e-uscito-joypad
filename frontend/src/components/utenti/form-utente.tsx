@@ -96,7 +96,7 @@ export function FormUtente({ utente }: { utente: Utente | null }) {
   const navigate = useNavigate()
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { me } = useRouteContext({ from: '/_app' })
+  const { me } = useRouteContext({ from: '/bo/_app' })
   const idNonTeStesso = React.useId()
   const proprio = utente != null && utente.id === me.id
   const [conferma, setConferma] = React.useState(false)
@@ -111,7 +111,7 @@ export function FormUtente({ utente }: { utente: Utente | null }) {
       if (nuovo) {
         // Dopo «Crea» si apre la modifica (F-UT-04).
         await queryClient.invalidateQueries({ queryKey: ['utenti'], refetchType: 'none' })
-        await navigate({ to: '/utenti/$id', params: { id: esito.id } })
+        await navigate({ to: '/bo/utenti/$id', params: { id: esito.id } })
       } else if (inviato.continua) {
         const chiave = dettaglio(esito.id).queryKey
         await queryClient.invalidateQueries({ queryKey: ['utenti'], refetchType: 'none' })
@@ -126,7 +126,7 @@ export function FormUtente({ utente }: { utente: Utente | null }) {
         mostraSuccesso('Modifiche salvate')
       } else {
         await queryClient.invalidateQueries({ queryKey: ['utenti'], refetchType: 'none' })
-        await navigate({ to: '/utenti' })
+        await navigate({ to: '/bo/utenti' })
       }
     },
     onError: (e) => {
@@ -140,7 +140,7 @@ export function FormUtente({ utente }: { utente: Utente | null }) {
       setConferma(false)
       queryClient.removeQueries({ queryKey: dettaglio(utente!.id).queryKey })
       await queryClient.invalidateQueries({ queryKey: ['utenti'], refetchType: 'none' })
-      await navigate({ to: '/utenti' })
+      await navigate({ to: '/bo/utenti' })
     },
     onError: (e) => {
       setConferma(false)
@@ -299,7 +299,7 @@ export function FormUtente({ utente }: { utente: Utente | null }) {
           invio={invio}
           inCorso={continua ? 'continua' : 'salva'}
           elimina={!nuovo && bottoneElimina(false)}
-          annulla={{ to: '/utenti' }}
+          annulla={{ to: '/bo/utenti' }}
           etichettaSalva={nuovo ? 'Crea' : 'Salva'}
           onContinua={nuovo ? undefined : () => invia({ continua: true })}
         />
@@ -320,7 +320,7 @@ export function FormUtente({ utente }: { utente: Utente | null }) {
     >
       <IntestazionePagina
         className="lg:-mb-2"
-        indietro={{ to: '/utenti', etichetta: 'Utenti' }}
+        indietro={{ to: '/bo/utenti', etichetta: 'Utenti' }}
         titolo={utente ? utente.username : 'Nuovo utente'}
       />
 

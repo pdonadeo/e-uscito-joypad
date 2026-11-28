@@ -1,5 +1,6 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core'
 import { ClientError, GraphQLClient } from 'graphql-request'
+import { ErroreApi, MESSAGGIO_RETE, type CodiceErrore } from '@/lib/errore-api'
 
 // Client di POST /api/graphql (docs/schema.graphql).
 // - Content-Type esatto `application/json`, senza charset: con il charset Dream risponde 400.
@@ -12,29 +13,7 @@ const client = new GraphQLClient(`${window.location.origin}/api/graphql`, {
   headers: { 'Content-Type': 'application/json' },
 })
 
-export type CodiceErrore =
-  | 'UNAUTHENTICATED'
-  | 'FORBIDDEN'
-  | 'BAD_USER_INPUT'
-  | 'NOT_FOUND'
-  | 'RATE_LIMITED'
-  | 'UPSTREAM_ERROR'
-  | 'INTERNAL'
-  | 'GRAPHQL_VALIDATION'
-  // non è un codice del server: la richiesta non è arrivata o la risposta non è leggibile
-  | 'RETE'
-
-export class ErroreApi extends Error {
-  readonly codice: CodiceErrore
-
-  constructor(messaggio: string, codice: CodiceErrore) {
-    super(messaggio)
-    this.name = 'ErroreApi'
-    this.codice = codice
-  }
-}
-
-export const MESSAGGIO_RETE = 'Il server non risponde. Controlla la connessione e riprova.'
+export { eErroreApi, ErroreApi, MESSAGGIO_RETE, type CodiceErrore } from '@/lib/errore-api'
 
 function comeErroreApi(e: unknown): ErroreApi {
   if (e instanceof ClientError) {
@@ -60,5 +39,3 @@ export async function esegui<T, V extends Record<string, unknown>>(
     throw comeErroreApi(e)
   }
 }
-
-export const eErroreApi = (e: unknown, codice: CodiceErrore) => e instanceof ErroreApi && e.codice === codice

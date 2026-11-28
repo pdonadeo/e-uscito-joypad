@@ -67,7 +67,7 @@ const ORDINAMENTI_390: { valore: string; etichetta: string }[] = [
   { valore: 'pubblicato-desc', etichetta: 'Pubblicato, prima i sì' },
 ]
 
-export const Route = createFileRoute('/_app/episodi/')({
+export const Route = createFileRoute('/bo/_app/episodi/')({
   validateSearch: (s: Record<string, unknown>): Ricerca => {
     const intero = (v: unknown) => (typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN)
     const pagina = intero(s.pagina)
@@ -100,7 +100,7 @@ function parametri(r: Ricerca): ParametriElenco {
 
 function ElencoEpisodi() {
   const ricerca = Route.useSearch()
-  const navigate = useNavigate({ from: '/episodi/' })
+  const navigate = useNavigate({ from: '/bo/episodi/' })
   const desktop = useDesktop()
   const queryClient = useQueryClient()
   const p = parametri(ricerca)
@@ -147,7 +147,7 @@ function ElencoEpisodi() {
       else n.add(id)
       return n
     })
-  const apri = (id: number) => navigate({ to: '/episodi/$id', params: { id } })
+  const apri = (id: number) => navigate({ to: '/bo/episodi/$id', params: { id } })
 
   const ordinaPer = (c: Colonna) => {
     const attuale = ricerca.ordina ?? 'data'
@@ -190,7 +190,7 @@ function ElencoEpisodi() {
         titolo="Episodi"
         azioni={
           <Button asChild size={desktop ? 'default' : 'sm'}>
-            <Link to="/episodi/nuovo">{desktop ? '+ Nuovo episodio' : '+ Nuovo'}</Link>
+            <Link to="/bo/episodi/nuovo">{desktop ? '+ Nuovo episodio' : '+ Nuovo'}</Link>
           </Button>
         }
       />
@@ -319,7 +319,7 @@ function ElencoEpisodi() {
                   <TableCell className="truncate font-bold">{e.episodio_numero}</TableCell>
                   <TableCell className="truncate pr-16">
                     <Link
-                      to="/episodi/$id"
+                      to="/bo/episodi/$id"
                       params={{ id: e.id }}
                       onClick={(ev) => ev.stopPropagation()}
                       className="outline-none focus-visible:underline"
@@ -493,7 +493,7 @@ function SchedaEpisodio({
         </Badge>
       </div>
       <Link
-        to="/episodi/$id"
+        to="/bo/episodi/$id"
         params={{ id: e.id }}
         onClick={(ev) => ev.stopPropagation()}
         className="text-lg font-bold outline-none focus-visible:underline"

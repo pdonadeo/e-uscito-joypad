@@ -23,7 +23,7 @@ import { cambiaPassword, MESSAGGIO_ATTUALE_ERRATA } from '@/lib/sessione'
 // - A successo: Toast `success` CHECKPOINT, form vuoto, si resta sulla pagina.
 // - ANNULLA torna alla pagina precedente dell'app; se la pagina è stata aperta direttamente,
 //   agli episodi.
-export const Route = createFileRoute('/_app/password')({
+export const Route = createFileRoute('/bo/_app/password')({
   component: PaginaPassword,
 })
 
@@ -83,7 +83,7 @@ function PaginaPassword() {
   const annulla = () => {
     chiudiErrori()
     if (indietro) router.history.back()
-    else void navigate({ to: '/episodi' })
+    else void navigate({ to: '/bo/episodi' })
   }
 
   const campo = (

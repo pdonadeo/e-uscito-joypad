@@ -209,7 +209,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
       if (nuovo) {
         // Dopo «Crea» si apre la modifica (F-EP-06).
         await queryClient.invalidateQueries({ queryKey: ['episodi'] })
-        await navigate({ to: '/episodi/$id', params: { id: esito as number } })
+        await navigate({ to: '/bo/episodi/$id', params: { id: esito as number } })
       } else if (typeof esito === 'object') {
         // «Salva e continua»: gli elenchi si rileggeranno quando si riaprono; il dettaglio in
         // cache diventa quello salvato (intestazione e cover), senza che una rilettura già
@@ -231,7 +231,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
       } else {
         // Dopo «Salva» si torna all'elenco (prototipo).
         await queryClient.invalidateQueries({ queryKey: ['episodi'] })
-        await navigate({ to: '/episodi' })
+        await navigate({ to: '/bo/episodi' })
       }
     },
     onError: (e) => {
@@ -245,7 +245,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
       setConferma(false)
       queryClient.removeQueries({ queryKey: ['episodi', 'dettaglio', episodio!.id] })
       await queryClient.invalidateQueries({ queryKey: ['episodi'] })
-      await navigate({ to: '/episodi' })
+      await navigate({ to: '/bo/episodi' })
     },
     onError: (e) => {
       setConferma(false)
@@ -641,7 +641,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
           invio={invio}
           inCorso={continua ? 'continua' : 'salva'}
           elimina={!nuovo && bottoneElimina(false)}
-          annulla={{ to: '/episodi' }}
+          annulla={{ to: '/bo/episodi' }}
           etichettaSalva={nuovo ? 'Crea' : 'Salva'}
           onContinua={nuovo ? undefined : () => invia({ continua: true })}
         />
@@ -679,7 +679,7 @@ export function FormEpisodio({ episodio }: { episodio: Episodio | null }) {
       >
         <IntestazionePagina
           className="lg:-mb-2"
-          indietro={{ to: '/episodi', etichetta: 'Episodi' }}
+          indietro={{ to: '/bo/episodi', etichetta: 'Episodi' }}
           titolo={episodio ? nomeEpisodio(episodio) : 'Nuovo episodio'}
           stato={
             episodio &&

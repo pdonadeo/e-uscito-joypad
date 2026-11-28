@@ -7,8 +7,7 @@ import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ErroreApi, esegui, MESSAGGIO_RETE } from '@/lib/graphql'
-import { graphql } from '@/gql'
+import { ErroreApi, MESSAGGIO_RETE } from '@/lib/errore-api'
 import { login, utenteCorrente } from '@/lib/sessione'
 import { cn } from '@/lib/utils'
 
@@ -17,25 +16,14 @@ import { cn } from '@/lib/utils'
 // normal del resto dell'interfaccia. Da lg l'Alert dista 22 px dal campo e 26 dal bottone (login-errore-1180/1440.png: 22 e 25;
 // 25 non è tra le spaziature ammesse, il px in più compensa l'Alert alto 42 invece di 43).
 
-const documentoSessioneAttiva = graphql(`
-  query SessioneAttiva {
-    me {
-      id
-    }
-  }
-`)
-
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute('/bo/login')({
   // con una sessione già valida il login non serve: si va agli episodi
+  // (import dinamico: la parte non separata della rotta finisce nel chunk d'ingresso della home,
+  // che non deve portarsi dietro graphql-request)
   beforeLoad: async () => {
-    let attiva = false
-    try {
-      await esegui(documentoSessioneAttiva)
-      attiva = true
-    } catch {
-      // nessuna sessione (o server irraggiungibile): si resta sul login
-    }
-    if (attiva) throw redirect({ to: '/episodi' })
+    const { sessioneAttiva } = await import('@/lib/sessione')
+    // senza sessione (o con il server irraggiungibile) si resta sul login
+    if (await sessioneAttiva()) throw redirect({ to: '/bo/episodi' })
   },
   component: PaginaLogin,
 })
@@ -72,7 +60,7 @@ function PaginaLogin() {
       try {
         const me = await login(value.username, value.password)
         queryClient.setQueryData(utenteCorrente.queryKey, me)
-        await navigate({ to: '/episodi' })
+        await navigate({ to: '/bo/episodi' })
       } catch (e) {
         // il messaggio è quello del server: 401 «Credenziali non valide o utente non abilitato»,
         // 429 «Troppe richieste di login, riprova tra poco» (V-04)

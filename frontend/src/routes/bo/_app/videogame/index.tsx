@@ -58,7 +58,7 @@ const TESTI_VUOTO = {
   errore: 'Non è stato possibile leggere i videogame.',
 }
 
-export const Route = createFileRoute('/_app/videogame/')({
+export const Route = createFileRoute('/bo/_app/videogame/')({
   validateSearch: (s: Record<string, unknown>): Ricerca => {
     const intero = (v: unknown) => (typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN)
     const pagina = intero(s.pagina)
@@ -87,7 +87,7 @@ function parametri(r: Ricerca): ParametriElencoVideogame {
 
 function ElencoVideogame() {
   const ricerca = Route.useSearch()
-  const navigate = useNavigate({ from: '/videogame/' })
+  const navigate = useNavigate({ from: '/bo/videogame/' })
   const desktop = useDesktop()
   const queryClient = useQueryClient()
   const p = parametri(ricerca)
@@ -135,7 +135,7 @@ function ElencoVideogame() {
       else n.add(id)
       return n
     })
-  const apri = (id: number) => navigate({ to: '/videogame/$id', params: { id } })
+  const apri = (id: number) => navigate({ to: '/bo/videogame/$id', params: { id } })
 
   const colonnaAttiva = ricerca.ordina ?? 'titolo'
   const ascendente = p.direzione === 'ASC'
@@ -167,7 +167,7 @@ function ElencoVideogame() {
         titolo="Videogame"
         azioni={
           <Button asChild size={desktop ? 'default' : 'sm'}>
-            <Link to="/videogame/nuovo">{desktop ? '+ Nuovo videogame' : '+ Nuovo'}</Link>
+            <Link to="/bo/videogame/nuovo">{desktop ? '+ Nuovo videogame' : '+ Nuovo'}</Link>
           </Button>
         }
       />
@@ -276,7 +276,7 @@ function ElencoVideogame() {
                   </TableCell>
                   <TableCell className="truncate pr-16 font-bold">
                     <Link
-                      to="/videogame/$id"
+                      to="/bo/videogame/$id"
                       params={{ id: v.id }}
                       onClick={(ev) => ev.stopPropagation()}
                       className="outline-none focus-visible:underline"
@@ -371,7 +371,7 @@ function SchedaVideogame({
       <MiniaturaCover src={v.cover} className="h-44 w-64" />
       <div className="flex min-w-0 flex-col gap-4">
         <Link
-          to="/videogame/$id"
+          to="/bo/videogame/$id"
           params={{ id: v.id }}
           onClick={(ev) => ev.stopPropagation()}
           className="truncate text-lg font-bold outline-none focus-visible:underline"

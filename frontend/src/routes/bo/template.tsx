@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 // di login.tsx, quindi fuori dal guard di _app.tsx, e non chiama /api/graphql. Il file si genera
 // nel browser al clic, non all'apertura: con lo StrictMode di main.tsx partirebbe due volte.
 
-export const Route = createFileRoute('/template')({
+export const Route = createFileRoute('/bo/template')({
   component: PaginaTemplate,
 })
 

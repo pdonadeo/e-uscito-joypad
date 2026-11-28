@@ -17,6 +17,15 @@ const documentoMe = graphql(`
   }
 `)
 
+// Solo l'id: basta a sapere se c'è una sessione valida (beforeLoad di /bo/login).
+const documentoSessioneAttiva = graphql(`
+  query SessioneAttiva {
+    me {
+      id
+    }
+  }
+`)
+
 const documentoLogin = graphql(`
   mutation Login($credenziali: CredenzialiInput!) {
     login(credenziali: $credenziali) {
@@ -52,6 +61,16 @@ export const utenteCorrente = queryOptions({
   queryFn: async () => (await esegui(documentoMe)).me,
   staleTime: 60_000,
 })
+
+// Vero se c'è una sessione valida; falso senza sessione o con il server irraggiungibile.
+export async function sessioneAttiva() {
+  try {
+    await esegui(documentoSessioneAttiva)
+    return true
+  } catch {
+    return false
+  }
+}
 
 export async function login(username: string, password: string) {
   return (await esegui(documentoLogin, { credenziali: { username, password } })).login

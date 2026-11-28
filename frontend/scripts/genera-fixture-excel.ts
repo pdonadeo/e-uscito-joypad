@@ -1,6 +1,6 @@
 // Genera i file .xlsx di prova dell'import Excel in tests/api/fixture/import-excel/.
 //
-//   ~/.bun/bin/bun run new-bo/scripts/genera-fixture-excel.ts
+//   ~/.bun/bin/bun run frontend/scripts/genera-fixture-excel.ts
 //
 // I file si committano: rigenerarli dà file identici, finché non cambiano il generatore
 // (src/lib/excel/template.ts) o le righe qui sotto. Usano solo:

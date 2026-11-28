@@ -4,7 +4,7 @@ import { FormNuovoVideogame } from '@/components/videogame/form-nuovo-videogame'
 
 // Nuovo videogame (F-VG-05): il form è un componente a sé, che non naviga; qui, a creazione
 // riuscita, si apre la modifica del videogame creato e ANNULLA torna all'elenco.
-export const Route = createFileRoute('/_app/videogame/nuovo')({
+export const Route = createFileRoute('/bo/_app/videogame/nuovo')({
   component: NuovoVideogame,
 })
 
@@ -14,12 +14,12 @@ function NuovoVideogame() {
     <div className="flex flex-col gap-18 lg:gap-20">
       <IntestazionePagina
         className="lg:-mb-2"
-        indietro={{ to: '/videogame', etichetta: 'Videogame' }}
+        indietro={{ to: '/bo/videogame', etichetta: 'Videogame' }}
         titolo="Nuovo videogame"
       />
       <FormNuovoVideogame
-        onCreato={(v) => void navigate({ to: '/videogame/$id', params: { id: v.id } })}
-        onAnnulla={() => void navigate({ to: '/videogame' })}
+        onCreato={(v) => void navigate({ to: '/bo/videogame/$id', params: { id: v.id } })}
+        onAnnulla={() => void navigate({ to: '/bo/videogame' })}
       />
     </div>
   )

@@ -81,7 +81,7 @@ const TESTI_VUOTO = {
   errore: 'Non è stato possibile leggere gli utenti.',
 }
 
-export const Route = createFileRoute('/_app/utenti/')({
+export const Route = createFileRoute('/bo/_app/utenti/')({
   validateSearch: (s: Record<string, unknown>): Ricerca => {
     const intero = (v: unknown) => (typeof v === 'number' ? v : typeof v === 'string' ? Number(v) : NaN)
     const pagina = intero(s.pagina)
@@ -110,7 +110,7 @@ function parametri(r: Ricerca): ParametriElencoUtenti {
 
 function ElencoUtenti() {
   const ricerca = Route.useSearch()
-  const navigate = useNavigate({ from: '/utenti/' })
+  const navigate = useNavigate({ from: '/bo/utenti/' })
   const { me } = Route.useRouteContext()
   const desktop = useDesktop()
   const queryClient = useQueryClient()
@@ -161,7 +161,7 @@ function ElencoUtenti() {
       else n.add(id)
       return n
     })
-  const apri = (id: number) => navigate({ to: '/utenti/$id', params: { id } })
+  const apri = (id: number) => navigate({ to: '/bo/utenti/$id', params: { id } })
 
   const colonnaAttiva = ricerca.ordina ?? 'username'
   const ascendente = p.direzione === 'ASC'
@@ -203,7 +203,7 @@ function ElencoUtenti() {
         titolo="Utenti"
         azioni={
           <Button asChild size={desktop ? 'default' : 'sm'}>
-            <Link to="/utenti/nuovo">{desktop ? '+ Nuovo utente' : '+ Nuovo'}</Link>
+            <Link to="/bo/utenti/nuovo">{desktop ? '+ Nuovo utente' : '+ Nuovo'}</Link>
           </Button>
         }
       />
@@ -312,7 +312,7 @@ function ElencoUtenti() {
                   </TableCell>
                   <TableCell className="truncate pr-12 font-bold">
                     <Link
-                      to="/utenti/$id"
+                      to="/bo/utenti/$id"
                       params={{ id: u.id }}
                       onClick={(ev) => ev.stopPropagation()}
                       className="outline-none focus-visible:underline"
@@ -443,7 +443,7 @@ function SchedaUtente({
           </span>
         )}
         <Link
-          to="/utenti/$id"
+          to="/bo/utenti/$id"
           params={{ id: u.id }}
           onClick={(ev) => ev.stopPropagation()}
           className="truncate text-lg font-bold outline-none focus-visible:underline"

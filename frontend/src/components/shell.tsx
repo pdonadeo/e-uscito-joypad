@@ -31,21 +31,21 @@ import { logout, type UtenteCorrente } from '@/lib/sessione'
 
 const VOCI = [
   {
-    to: '/episodi',
+    to: '/bo/episodi',
     etichetta: 'Episodi',
     rotaia: <GlifoPlay misura="grande" />,
     espansa: <GlifoPlay misura="voce" />,
     soloSuperuser: false,
   },
   {
-    to: '/videogame',
+    to: '/bo/videogame',
     etichetta: 'Videogame',
     rotaia: <GlifoRombo misura="grande" />,
     espansa: <GlifoRombo misura="voce" />,
     soloSuperuser: false,
   },
   {
-    to: '/utenti',
+    to: '/bo/utenti',
     etichetta: 'Utenti',
     rotaia: <GlifoStella misura="grande" />,
     espansa: <GlifoStella misura="voce" />,
@@ -65,7 +65,7 @@ function useEsci() {
     } finally {
       // il logout riesce sempre (F-AU-02); anche se la rete cade, la sessione locale si chiude
       queryClient.removeQueries()
-      await navigate({ to: '/login' })
+      await navigate({ to: '/bo/login' })
     }
   }
 }
@@ -155,7 +155,7 @@ function MenuMobile({ me, esci }: { me: UtenteCorrente; esci: () => void }) {
           {/* F-AU-06: cambio della propria password, sopra ESCI; `outline` come ESCI (il `secondary`
               crema sparirebbe sul fondo crema dello Sheet) */}
           <Button asChild variant="outline">
-            <Link to="/password" onClick={() => setAperto(false)}>
+            <Link to="/bo/password" onClick={() => setAperto(false)}>
               Parola d'ordine
             </Link>
           </Button>
@@ -169,7 +169,7 @@ function MenuMobile({ me, esci }: { me: UtenteCorrente; esci: () => void }) {
 }
 
 export function Shell() {
-  const { me } = useRouteContext({ from: '/_app' })
+  const { me } = useRouteContext({ from: '/bo/_app' })
   const esci = useEsci()
 
   return (
@@ -193,7 +193,7 @@ export function Shell() {
           </span>
           {/* F-AU-06: bottone secondario prima di ESCI, con il bordo crema di 2 px per essere alto come ESCI */}
           <Button asChild variant="secondary" size="sm" className="ml-2 border-2 border-crema px-12 py-7 text-sm">
-            <Link to="/password">Parola d'ordine</Link>
+            <Link to="/bo/password">Parola d'ordine</Link>
           </Button>
           <Button variant="outline-su-scuro" size="sm" className="gap-10" onClick={esci}>
             Esci <GlifoEspelli />

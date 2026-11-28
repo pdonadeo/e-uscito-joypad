@@ -26,7 +26,7 @@ export function EpisodiCitati({ videogameId, desktop }: { videogameId: number; d
   React.useEffect(() => {
     if (data && pagina > ultima) setPagina(ultima)
   }, [data, pagina, ultima])
-  const apri = (id: number) => void navigate({ to: '/episodi/$id', params: { id } })
+  const apri = (id: number) => void navigate({ to: '/bo/episodi/$id', params: { id } })
   const nota = 'Sola lettura: i collegamenti si modificano dall\'episodio'
 
   const vuoto = isPending ? 'Caricamento…' : isError ? 'Non è stato possibile leggere gli episodi.' : 'Nessun episodio cita questo videogame.'
@@ -76,7 +76,7 @@ export function EpisodiCitati({ videogameId, desktop }: { videogameId: number; d
                     <TableCell className="truncate pl-14 font-bold">{a.episodio_numero}</TableCell>
                     <TableCell className="truncate pr-12">
                       <Link
-                        to="/episodi/$id"
+                        to="/bo/episodi/$id"
                         params={{ id: a.episodio_id }}
                         onClick={(ev) => ev.stopPropagation()}
                         className="outline-none focus-visible:underline"
@@ -110,7 +110,7 @@ export function EpisodiCitati({ videogameId, desktop }: { videogameId: number; d
                     {a.data_uscita}
                   </span>
                   <Link
-                    to="/episodi/$id"
+                    to="/bo/episodi/$id"
                     params={{ id: a.episodio_id }}
                     onClick={(ev) => ev.stopPropagation()}
                     className="truncate text-md font-bold outline-none focus-visible:underline"

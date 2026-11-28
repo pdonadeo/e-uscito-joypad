@@ -98,7 +98,7 @@ export function FormVideogame({ videogame }: { videogame: Videogame }) {
         // si rilegge all'apertura dell'elenco, non qui: la pagina si sta lasciando
         await queryClient.invalidateQueries({ queryKey: ['videogame'], refetchType: 'none' })
         await queryClient.invalidateQueries({ queryKey: ['episodi'], refetchType: 'none' })
-        await navigate({ to: '/videogame' })
+        await navigate({ to: '/bo/videogame' })
       }
     },
     onError: (e) => {
@@ -114,7 +114,7 @@ export function FormVideogame({ videogame }: { videogame: Videogame }) {
       queryClient.removeQueries({ queryKey: ['videogame', 'citati', videogame.id] })
       await queryClient.invalidateQueries({ queryKey: ['videogame'], refetchType: 'none' })
       await queryClient.invalidateQueries({ queryKey: ['episodi'], refetchType: 'none' })
-      await navigate({ to: '/videogame' })
+      await navigate({ to: '/bo/videogame' })
     },
     onError: (e) => {
       setConferma(false)
@@ -254,7 +254,7 @@ export function FormVideogame({ videogame }: { videogame: Videogame }) {
           invio={invio}
           inCorso={continua ? 'continua' : 'salva'}
           elimina={bottoneElimina(false)}
-          annulla={{ to: '/videogame' }}
+          annulla={{ to: '/bo/videogame' }}
           etichettaSalva="Salva"
           onContinua={() => invia({ continua: true })}
         />
@@ -274,7 +274,7 @@ export function FormVideogame({ videogame }: { videogame: Videogame }) {
     >
       <IntestazionePagina
         className="lg:-mb-2"
-        indietro={{ to: '/videogame', etichetta: 'Videogame' }}
+        indietro={{ to: '/bo/videogame', etichetta: 'Videogame' }}
         titolo={nomeVideogame(videogame)}
       />
 

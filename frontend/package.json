@@ -1,14 +1,14 @@
 {
-  "name": "new-bo",
+  "name": "frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "codegen": "graphql-codegen --config codegen.ts && tsr generate",
-    "lint:classi": "bash scripts/controlla-classi.sh src",
+    "lint:classi": "bash scripts/controlla-classi.sh src && bash scripts/controlla-link-bo.sh src",
     "typecheck": "bun run codegen && tsc -b",
-    "build": "bun run lint:classi && bun run codegen && vite build",
+    "build": "bun run lint:classi && bun run codegen && vite build && bun scripts/controlla-ingresso.ts",
     "lint": "oxlint",
     "test": "TZ=Europe/Rome bun test src/lib/excel",
     "preview": "vite preview"

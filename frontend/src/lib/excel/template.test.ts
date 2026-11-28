@@ -5,7 +5,7 @@ import { colonna } from './scrittore'
 import { creaTemplate } from './template'
 
 // Test del template dei minutaggi (criteri T2-T5 della spec, convalide della Fase 0).
-// Si lanciano con `bun run --cwd new-bo test`, che imposta TZ=Europe/Rome.
+// Si lanciano con `bun run --cwd frontend test`, che imposta TZ=Europe/Rome.
 
 test('il fuso è Europe/Rome (lo imposta lo script «test» di package.json)', () => {
   expect(process.env.TZ).toBe('Europe/Rome')
