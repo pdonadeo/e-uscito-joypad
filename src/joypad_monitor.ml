@@ -1,31 +1,9 @@
 open Cohttp_lwt_unix
 
-type ep_num =
-  | Intero of int
-  | Stringa of string
-  | NonSpecificato
-[@@deriving yojson]
-
-type data = {
-  ep_num : ep_num;
-  title : string;
-  date : Timedesc.Date.t;
-}
-
-type dati_ultima_puntata = {
-  uscito : bool;
-  giorni_fa : string;
-  data_italiano : string;
-  ep_num : ep_num;
-  titolo : string;
-  msg_risposta_no : string option;
-}
-[@@deriving yojson]
+open Meta
 
 let log = Dream.sub_log "joypad.monitor"
 let last_episode_data : data option ref = ref None
-let soglia_uscito_giorni = 24
-let soglia_lamentele_giorni = 48
 
 let body () =
   let%lwt _, body = Client.get (Uri.of_string Settings.joypad_page) in
@@ -111,33 +89,10 @@ let piu_recente post db =
   | None, x | x, None -> x
   | Some p, Some d -> if Timedesc.Date.diff_days d.date p.date > 0 then Some d else Some p
 
-let elabora_risposta last_episode_data =
-  match last_episode_data with
-  | Some last_episode_data ->
-    let tz = Timedesc.Time_zone.make_exn "Europe/Rome" in
-    let adesso = Timedesc.now ~tz_of_date_time:tz () in
-    let oggi = Timedesc.date adesso in
-    let mese_corrente = Timedesc.Date.month oggi in
-    let giorni_passati = Timedesc.Date.diff_days oggi last_episode_data.date in
-    let uscito = if giorni_passati <= soglia_uscito_giorni then true else false in
-    let giorni_fa = Utils.distanza giorni_passati in
-    let data_italiano = Utils.string_of_date last_episode_data.date in
-    let msg_risposta_no =
-      match giorni_passati with
-      | _n when (not uscito) && (mese_corrente = 8 || mese_corrente = 9) ->
-        Some "È finita la stagione di Joypad. Aspettiamo la prossima a Settembre."
-      | n when (not uscito) && n <= soglia_lamentele_giorni ->
-        Some "Però adesso non torturare Zampa, aspetta ancora qualche giorno…"
-      | n when (not uscito) && n > soglia_lamentele_giorni ->
-        Some "Mi duole ammetterlo ma è giunto il momento di protestare!"
-      | _ -> None
-    in
-    (uscito, giorni_fa, data_italiano, last_episode_data.ep_num, last_episode_data.title, msg_risposta_no)
-  | None -> (false, "", "", NonSpecificato, "", None)
-
 let risposta req =
   let%lwt dal_db = ultima_dal_db req in
-  Lwt.return (elabora_risposta (piu_recente !last_episode_data dal_db))
+  let oggi = Timedesc.date (Timedesc.now ~tz_of_date_time:(Timedesc.Time_zone.make_exn "Europe/Rome") ()) in
+  Lwt.return (decidi ~oggi (piu_recente !last_episode_data dal_db))
 
 let rec monitor () =
   log.debug (fun l -> l "Scarico info ultima puntata...");

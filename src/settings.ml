@@ -4,7 +4,10 @@ type seconds = float
 
 (* Costanti del progetto *)
 let monitor_period_sec : seconds = 60.0 *. 10.0
-let joypad_page = "https://www.ilpost.it/podcasts/joypad/"
+let sito = "https://www.euscitojoypad.it"
+
+(* Pagina del podcast su Il Post da cui il monitor legge l'ultima puntata; i test la puntano a un mock. *)
+let joypad_page = getenv ~default:"https://www.ilpost.it/podcasts/joypad/" ~f:Fun.id "JOYPAD_PAGE_URL"
 
 (* Opzioni di questo server REST *)
 let listen_address = getenv ~default:"0.0.0.0" ~f:Fun.id "REST_LISTEN_ADDRESS"

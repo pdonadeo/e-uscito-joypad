@@ -24,16 +24,29 @@ let () =
 let loader root path _request =
   match Static_filesystem.read (root ^ "/" ^ path) with
   | None -> Dream.empty `Not_Found
-  | Some asset -> Dream.respond asset
+  | Some asset ->
+    (* magic-mime non conosce .webmanifest: senza questo uscirebbe application/octet-stream *)
+    let headers =
+      if Filename.extension path = ".webmanifest" then [("Content-Type", "application/manifest+json")] else []
+    in
+    Dream.respond ~headers asset
 
 let with_noindex_follow handler req =
   let%lwt resp = handler req in
   let () = Dream.add_header resp "X-Robots-Tag" "noindex, follow" in
   Lwt.return resp
 
+(* Pagina pubblica (SPA di Vite) col blocco <head> della risposta del giorno. og:url usa il
+   solo percorso, senza query string. *)
 let default_handler req =
-  let%lwt uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.risposta req in
-  Dream.html (Views.index uscito giorni_fa data_italiano ep_num titolo msg_risposta_no)
+  let%lwt dati = Joypad_monitor.risposta req in
+  let target = Dream.target req in
+  let percorso =
+    match String.index_opt target '?' with
+    | Some i -> String.sub target 0 i
+    | None -> target
+  in
+  Dream.html ~headers:[("Cache-Control", "no-cache")] (Views.pagina_pubblica ~percorso dati)
 
 let game_page_handler req = with_noindex_follow default_handler req
 let joycord_json_tree : string option ref = ref None
@@ -48,16 +61,14 @@ let get_joycord_json_tree _req =
   | None -> Dream.json "[]"
   | Some json -> Dream.json json
 
-(* /bo: backoffice (new-bo), SPA con router a path: ogni rotta sotto /bo serve index.html. *)
+(* /bo: backoffice, nella stessa SPA del pubblico: ogni rotta sotto /bo serve index.html col
+   blocco <head> del bo. *)
 let bo_index _req =
-  match Static_filesystem.read "/bo/index.html" with
-  | None -> Dream.empty `Not_Found
-  | Some page ->
-    (* niente framing (clickjacking) *)
-    Dream.html
-      ~headers:
-        [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
-      page
+  (* niente framing (clickjacking) *)
+  Dream.html
+    ~headers:
+      [("Cache-Control", "no-cache"); ("X-Frame-Options", "DENY"); ("Content-Security-Policy", "frame-ancestors 'none'")]
+    (Views.pagina_bo ())
 
 let check_admin_settings () =
   let placeholder = Settings.dream_secret = Some "DREAM SECRET CHANGE ME IN PRODUCTION" in
@@ -103,15 +114,15 @@ let server () =
          get "/assets/**" @@ static ~loader "/assets";
          get "/static/joypad-img.jpg" @@ static ~loader "";
          get "/static/apple-touch-icon.png" @@ static ~loader "";
-         get "/e-uscito-joypad.css" @@ static ~loader "";
          get "/joypad-img.jpg" @@ static ~loader "";
          get "/favicon-16x16.png" @@ static ~loader "";
          get "/favicon-32x32.png" @@ static ~loader "";
          get "/favicon.ico" @@ static ~loader "";
+         get "/site.webmanifest" @@ static ~loader "";
+         get "/favicon-bo.svg" @@ static ~loader "";
          get "/api/ultima-puntata" (fun r ->
-             let%lwt uscito, giorni_fa, data_italiano, ep_num, titolo, msg_risposta_no = Joypad_monitor.risposta r in
-             let dati = Joypad_monitor.{ uscito; giorni_fa; data_italiano; ep_num; titolo; msg_risposta_no } in
-             Joypad_monitor.dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
+             let%lwt dati = Joypad_monitor.risposta r in
+             Meta.dati_ultima_puntata_to_yojson dati |> Yojson.Safe.to_string |> Dream.json);
          get "/api/last-episodes/:num/:offset" (fun r -> Rest.decorator r Rest.Last_episodes.view);
          get "/api/search-game/:searchInput" (fun r -> Rest.decorator r Rest.Search_game.view);
          get "/api/search-game-title/:searchInput" (fun r -> Rest.decorator r Rest.Search_game_title.view);
@@ -131,7 +142,7 @@ let server () =
          Gql.Routes.routes;
          Gql.Routes.graphiql;
          get "/bo/files/**" (fun _ -> Dream.empty `Not_Found) (* servito da nginx *);
-         get "/bo/assets/**" @@ static ~loader "/bo/assets";
+         get "/bo/assets/**" (fun _ -> Dream.empty `Not_Found) (* gli asset stanno in /assets *);
          get "/bo" bo_index;
          get "/bo/**" bo_index;
          get "/" default_handler;

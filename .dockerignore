@@ -8,9 +8,9 @@ compose_env_prod*
 docker-compose.yml
 dump-prod
 euscitojoypad_db
+frontend/dist
 frontend/node_modules
 infra/db/seed
+legacy-frontend
 media
-new-bo/dist
-new-bo/node_modules
 node_modules

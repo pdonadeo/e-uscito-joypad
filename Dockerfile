@@ -1,22 +1,11 @@
-#################
-# BUILD PHASE 1 #
-#################
-FROM node:26-alpine3.24 AS build-stage-1
-WORKDIR /app
-COPY ./frontend/package.json ./frontend/yarn.lock ./
-RUN npm install -g yarn@latest
-RUN yarn
-COPY ./frontend/ ./
-RUN yarn build
-
-##########################
-# BUILD PHASE 1b: new-bo #
-##########################
-FROM oven/bun:1.4.4 AS build-new-bo
-WORKDIR /app/new-bo
-COPY ./new-bo/package.json ./new-bo/bun.lock ./
+###########################
+# BUILD PHASE 1: frontend #
+###########################
+FROM oven/bun:1.4.4 AS build-frontend
+WORKDIR /app/frontend
+COPY ./frontend/package.json ./frontend/bun.lock ./
 RUN bun install --frozen-lockfile
-COPY ./new-bo/ ./
+COPY ./frontend/ ./
 COPY ./docs/schema.graphql /app/docs/schema.graphql
 RUN bun run build
 
@@ -29,16 +18,11 @@ USER root
 ADD --chown=opam:opam ./dune ./dune-project /app/
 ADD --chown=opam:opam ./src /app/src
 ADD --chown=opam:opam ./infra/db/migrazioni /app/infra/db/migrazioni
-RUN mkdir -p /app/frontend/public /app/frontend/build
-ADD --chown=opam:opam ./frontend/public /app/frontend/public
-ADD --chown=opam:opam ./frontend/prerendered_index.html /app/frontend/prerendered_index.html
-COPY --from=build-stage-1 --chown=opam:opam /app/build /app/frontend/build
-RUN chown opam:opam /app/frontend /app/frontend/build /app/frontend/public
-RUN mkdir -p /app/new-bo/dist
-ADD --chown=opam:opam ./new-bo/dune /app/new-bo/dune
-COPY --from=build-new-bo --chown=opam:opam /app/new-bo/dist /app/new-bo/dist
-RUN chown opam:opam /app/new-bo /app/new-bo/dist
-RUN test -f /app/new-bo/dist/index.html
+RUN mkdir -p /app/frontend/dist
+ADD --chown=opam:opam ./frontend/dune /app/frontend/dune
+COPY --from=build-frontend --chown=opam:opam /app/frontend/dist /app/frontend/dist
+RUN chown opam:opam /app/frontend /app/frontend/dist
+RUN test -f /app/frontend/dist/index.html
 RUN apk add upx
 
 USER opam

@@ -1,0 +1,5 @@
+; Test unitari della libreria meta (opam exec -- dune build @src/meta/test/runtest).
+
+(test
+ (name test_meta)
+ (libraries meta timedesc yojson))

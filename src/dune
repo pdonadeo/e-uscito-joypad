@@ -9,7 +9,7 @@
   static_filesystem
   sitemap)
  (preprocess
-  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
+  (pps lwt_ppx ppx_deriving_yojson))
  (libraries
   dream
   db
@@ -17,6 +17,7 @@
   admin
   gql
   settings
+  meta
   migrazioni
   batteries
   malloc
@@ -24,7 +25,6 @@
   cohttp-lwt-unix
   lambdasoup
   re2
-  tyxml
   ppx_deriving_yojson.runtime
   caqti-driver-postgresql
   caqti-lwt))
@@ -38,43 +38,22 @@
  (name utils)
  (modules utils)
  (preprocess
-  (pps lwt_ppx tyxml-ppx ppx_deriving_yojson))
+  (pps lwt_ppx ppx_deriving_yojson))
  (libraries dream batteries malloc timedesc re2))
+
+; Tutto frontend/dist (la build di Vite: pubblico e bo) alla radice del filesystem statico.
+; cp -a dist/* non copia .vite/, che Dream non deve servire.
 
 (rule
  (target static_filesystem.ml)
  (deps
-  (glob_files_rec %{project_root}/frontend/build/*)
-  (glob_files_rec %{project_root}/new-bo/dist/*)
-  (file %{project_root}/frontend/prerendered_index.html))
+  (glob_files_rec %{project_root}/frontend/dist/*))
  (action
   (progn
    (bash
     "rm -Rf %{project_root}/static_filesystem && mkdir %{project_root}/static_filesystem")
-   (bash "mkdir %{project_root}/static_filesystem/assets")
-   (bash "mkdir %{project_root}/static_filesystem/static")
    (bash
-    "cp -a %{project_root}/frontend/build/apple-touch-icon.png %{project_root}/static_filesystem/static")
-   (bash
-    "cp -a %{project_root}/frontend/build/assets/* %{project_root}/static_filesystem/assets")
-   (bash
-    "cp -a %{project_root}/frontend/build/e-uscito-joypad.css %{project_root}/static_filesystem/")
-   (bash
-    "cp -a %{project_root}/frontend/build/favicon-16x16.png %{project_root}/static_filesystem/")
-   (bash
-    "cp -a %{project_root}/frontend/build/favicon-32x32.png %{project_root}/static_filesystem/")
-   (bash
-    "cp -a %{project_root}/frontend/build/favicon.ico %{project_root}/static_filesystem/")
-   (bash
-    "cp -a %{project_root}/frontend/build/index.html %{project_root}/static_filesystem/")
-   (bash
-    "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/")
-   (bash
-    "cp -a %{project_root}/frontend/build/joypad-img.jpg %{project_root}/static_filesystem/static/")
-   (bash
-    "cp %{project_root}/frontend/prerendered_index.html %{project_root}/static_filesystem/")
-   (bash
-    "if [ -d %{project_root}/new-bo/dist ]; then cp -a %{project_root}/new-bo/dist %{project_root}/static_filesystem/bo; fi")
+    "cp -a %{project_root}/frontend/dist/* %{project_root}/static_filesystem/")
    (with-stdout-to
     %{target}
     (run ocaml-crunch -m plain %{project_root}/static_filesystem)))))

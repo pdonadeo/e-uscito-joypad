@@ -1,0 +1,8 @@
+; Logica pura della risposta del giorno (decisione SÌ/NO) e del blocco <head>
+; che Dream inietta nell'index.html di Vite. Test in test/.
+
+(library
+ (name meta)
+ (libraries dream settings utils timedesc ppx_deriving_yojson.runtime)
+ (preprocess
+  (pps ppx_deriving_yojson)))
